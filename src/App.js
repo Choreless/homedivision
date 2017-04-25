@@ -1,18 +1,33 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Login from './Login';
+import Home from './Home';
+import CreateRoom from './CreateRoom';
+import Monthly from './Monthly';
+import Weekly from './Weekly';
+import Navigation from './Navigation';
+import { Route, Switch } from 'react-router-dom';
+
+/*This file handles the display of routes and navigation, as well as footer. */
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
-        </div>
-        <p className="App-intro">
-          This is the default navigation. App.js is hosting navigation.
-        </p>
+      <div>
+        <header>
+          <Navigation/>
+        </header>
+        <main>
+          <Switch>
+            <Route exact path="/" component={Home} />
+            <Route path="/login" component={Login}/>
+            <Route render={()=><CreateRoom auth={false}/>}/>
+            <Route path="/:roomID/monthly" component={Monthly}/>
+            <Route path="/:roomID/weekly" component={Weekly}/>
+          </Switch>
+        </main>
+        <footer>
+
+        </footer>
       </div>
     );
   }
