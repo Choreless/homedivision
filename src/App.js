@@ -19,10 +19,10 @@ class App extends Component {
         <main>
           <Switch>
             <Route exact path="/" component={Home} />
-            <Route path="/login" component={Login}/>
-            <Route render={()=><CreateRoom auth={false}/>}/>
             <Route path="/:roomID/monthly" component={Monthly}/>
             <Route path="/:roomID/weekly" component={Weekly}/>
+            <Route path="/login" component={Login}/>
+            <Route path="/create" render={(props)=><CreateRoom {...props} auth={true}/>}/>
           </Switch>
         </main>
         <footer>

@@ -3,6 +3,11 @@ import React, { Component } from 'react';
 /*This file displays the create/join room page*/
 
 class CreateRoom extends Component {
+
+  componentWillReceiveProps = (newProps) => {
+    //Check for prop changes, and set state from here if something new comes up, since render does not re render component.
+  }
+
   render() {
     return (
       <section className="container">
