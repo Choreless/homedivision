@@ -9,6 +9,7 @@ class Navigation extends Component {
       <div>
         <ul>
           <li><Link to="/login">Login</Link></li>
+          <li><Link to="/signup">Signup</Link></li>
           <li><Link to="/create">Create Room</Link></li>
           <li><Link to="/dw23498xz/weekly">Weekly Calendar</Link></li>
           <li><Link to="/dw23498xz/monthly">Monthly Calendar</Link></li>
