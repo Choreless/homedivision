@@ -36,7 +36,7 @@ class Navigation extends Component {
     let drawerlinks = _.map(links, (elem, index) => {
       let activeStyle = this.handleActiveLink(elem.link);
       return (
-        <Link to={elem.link} key={'drawerlink-' + index}><MenuItem style={activeStyle}>{elem.body}</MenuItem></Link>
+        <Link to={elem.link} key={'drawerlink-' + index} onTouchTap={this.handleToggle}><MenuItem style={activeStyle}>{elem.body}</MenuItem></Link>
       )
     });
     return (
