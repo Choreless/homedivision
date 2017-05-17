@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import ReactGridLayout from 'react-grid-layout';
+import PropTypes from 'prop-types';
 import {Responsive, WidthProvider} from 'react-grid-layout';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 var _ = require('lodash');
@@ -9,11 +9,15 @@ import './weekly.css';
 
 class Weekly extends Component {
     
+    static propTypes = {
+        onLayoutChange: PropTypes.func.isRequired
+    };    
+    
     static defaultProps = { 
         className: "layout",
         rowHeight: 30,
         onLayoutChange: function() {},
-        cols: {lg: 12, md: 10, sm: 6, xs: 4, xxs: 2},
+        cols: {lg: 7, md: 7, sm: 7, xs: 7, xxs: 7},
         initialLayout: generateLayout()
     };    
 
@@ -29,9 +33,10 @@ class Weekly extends Component {
     componentDidMount() {
         this.setState({mounted: true});
     }
-      onBreakpointChange = (breakpoint) => {
+
+    onBreakpointChange = (breakpoint) => {
         this.setState({
-          currentBreakpoint: breakpoint
+            currentBreakpoint: breakpoint
         });
       };
 
@@ -58,21 +63,21 @@ class Weekly extends Component {
         }
     
                      
-  render() {
-    return (
-      <div>
-        <ResponsiveReactGridLayout
-          {...this.props}
-          layouts={this.state.layouts}
-          onBreakpointChange={this.onBreakpointChange}
-          onLayoutChange={this.onLayoutChange}
-          // WidthProvider option
-          measureBeforeMount={true}>
-          {this.generateDOM()}
-        </ResponsiveReactGridLayout>
-      </div>     
-    );
-  }
+    render() {
+        return (
+            <div>
+                <ResponsiveReactGridLayout
+                    {...this.props}
+                    layouts={this.state.layouts}
+                    onBreakpointChange={this.onBreakpointChange}
+                    onLayoutChange={this.onLayoutChange}
+                    // WidthProvider option
+                    measureBeforeMount={true}>
+                    {this.generateDOM()}
+                </ResponsiveReactGridLayout>
+            </div>     
+        );
+    }
 }
 
 function generateLayout() {
@@ -81,7 +86,7 @@ function generateLayout() {
         return {
             x: _.random(0, 5) * 2 % 12,
             y: Math.floor(i / 6) * y,
-            w: 1.5,
+            w: 1,
             h: 2,
             i: i.toString(),
             isResizable: false,
