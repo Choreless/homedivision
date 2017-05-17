@@ -65,17 +65,15 @@ class Weekly extends Component {
                      
     render() {
         return (
-            <div>
-                <ResponsiveReactGridLayout
-                    {...this.props}
-                    layouts={this.state.layouts}
-                    onBreakpointChange={this.onBreakpointChange}
-                    onLayoutChange={this.onLayoutChange}
-                    // WidthProvider option
-                    measureBeforeMount={true}>
-                    {this.generateDOM()}
-                </ResponsiveReactGridLayout>
-            </div>     
+            <ResponsiveReactGridLayout
+                {...this.props}
+                layouts={this.state.layouts}
+                onBreakpointChange={this.onBreakpointChange}
+                onLayoutChange={this.onLayoutChange}
+                // WidthProvider option
+                measureBeforeMount={true}>
+                {this.generateDOM()}
+            </ResponsiveReactGridLayout>    
         );
     }
 }
