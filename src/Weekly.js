@@ -53,15 +53,11 @@ class Weekly extends Component {
     generateDOM() {
         return _.map(this.state.layouts.lg, function (l, i) {
             return (
-                <div key={i} className={l.static ? 'static' : ''}>
-                {l.static ?
-                    <span className="text" title="This item is static and cannot be removed or resized.">Static - {i}</span>
-                    : <span className="text">{i}</span>
-                } 
+                <div key={i} className={''}>
+                <span className="text">Take out the trash</span>
                 </div>);
             });
         }
-    
                      
     render() {
         return (
@@ -90,7 +86,6 @@ function generateLayout() {
             h: 2,
             i: i.toString(),
             isResizable: false,
-            static: Math.random() < 0.05
         };
     });
 }
