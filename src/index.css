@@ -1,55 +1,60 @@
+.reduce-bot-margin {
+  margin-bottom: 0px !important;
+}
+
+
 /* label focus color */
 
 input:focus+label {
-    opacity: 0;
-    color: white !important;
+  opacity: 0;
+  color: white !important;
 }
 
 
 /* label underline focus color */
 
 input:focus {
-    border-bottom: none !important;
-    box-shadow: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
 }
 
 @media only screen and (max-width: 992px) {
-    header, main, footer {
-        padding-left: 0 !important;
-    }
+  header, main, footer {
+    padding-left: 0 !important;
+  }
 }
 
 @media (min-width: 768px) {
-    h1 {
-        font-size: 1.5rem;
-    }
-    h2 {
-        font-size: 1.25rem;
-    }
+  h1 {
+    font-size: 1.5rem;
+  }
+  h2 {
+    font-size: 1.25rem;
+  }
 }
 
 @media (min-width: 992px) {
-    .container {
-        width: 95%;
-    }
-    h1 {
-        font-size: 2rem;
-    }
-    h2 {
-        font-size: 0.75rem;
-    }
-    #navbar-appbar>button {
-        visibility: hidden;
-        display: none;
-        margin: 8px 8px 0px -66px !important;
-    }
+  .container {
+    width: 95%;
+  }
+  h1 {
+    font-size: 2rem;
+  }
+  h2 {
+    font-size: 0.75rem;
+  }
+  #navbar-appbar>button {
+    visibility: hidden;
+    display: none;
+    margin: 8px 8px 0px -66px !important;
+  }
 }
 
 @media (min-width: 1200px) {
-    h1 {
-        font-size: 2.5rem;
-    }
-    h2 {
-        font-size: 2.25rem;
-    }
+  h1 {
+    font-size: 2.5rem;
+  }
+  h2 {
+    font-size: 2.25rem;
+  }
 }
