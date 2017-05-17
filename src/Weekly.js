@@ -13,6 +13,8 @@ class Weekly extends Component {
         onLayoutChange: PropTypes.func.isRequired
     };    
     
+    // This code is for a responsive grid layout; however, I set all the columns to be 7
+    // since we will be switching to a different view on a md or lower breakpoint 
     static defaultProps = { 
         className: "layout",
         rowHeight: 30,
@@ -50,11 +52,13 @@ class Weekly extends Component {
         });
       };
 
+
+    // Creates the chore cards
     generateDOM() {
         return _.map(this.state.layouts.lg, function (l, i) {
             return (
                 <div key={i} className={''}>
-                <span className="text">Take out the trash</span>
+                <span className="text">Chore name here</span>
                 </div>);
             });
         }
@@ -76,6 +80,11 @@ class Weekly extends Component {
     }
 }
 
+// Sets the properties for each chore card
+// x  is x position on grid 
+// y is y position on grid
+// w and h are width and height
+// i is the div key of the card
 function generateLayout() {
     return _.map(_.range(0, 20), function (item, i) {
         var y = Math.ceil(Math.random() * 4) + 1;
