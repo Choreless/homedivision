@@ -86,15 +86,15 @@ class Weekly extends Component {
 }
 
 // Sets the properties for each chore card
-// x  is x position on grid 
-// y is y position on grid
+// x is the x position on the grid 
+// y is the y position on the grid
 // w and h are width and height
 // i is the div key of the card
 function generateLayout() {
-    return _.map(_.range(0, 5), function (item, i) {
+    return _.map(_.range(0, 10), function (item, i) {
         var y = Math.ceil(Math.random() * 4) + 1;
         return {
-            x: _.random(0, 5) * 2 % 12,
+            x: 8,
             y: Math.floor(i / 6) * y,
             w: 1,
             h: 2,
