@@ -7,6 +7,8 @@ import App from './App';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import './index.css';
 import '../node_modules/materialize-css/dist/css/materialize.min.css';
+import '../node_modules/react-grid-layout/css/styles.css';
+import '../node_modules/react-resizable/css/styles.css';
 
 /*This file handles setting up the whole application, as well as including base functionality and CSS files*/
 
