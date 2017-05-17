@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Row, Col, Collapsible, CollapsibleItem } from 'react-materialize';
+import { Row, Col, Collapsible, CollapsibleItem} from 'react-materialize';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import { IconButton, Dialog, DatePicker, FlatButton, Checkbox } from 'material-ui';
+import { IconButton, Dialog, DatePicker, FlatButton, Checkbox, Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui';
 import ActionAddNote from 'material-ui/svg-icons/action/note-add';
+import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 
 /*This file handles display of the monthly view*/
 
@@ -27,6 +28,11 @@ class Monthly extends Component {
   render() {
     const actions = [
       <FlatButton
+        label="Cancel"
+        primary={true}
+        onTouchTap={this.handleClose}
+      />,
+      <FlatButton
         label="Ok"
         primary={true}
         onTouchTap={this.handleClose}
@@ -49,14 +55,37 @@ class Monthly extends Component {
               <CollapsibleItem header='Group Member 2'>
                 <Row>
                   <Col s={10}>
-                    <ul>
-                      <li>Chore 1 : Monday</li>
-                      <li>Chore 2 : Friday</li>
-                    </ul>
+                    <MuiThemeProvider muiTheme={getMuiTheme()}>
+                      <Table
+                        selectable={false}>
+                        <TableHeader
+                          displaySelectAll={false}
+                          adjustForCheckbox={false}>
+                          <TableRow>
+                            <TableHeaderColumn>Chore</TableHeaderColumn>
+                            <TableHeaderColumn>Time</TableHeaderColumn>
+                            <TableHeaderColumn>Edit</TableHeaderColumn>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody
+                          displayRowCheckbox={false}>
+                          <TableRow>
+                            <TableRowColumn>Clean Dishes</TableRowColumn>
+                            <TableRowColumn>Mon</TableRowColumn>
+                            <TableRowColumn><IconButton><EditIcon/></IconButton></TableRowColumn>
+                          </TableRow>
+                          <TableRow>
+                            <TableRowColumn>Do Laundry</TableRowColumn>
+                            <TableRowColumn>Sun</TableRowColumn>
+                            <TableRowColumn><IconButton><EditIcon/></IconButton></TableRowColumn>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </MuiThemeProvider>
                   </Col>
                   <Col s={2}>
                     <MuiThemeProvider muiTheme={getMuiTheme()}>
-                      <IconButton tooltip="Add Chore" onTouchTap={this.handleOpen}><ActionAddNote/></IconButton>
+                      <IconButton iconStyle={{height: 36, width: 36}} tooltip="Add Chore Card" onTouchTap={this.handleOpen}><ActionAddNote/></IconButton>
                     </MuiThemeProvider>
                   </Col>
                 </Row>
