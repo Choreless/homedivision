@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
+//import firebase from 'firebase';
 import PropTypes from 'prop-types';
 import {Responsive, WidthProvider} from 'react-grid-layout';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 import WeeklyDays from './WeeklyDays.js';
-var _ = require('lodash');
 import './weekly.css';
+var _ = require('lodash');
+
+//var generalRef = firebase.database().ref("groups/dw23498xz/chores");
 
 /*This file handles display of the weekly calendar*/
 
@@ -86,7 +89,7 @@ class Weekly extends Component {
 }
 
 // Sets the properties for each chore card
-// x is the x position on the grid 
+// x is the x position on the grid, defaults to 8, the chore deck column 
 // y is the y position on the grid
 // w and h are width and height
 // i is the div key of the card
