@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {Responsive, WidthProvider} from 'react-grid-layout';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
+import WeeklyDays from './WeeklyDays.js';
 var _ = require('lodash');
 import './weekly.css';
 
@@ -65,15 +66,21 @@ class Weekly extends Component {
                      
     render() {
         return (
-            <ResponsiveReactGridLayout
-                {...this.props}
-                layouts={this.state.layouts}
-                onBreakpointChange={this.onBreakpointChange}
-                onLayoutChange={this.onLayoutChange}
-                // WidthProvider option
-                measureBeforeMount={true}>
-                {this.generateDOM()}
-            </ResponsiveReactGridLayout>    
+            <div>
+                <WeeklyDays
+
+                />
+            
+                <ResponsiveReactGridLayout
+                    {...this.props}
+                    layouts={this.state.layouts}
+                    onBreakpointChange={this.onBreakpointChange}
+                    onLayoutChange={this.onLayoutChange}
+                    // WidthProvider option
+                    measureBeforeMount={true}>
+                    {this.generateDOM()}
+                </ResponsiveReactGridLayout>
+            </div>
         );
     }
 }
