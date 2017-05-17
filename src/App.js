@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Login from './Login';
-import Signup from './Signup';
 import Home from './Home';
 import CreateRoom from './CreateRoom';
 import Monthly from './Monthly';
@@ -23,7 +22,6 @@ class App extends Component {
             <Route path="/:roomID/monthly" component={Monthly}/>
             <Route path="/:roomID/weekly" component={Weekly}/>
             <Route path="/login" component={Login}/>
-            <Route path="/signup" component={Signup}/>
             <Route path="/create" render={(props)=><CreateRoom {...props} auth={true}/>}/>
           </Switch>
         </main>
