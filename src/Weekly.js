@@ -1,19 +1,29 @@
 import React, { Component } from 'react';
-import ReactGridLayout from 'react-grid-layout';
+//import firebase from 'firebase';
+import PropTypes from 'prop-types';
 import {Responsive, WidthProvider} from 'react-grid-layout';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
-var _ = require('lodash');
+import WeeklyDays from './WeeklyDays.js';
 import './weekly.css';
+var _ = require('lodash');
+
+//var generalRef = firebase.database().ref("groups/dw23498xz/chores");
 
 /*This file handles display of the weekly calendar*/
 
 class Weekly extends Component {
     
+    static propTypes = {
+        onLayoutChange: PropTypes.func.isRequired
+    };    
+    
+    // This code is for a responsive grid layout; however, I set all the columns to be 8 (days + col for card deck)
+    // since we will be switching to a different view on a md or lower breakpoint 
     static defaultProps = { 
         className: "layout",
         rowHeight: 30,
         onLayoutChange: function() {},
-        cols: {lg: 12, md: 10, sm: 6, xs: 4, xxs: 2},
+        cols: {lg: 8, md: 8, sm: 8, xs: 8, xxs: 8},
         initialLayout: generateLayout()
     };    
 
@@ -29,9 +39,10 @@ class Weekly extends Component {
     componentDidMount() {
         this.setState({mounted: true});
     }
-      onBreakpointChange = (breakpoint) => {
+
+    onBreakpointChange = (breakpoint) => {
         this.setState({
-          currentBreakpoint: breakpoint
+            currentBreakpoint: breakpoint
         });
       };
 
@@ -45,47 +56,53 @@ class Weekly extends Component {
         });
       };
 
+
+    // Creates the chore cards
     generateDOM() {
         return _.map(this.state.layouts.lg, function (l, i) {
             return (
-                <div key={i} className={l.static ? 'static' : ''}>
-                {l.static ?
-                    <span className="text" title="This item is static and cannot be removed or resized.">Static - {i}</span>
-                    : <span className="text">{i}</span>
-                } 
+                <div key={i} className={''}>
+                <span className="text">Chore name here</span>
                 </div>);
             });
         }
-    
                      
-  render() {
-    return (
-      <div>
-        <ResponsiveReactGridLayout
-          {...this.props}
-          layouts={this.state.layouts}
-          onBreakpointChange={this.onBreakpointChange}
-          onLayoutChange={this.onLayoutChange}
-          // WidthProvider option
-          measureBeforeMount={true}>
-          {this.generateDOM()}
-        </ResponsiveReactGridLayout>
-      </div>     
-    );
-  }
+    render() {
+        return (
+            <div>
+                <WeeklyDays
+
+                />
+            
+                <ResponsiveReactGridLayout
+                    {...this.props}
+                    layouts={this.state.layouts}
+                    onBreakpointChange={this.onBreakpointChange}
+                    onLayoutChange={this.onLayoutChange}
+                    // WidthProvider option
+                    measureBeforeMount={true}>
+                    {this.generateDOM()}
+                </ResponsiveReactGridLayout>
+            </div>
+        );
+    }
 }
 
+// Sets the properties for each chore card
+// x is the x position on the grid, defaults to 8, the chore deck column 
+// y is the y position on the grid
+// w and h are width and height
+// i is the div key of the card
 function generateLayout() {
-    return _.map(_.range(0, 20), function (item, i) {
+    return _.map(_.range(0, 10), function (item, i) {
         var y = Math.ceil(Math.random() * 4) + 1;
         return {
-            x: _.random(0, 5) * 2 % 12,
+            x: 8,
             y: Math.floor(i / 6) * y,
-            w: 1.5,
+            w: 1,
             h: 2,
             i: i.toString(),
             isResizable: false,
-            static: Math.random() < 0.05
         };
     });
 }
