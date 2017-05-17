@@ -15,6 +15,7 @@ class WeeklyDays extends Component {
             <div className="col-md-1">Thursday</div>
             <div className="col-md-1">Friday</div>
             <div className="col-md-1">Saturday</div>
+            <div className="col-md-1">Deck</div>        
           </div>
         </div>
     );

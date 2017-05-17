@@ -14,13 +14,13 @@ class Weekly extends Component {
         onLayoutChange: PropTypes.func.isRequired
     };    
     
-    // This code is for a responsive grid layout; however, I set all the columns to be 7
+    // This code is for a responsive grid layout; however, I set all the columns to be 8 (days + col for card deck)
     // since we will be switching to a different view on a md or lower breakpoint 
     static defaultProps = { 
         className: "layout",
         rowHeight: 30,
         onLayoutChange: function() {},
-        cols: {lg: 7, md: 7, sm: 7, xs: 7, xxs: 7},
+        cols: {lg: 8, md: 8, sm: 8, xs: 8, xxs: 8},
         initialLayout: generateLayout()
     };    
 
@@ -91,7 +91,7 @@ class Weekly extends Component {
 // w and h are width and height
 // i is the div key of the card
 function generateLayout() {
-    return _.map(_.range(0, 20), function (item, i) {
+    return _.map(_.range(0, 5), function (item, i) {
         var y = Math.ceil(Math.random() * 4) + 1;
         return {
             x: _.random(0, 5) * 2 % 12,
