@@ -36,7 +36,7 @@ class Weekly extends Component {
         className: "layout",
         rowHeight: 30,
         onLayoutChange: function() {},
-        cols: {lg: 8, md: 8, sm: 8, xs: 8, xxs: 8},
+        cols: {lg: 9, md: 9, sm: 9, xs: 9, xxs: 9},
         initialLayout: generateLayout()
     };
 
@@ -140,6 +140,7 @@ class Weekly extends Component {
                 <div>
                   <div className="container-fluid">
                       <div className="row seven-cols">
+                          <div className="col-md-1 center">Members</div>                
                           <div className="col-md-1 center">Sunday</div>
                           <div className="col-md-1 center">Monday</div>
                           <div className="col-md-1 center">Tuesday</div>
