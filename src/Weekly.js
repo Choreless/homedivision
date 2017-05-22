@@ -9,10 +9,9 @@ import _ from 'lodash';
 import { Row, Col, Collapsible, CollapsibleItem} from 'react-materialize';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import { IconButton, Dialog, DatePicker, FlatButton, Checkbox, Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui';
+import { IconButton, Dialog, DatePicker, FlatButton, Checkbox, Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn, Drawer, MenuItem } from 'material-ui';
 import ActionAddNote from 'material-ui/svg-icons/action/note-add';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
-import controller from './check';
 
 
 //var generalRef = firebase.database().ref("groups/dw23498xz/chores");
@@ -24,6 +23,7 @@ class Weekly extends Component {
       currentBreakpoint: 'lg',
       mounted: false,
       layouts: {lg: this.props.initialLayout},
+      open: true,
     }
 
     static propTypes = {
@@ -42,7 +42,19 @@ class Weekly extends Component {
 
     componentDidMount = () => {
         this.setState({mounted: true});
-        this.setState({isMobile: controller.checkMobile()});
+        this.updateWindowDimensions();
+        window.addEventListener('resize', this.updateWindowDimensions);
+    }
+
+    componentWillUnmount = () => {
+      window.removeEventListener('resize', this.updateWindowDimensions);
+    }
+
+    updateWindowDimensions = () => {
+      let temp;
+      if(window.innerWidth >= 992) temp = false;
+      else temp = true;
+      this.setState({ isMobile: temp});
     }
 
     onBreakpointChange = (breakpoint) => {
@@ -136,6 +148,13 @@ class Weekly extends Component {
               </section>
             :
               <section>
+                {/* <MuiThemeProvider muiTheme={getMuiTheme()}>
+                  <Drawer containerStyle={{top: '65px', boxShadow: 'none'}} open={this.state.open}>
+                    <div style={{height: 50}}></div>
+                    <div style={{marginLeft: 50, height: 90}}>Jimmy</div>
+                    <div style={{marginLeft: 50, height: 90}}>Jeff</div>
+                  </Drawer>
+                </MuiThemeProvider> */}
                 <div>
                   <div className="container-fluid">
                       <div className="row seven-cols">
