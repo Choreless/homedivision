@@ -9,10 +9,9 @@ import _ from 'lodash';
 import { Row, Col, Collapsible, CollapsibleItem} from 'react-materialize';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import { IconButton, Dialog, DatePicker, FlatButton, Checkbox, Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui';
+import { IconButton, Dialog, DatePicker, FlatButton, Checkbox, Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn, Drawer, MenuItem } from 'material-ui';
 import ActionAddNote from 'material-ui/svg-icons/action/note-add';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
-import controller from './check';
 
 
 //var choresRef = firebase.database().ref("groups/dw23498xz/chores");
@@ -24,6 +23,7 @@ class Weekly extends Component {
       currentBreakpoint: 'lg',
       mounted: false,
       layouts: {lg: this.props.initialLayout},
+      open: true,
     }
 
     static propTypes = {
@@ -36,13 +36,25 @@ class Weekly extends Component {
         className: "layout",
         rowHeight: 30,
         onLayoutChange: function() {},
-        cols: {lg: 9, md: 9, sm: 9, xs: 9, xxs: 9},
+        cols: {lg: 8, md: 8, sm: 8, xs: 8, xxs: 8},
         initialLayout: generateLayout()
     };
 
     componentDidMount = () => {
         this.setState({mounted: true});
-        this.setState({isMobile: controller.checkMobile()});
+        this.updateWindowDimensions();
+        window.addEventListener('resize', this.updateWindowDimensions);
+    }
+
+    componentWillUnmount = () => {
+      window.removeEventListener('resize', this.updateWindowDimensions);
+    }
+
+    updateWindowDimensions = () => {
+      let temp;
+      if(window.innerWidth >= 992) temp = false;
+      else temp = true;
+      this.setState({ isMobile: temp});
     }
 
     onBreakpointChange = (breakpoint) => {
@@ -137,10 +149,17 @@ class Weekly extends Component {
               </section>
             :
               <section>
+                {/* <MuiThemeProvider muiTheme={getMuiTheme()}>
+                  <Drawer containerStyle={{top: '65px', boxShadow: 'none'}} open={this.state.open}>
+                    <div style={{height: 50}}></div>
+                    <div style={{marginLeft: 50, height: 90}}>Jimmy</div>
+                    <div style={{marginLeft: 50, height: 90}}>Jeff</div>
+                  </Drawer>
+                </MuiThemeProvider> */}
                 <div>
                   <div className="container-fluid">
                       <div className="row seven-cols">
-                          <div className="col-md-1 center">Members</div>                
+                          <div className="col-md-1 center">Deck</div>                
                           <div className="col-md-1 center">Sunday</div>
                           <div className="col-md-1 center">Monday</div>
                           <div className="col-md-1 center">Tuesday</div>
@@ -148,7 +167,6 @@ class Weekly extends Component {
                           <div className="col-md-1 center">Thursday</div>
                           <div className="col-md-1 center">Friday</div>
                           <div className="col-md-1 center">Saturday</div>
-                          <div className="col-md-1 center">Deck</div>
                       </div>
                   </div>
                     <ResponsiveReactGridLayout

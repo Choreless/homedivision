@@ -76,7 +76,7 @@ class Navigation extends Component {
           </MuiThemeProvider>
         <MuiThemeProvider muiTheme={getMuiTheme()}>
             <Drawer
-              width={230}
+              width={256}
               open={this.state.open}
               docked={false}
               onRequestChange={(open) => this.setState({open})}

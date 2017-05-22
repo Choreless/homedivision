@@ -1,18 +1,24 @@
+/*main, footer {
+  padding-left: 300px;
+}
+
+@media only screen and (max-width : 992px) {
+main, footer {
+    padding-left: 0;
+  }
+}*/
+
 .reduce-bot-margin {
   margin-bottom: 0px !important;
 }
 
-
 /* label focus color */
-
 input:focus+label {
   opacity: 0;
   color: white !important;
 }
 
-
 /* label underline focus color */
-
 input:focus {
   border-bottom: none !important;
   box-shadow: none !important;
