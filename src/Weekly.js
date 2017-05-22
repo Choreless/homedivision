@@ -83,10 +83,29 @@ class Weekly extends Component {
     }   
 
     componentDidMount = () => {
+        var user = firebase.auth().currentUser;
+        console.log(user);
+                this.setState({
+                    user: this.user
+                });
         this.setState({mounted: true});
         this.updateWindowDimensions();
         window.addEventListener('resize', this.updateWindowDimensions);
-         firebase.database().ref('groups/' + this.state.groupID).on('value', (snapshot) => {
+/*
+        firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+            //console.log("inside user");
+                this.setState({
+                    user: user
+                });
+        } else {
+            // No user is signed in.
+                        console.log("outside user");
+        }
+        });*/
+
+        // grabs the group data from firebase
+        firebase.database().ref('groups/' + this.state.groupID).on('value', (snapshot) => {
             const currentChores = snapshot.val();
             if (currentChores != null) {
                 this.setState({
@@ -94,6 +113,7 @@ class Weekly extends Component {
                 });
             }
             console.log(this.state.chores);
+            console.log(this.state.user);
         })       
     }
 
