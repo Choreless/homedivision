@@ -13,7 +13,6 @@ import { IconButton, Dialog, DatePicker, FlatButton, Checkbox, Table, TableBody,
 import ActionAddNote from 'material-ui/svg-icons/action/note-add';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 
-
 //var choresRef = firebase.database().ref("groups/dw23498xz/chores");
 
 /*This file handles display of the weekly calendar*/
@@ -24,6 +23,9 @@ class Weekly extends Component {
       mounted: false,
       layouts: {lg: this.props.initialLayout},
       open: true,
+      groupID: 'dw23498xz',  
+      chores: [],   
+      newCounter: 0     
     }
 
     static propTypes = {
@@ -37,13 +39,62 @@ class Weekly extends Component {
         rowHeight: 30,
         onLayoutChange: function() {},
         cols: {lg: 8, md: 8, sm: 8, xs: 8, xxs: 8},
-        initialLayout: generateLayout()
+        initialLayout: generateLayout(),
+    };  
+
+  createElement(el) {
+    var removeStyle = {
+      position: 'absolute',
+      right: '2px',
+      top: 0,
+      cursor: 'pointer'
     };
+    var i = el.add ? '+' : el.i;
+    return (
+      <div key={i} data-grid={el}>
+        {el.add ?
+          <span className="add text" onClick={this.onAddItem} title="You can add an item by clicking here, too.">Add +</span>
+        : <span className="text">{i}</span>}
+        <span className="remove" style={removeStyle} onClick={this.onRemoveItem.bind(this, i)}>x</span>
+      </div>
+    );
+  }
+
+    onAddItem() {
+        /*eslint no-console: 0*/
+     console.log('adding', 'n' + this.state.newCounter);
+        this.setState({
+            // Add a new item. It must have a unique key!
+         items: this.state.items.concat({
+            i: 'n' + this.state.newCounter,
+            x: 0, // on the deck col
+            y: Infinity, // puts it at the bottom
+            w: 1,
+            h: 2
+        }),
+    // Increment the counter to ensure key is always unique.
+    newCounter: this.state.newCounter + 1
+    });
+    }
+
+    onRemoveItem(i) {
+        console.log('removing', i);
+        this.setState({items: _.reject(this.state.items, {i: i})});
+    }   
 
     componentDidMount = () => {
         this.setState({mounted: true});
         this.updateWindowDimensions();
         window.addEventListener('resize', this.updateWindowDimensions);
+         firebase.database().ref('groups/' + this.state.groupID).on('value', (snapshot) => {
+            const currentChores = snapshot.val();
+            if (currentChores != null) {
+                this.setState({
+                    chores: currentChores
+                });
+            }
+            console.log(this.state.chores);
+        })       
     }
 
     componentWillUnmount = () => {
@@ -159,7 +210,9 @@ class Weekly extends Component {
                 <div>
                   <div className="container-fluid">
                       <div className="row seven-cols">
-                          <div className="col-md-1 center">Deck</div>                
+                          <div className="col-md-1 center">Deck
+                                 <button onClick={this.onAddItem}>Add Item</button>     
+                          </div>                
                           <div className="col-md-1 center">Sunday</div>
                           <div className="col-md-1 center">Monday</div>
                           <div className="col-md-1 center">Tuesday</div>
@@ -197,8 +250,8 @@ function generateLayout() {
     return _.map(_.range(0, 10), function (item, i) {
         var y = Math.ceil(Math.random() * 4) + 1;
         return {
-            x: 8,
-            y: Math.floor(i / 6) * y,
+            x: 0,
+            y: Infinity, // puts card at the bottom
             w: 1,
             h: 2,
             i: i.toString(),
