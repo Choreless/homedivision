@@ -1,12 +1,7 @@
 import React, { Component } from 'react';
-import './CreateGroup.css';
 /*This file displays the create/join group page*/
 
 class CreateGroup extends Component {
-
-  static defaultProps = {
-    
-  };
 
   componentWillReceiveProps = (newProps) => {
     //Check for prop changes, and set state from here if something new comes up, since render does not re render component.
@@ -46,11 +41,17 @@ class CreateGroup extends Component {
   }
 
   groupForm() {
-    if(true) {
-      this.createGroupForm();
-    } else {
-      this.joinGroupForm();
-    }
+    //How are we storing/passing user data? need to check if they are in a group or not
+    //if(!this.state.hasGroup) { 
+      return (
+        <div>
+          {this.joinGroupForm()}
+          {this.createGroupForm()}
+        </div>
+      );
+    //} else {
+      //leave a group?
+    //}
   }
 
 //How should i deal with authentication?
@@ -62,8 +63,7 @@ class CreateGroup extends Component {
   render() {
     return (
       <div>
-        {this.doescreateGroupForm()}
-        {this.joinGroupForm()}
+        {this.groupForm()}
       </div>
     );
   }
