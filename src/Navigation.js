@@ -32,7 +32,7 @@ class Navigation extends Component {
   }
 
   render() {
-    let links = [{link: '/', body: 'Home'}, {link: '/login', body: 'Login'}, {link: '/create', body: 'Create Room'}, {link: '/dw23498xz/weekly', body: 'Test Weekly'}, {link: '/dw23498xz/monthly', body: 'Test Monthly'}];
+    let links = [{link: '/', body: 'Home'}, {link: '/login', body: 'Login'}, {link: '/create', body: 'Create Group'}, {link: '/dw23498xz/weekly', body: 'Test Weekly'}, {link: '/dw23498xz/monthly', body: 'Test Monthly'}];
     let drawerlinks = _.map(links, (elem, index) => {
       let activeStyle = this.handleActiveLink(elem.link);
       return (
