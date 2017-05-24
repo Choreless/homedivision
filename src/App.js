@@ -6,6 +6,7 @@ import Monthly from './Monthly';
 import Weekly from './Weekly';
 import GSettings from './GroupSettings';
 import Navigation from './Navigation';
+import UserSettings from './UserSettings';
 import { Route, Switch, Link, Redirect } from 'react-router-dom';
 import firebase from 'firebase';
 
@@ -54,6 +55,7 @@ class App extends Component {
             <Route path="/:roomID/settings" render={(props)=><GSettings {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle}/>}/>
             <Route path="/login" component={Login}/>
             <Route path="/create" render={(props)=><CreateGroup {...props} isAuth={this.state.isAuth}/>}/>
+            <Route path="/userSettings" render={(props)=><UserSettings {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle}/>}/>
             
           </Switch>
         </main>
