@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+//import fbcontroller from './fbcontroller';
 import {TextField, RaisedButton, CircularProgress} from 'material-ui';
 
 class CreateGroupForm extends Component{
@@ -12,7 +13,9 @@ class CreateGroupForm extends Component{
 
     //handle create group button
     createGroup = event => {
-
+        event.preventDefault();
+        //fbcontroller.createGroup(this.state.groupName);
+        //redirect to groupsettings
     }
 
     handleChange = (event) => {
@@ -30,7 +33,7 @@ class CreateGroupForm extends Component{
             <div className="container">
                 <h4>Create a New Group</h4>
                 <div style={{color: '#E53935'}}>{this.state.errorText}</div>
-                <form role="form" onSubmit={this.signIn}>
+                <form role="form" onSubmit={this.createGroup}>
                     <div className="input-field">
                         <TextField style={{color: '#039BE5'}} floatingLabelText="Group Name" fullWidth={true} type="groupName" name="groupName" onChange={(e) => {this.handleChange(e)}}/>
                     </div>
