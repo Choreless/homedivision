@@ -9,7 +9,7 @@ import _ from 'lodash';
 import { Row, Col, Collapsible, CollapsibleItem} from 'react-materialize';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import { IconButton, Dialog, DatePicker, FlatButton, Checkbox, Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn, Drawer, MenuItem } from 'material-ui';
+import { IconButton, Dialog, DatePicker, FlatButton, Checkbox, Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn, Drawer, MenuItem, Menu, Popover } from 'material-ui';
 import ActionAddNote from 'material-ui/svg-icons/action/note-add';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 
@@ -23,9 +23,10 @@ class Weekly extends Component {
       mounted: false,
       layouts: {lg: this.props.initialLayout},
       open: true,
-      groupID: 'dw23498xz',  
-      chores: [],   
-      newCounter: 0     
+      groupID: 'dw23498xz',
+      chores: [],
+      newCounter: 0,
+      popoverOpen: false,
     }
 
     static propTypes = {
@@ -40,7 +41,7 @@ class Weekly extends Component {
         onLayoutChange: function() {},
         cols: {lg: 8, md: 8, sm: 8, xs: 8, xxs: 8},
         initialLayout: generateLayout(),
-    };  
+    };
 
   createElement(el) {
     var removeStyle = {
@@ -80,7 +81,7 @@ class Weekly extends Component {
     onRemoveItem(i) {
         console.log('removing', i);
         this.setState({items: _.reject(this.state.items, {i: i})});
-    }   
+    }
 
   componentWillReceiveProps = (newProps) => {
     //Check for prop changes, and set state from here if something new comes up, since render does not re render component.
@@ -114,7 +115,7 @@ class Weekly extends Component {
                 });
             }
             console.log(this.state.chores);
-        })       
+        })
 
         firebase.database().ref('users/' + this.state.userID).on('value', (snapshot) => {
             const testData = snapshot.val();
@@ -124,7 +125,7 @@ class Weekly extends Component {
                 });
             }
             console.log(this.state.testData);
-        })  
+        })
     }
 
     componentWillUnmount = () => {
@@ -156,18 +157,35 @@ class Weekly extends Component {
 
 
     // Creates the chore cards
+    //Can get attribute of each card
     generateDOM = () => {
-        return _.map(this.state.layouts.lg, function (l, i) {
+        return _.map(this.state.layouts.lg, (l, i) => {
             return (
-                <div key={i} className={''}>
-                <span className="text">Chore name here</span>
+                <div key={i} onTouchTap={(e) => this.handleTouchTap(e, l, i)}>
+                <span>Chore name here</span>
                 </div>);
             });
         }
 
+//i is the index. l is the object containing x/y coords.
+    handleTouchTap = (event, l, i) => {
+      // This prevents ghost click.
+      console.log(l);
+      event.preventDefault();
+      this.setState({
+        popoverOpen: true,
+        anchorEl: event.currentTarget,
+      });
+    };
+
+    handleRequestClose = () => {
+      this.setState({
+        popoverOpen: false,
+      });
+    };
+
 
     render() {
-        console.log(this.state.userID);
         return (
           <div>
             {this.state.isMobile ?
@@ -242,8 +260,8 @@ class Weekly extends Component {
                   <div className="container-fluid">
                       <div className="row seven-cols">
                           <div className="col-md-1 center">Deck
-                                 <button onClick={this.onAddItem}>Add Item</button>     
-                          </div>                
+                                 <button onClick={this.onAddItem}>Add Item</button>
+                          </div>
                           <div className="col-md-1 center">Sunday</div>
                           <div className="col-md-1 center">Monday</div>
                           <div className="col-md-1 center">Tuesday</div>
@@ -263,6 +281,21 @@ class Weekly extends Component {
                         {this.generateDOM()}
                     </ResponsiveReactGridLayout>
                 </div>
+                <MuiThemeProvider muiTheme={getMuiTheme()}>
+                  <Popover
+                    open={this.state.popoverOpen}
+                    anchorEl={this.state.anchorEl}
+                    anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                    targetOrigin={{horizontal: 'left', vertical: 'top'}}
+                    onRequestClose={this.handleRequestClose}
+                  >
+                    <Menu>
+                      <MenuItem primaryText="Mark as Complete" />
+                      <MenuItem primaryText="Edit Chore" />
+                      <MenuItem primaryText="Remove" />
+                    </Menu>
+                  </Popover>
+                </MuiThemeProvider>
               </section>
             }
           </div>
@@ -273,7 +306,7 @@ class Weekly extends Component {
 
 // Generate the layout of the chore cards
 // Returns an array of objects
-// x is the x position on the grid, defaults to 8, the chore deck column 
+// x is the x position on the grid, defaults to 8, the chore deck column
 // y is the y position on the grid
 // w and h are width and height
 // i is the div key of the card
