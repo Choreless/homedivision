@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router';
 import { Link } from 'react-router-dom';
 import {AppBar, Drawer, MenuItem, Toolbar, ToolbarGroup, FlatButton} from 'material-ui';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import _ from 'lodash';
+import firebase from 'firebase';
 
 /*This file handles display of navigation*/
 
@@ -16,11 +18,6 @@ class Navigation extends Component {
     this.setState({open: !this.state.open});
   }
 
-  handleActive = (path) => {
-    this.handleToggle();
-    if(location.pathname !== path) this.history.push(path);
-  }
-
   handleActiveLink = (link) => {
     let path = location.pathname;
     if(path === link) {
@@ -31,14 +28,35 @@ class Navigation extends Component {
     }
   }
 
+  //Signout function
+  signOut = () =>  {
+    firebase.auth().signOut().then(() => {
+      if(location.pathname !== '/') this.props.history.push('/')
+      else this.forceUpdate();
+    }).catch((err) => {
+      alert(err);
+    })
+  }
+
   render() {
     let links = [{link: '/', body: 'Home'}, {link: '/login', body: 'Login'}, {link: '/create', body: 'Create Room'}, {link: '/dw23498xz/weekly', body: 'Test Weekly'}, {link: '/dw23498xz/monthly', body: 'Test Monthly'}];
     let drawerlinks = _.map(links, (elem, index) => {
       let activeStyle = this.handleActiveLink(elem.link);
       return (
-        <Link to={elem.link} key={'drawerlink-' + index}><MenuItem style={activeStyle}>{elem.body}</MenuItem></Link>
+        <Link to={elem.link} key={'drawerlink-' + index} onTouchTap={this.handleToggle}><MenuItem style={activeStyle}>{elem.body}</MenuItem></Link>
       )
     });
+    let rightNav;
+    if(this.props.userHandle === null || this.props.userHandle === undefined) {
+      rightNav = <span></span>
+    } else if(this.props.userHandle.length > 0) {
+      rightNav = <div>
+        <span style={{color: '#fff'}}>Welcome, {this.props.userHandle}</span>
+        <FlatButton onTouchTap={this.signOut} labelStyle={{color: '#fff'}} label="Sign Out"/>
+      </div>
+    } else {
+      rightNav = <Link to="/login"><FlatButton labelStyle={{color: '#fff'}} label="Sign In/Sign Up"/></Link>
+    }
     return (
       <div>
         <MuiThemeProvider muiTheme={getMuiTheme()}>
@@ -51,14 +69,14 @@ class Navigation extends Component {
                     title={<span style={{color: '#fff'}}>Logo</span>}
                   />
                 </ToolbarGroup>
-                <ToolbarGroup>
-                  <FlatButton labelStyle={{color: '#fff'}} label="Sign In"/>
+                <ToolbarGroup className="hide-on-med-and-down">
+                  {rightNav}
                 </ToolbarGroup>
               </Toolbar>
           </MuiThemeProvider>
         <MuiThemeProvider muiTheme={getMuiTheme()}>
             <Drawer
-              width={230}
+              width={256}
               open={this.state.open}
               docked={false}
               onRequestChange={(open) => this.setState({open})}
@@ -72,4 +90,4 @@ class Navigation extends Component {
   }
 }
 
-export default Navigation;
+export default withRouter(Navigation);
