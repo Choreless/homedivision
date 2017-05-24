@@ -8,6 +8,7 @@ class WeeklyDays extends Component {
     return (
         <div className="container-fluid">
             <div className="row seven-cols">
+                <div className="col-md-1 center">Members</div>
                 <div className="col-md-1 center">Sunday</div>
                 <div className="col-md-1 center">Monday</div>
                 <div className="col-md-1 center">Tuesday</div>
