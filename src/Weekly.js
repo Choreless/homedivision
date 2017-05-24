@@ -82,11 +82,31 @@ class Weekly extends Component {
         this.setState({items: _.reject(this.state.items, {i: i})});
     }   
 
+  componentWillReceiveProps = (newProps) => {
+    //Check for prop changes, and set state from here if something new comes up, since render does not re render component.
+    if(newProps.isAuth !== this.state.isAuth) {
+      this.setState({isAuth: newProps.isAuth, userID: newProps.userID});
+    }
+  }
     componentDidMount = () => {
         this.setState({mounted: true});
         this.updateWindowDimensions();
         window.addEventListener('resize', this.updateWindowDimensions);
-         firebase.database().ref('groups/' + this.state.groupID).on('value', (snapshot) => {
+/*
+        firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+            //console.log("inside user");
+                this.setState({
+                    user: user
+                });
+        } else {
+            // No user is signed in.
+                        console.log("outside user");
+        }
+        });*/
+
+        // grabs the group data from firebase
+        firebase.database().ref('groups/' + this.state.groupID).on('value', (snapshot) => {
             const currentChores = snapshot.val();
             if (currentChores != null) {
                 this.setState({
@@ -95,6 +115,16 @@ class Weekly extends Component {
             }
             console.log(this.state.chores);
         })       
+
+        firebase.database().ref('users/' + this.state.userID).on('value', (snapshot) => {
+            const testData = snapshot.val();
+            if (testData != null) {
+                this.setState({
+                    testData: testData
+                });
+            }
+            console.log(this.state.testData);
+        })  
     }
 
     componentWillUnmount = () => {
@@ -137,6 +167,7 @@ class Weekly extends Component {
 
 
     render() {
+        console.log(this.state.userID);
         return (
           <div>
             {this.state.isMobile ?
