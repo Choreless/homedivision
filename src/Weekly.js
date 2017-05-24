@@ -1,37 +1,116 @@
 import React, { Component } from 'react';
-import ReactGridLayout from 'react-grid-layout';
+import firebase from 'firebase';
+import PropTypes from 'prop-types';
 import {Responsive, WidthProvider} from 'react-grid-layout';
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
-var _ = require('lodash');
+import WeeklyDays from './WeeklyDays.js';
 import './weekly.css';
+import _ from 'lodash';
+import { Row, Col, Collapsible, CollapsibleItem} from 'react-materialize';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import { IconButton, Dialog, DatePicker, FlatButton, Checkbox, Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn, Drawer, MenuItem } from 'material-ui';
+import ActionAddNote from 'material-ui/svg-icons/action/note-add';
+import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
+
+//var choresRef = firebase.database().ref("groups/dw23498xz/chores");
 
 /*This file handles display of the weekly calendar*/
 
 class Weekly extends Component {
-    
-    static defaultProps = { 
+    state = {
+      currentBreakpoint: 'lg',
+      mounted: false,
+      layouts: {lg: this.props.initialLayout},
+      open: true,
+      groupID: 'dw23498xz',  
+      chores: [],   
+      newCounter: 0     
+    }
+
+    static propTypes = {
+        onLayoutChange: PropTypes.func.isRequired
+    };
+
+    // This code is for a responsive grid layout; however, I set all the columns to be 8 (days + col for card deck)
+    // since we will be switching to a different view on a md or lower breakpoint
+    static defaultProps = {
         className: "layout",
         rowHeight: 30,
         onLayoutChange: function() {},
-        cols: {lg: 12, md: 10, sm: 6, xs: 4, xxs: 2},
-        initialLayout: generateLayout()
-    };    
+        cols: {lg: 8, md: 8, sm: 8, xs: 8, xxs: 8},
+        initialLayout: generateLayout(),
+    };  
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            currentBreakpoint: 'lg',
-            mounted: false,
-            layouts: {lg: this.props.initialLayout},
-        };
-    }
+  createElement(el) {
+    var removeStyle = {
+      position: 'absolute',
+      right: '2px',
+      top: 0,
+      cursor: 'pointer'
+    };
+    var i = el.add ? '+' : el.i;
+    return (
+      <div key={i} data-grid={el}>
+        {el.add ?
+          <span className="add text" onClick={this.onAddItem} title="You can add an item by clicking here, too.">Add +</span>
+        : <span className="text">{i}</span>}
+        <span className="remove" style={removeStyle} onClick={this.onRemoveItem.bind(this, i)}>x</span>
+      </div>
+    );
+  }
 
-    componentDidMount() {
-        this.setState({mounted: true});
-    }
-      onBreakpointChange = (breakpoint) => {
+    onAddItem() {
+        /*eslint no-console: 0*/
+     console.log('adding', 'n' + this.state.newCounter);
         this.setState({
-          currentBreakpoint: breakpoint
+            // Add a new item. It must have a unique key!
+         items: this.state.items.concat({
+            i: 'n' + this.state.newCounter,
+            x: 0, // on the deck col
+            y: Infinity, // puts it at the bottom
+            w: 1,
+            h: 2
+        }),
+    // Increment the counter to ensure key is always unique.
+    newCounter: this.state.newCounter + 1
+    });
+    }
+
+    onRemoveItem(i) {
+        console.log('removing', i);
+        this.setState({items: _.reject(this.state.items, {i: i})});
+    }   
+
+    componentDidMount = () => {
+        this.setState({mounted: true});
+        this.updateWindowDimensions();
+        window.addEventListener('resize', this.updateWindowDimensions);
+         firebase.database().ref('groups/' + this.state.groupID).on('value', (snapshot) => {
+            const currentChores = snapshot.val();
+            if (currentChores != null) {
+                this.setState({
+                    chores: currentChores
+                });
+            }
+            console.log(this.state.chores);
+        })       
+    }
+
+    componentWillUnmount = () => {
+      window.removeEventListener('resize', this.updateWindowDimensions);
+    }
+
+    updateWindowDimensions = () => {
+      let temp;
+      if(window.innerWidth >= 992) temp = false;
+      else temp = true;
+      this.setState({ isMobile: temp});
+    }
+
+    onBreakpointChange = (breakpoint) => {
+        this.setState({
+            currentBreakpoint: breakpoint
         });
       };
 
@@ -45,47 +124,138 @@ class Weekly extends Component {
         });
       };
 
-    generateDOM() {
+
+    // Creates the chore cards
+    generateDOM = () => {
         return _.map(this.state.layouts.lg, function (l, i) {
             return (
-                <div key={i} className={l.static ? 'static' : ''}>
-                {l.static ?
-                    <span className="text" title="This item is static and cannot be removed or resized.">Static - {i}</span>
-                    : <span className="text">{i}</span>
-                } 
+                <div key={i} className={''}>
+                <span className="text">Chore name here</span>
                 </div>);
             });
         }
-    
-                     
-  render() {
-    return (
-      <div>
-        <ResponsiveReactGridLayout
-          {...this.props}
-          layouts={this.state.layouts}
-          onBreakpointChange={this.onBreakpointChange}
-          onLayoutChange={this.onLayoutChange}
-          // WidthProvider option
-          measureBeforeMount={true}>
-          {this.generateDOM()}
-        </ResponsiveReactGridLayout>
-      </div>     
-    );
-  }
+
+
+    render() {
+        return (
+          <div>
+            {this.state.isMobile ?
+              <section>
+                <Row className="reduce-bot-margin">
+                  <Col s={12}>
+                    <h2 style={{fontSize: '1.8rem'}}>Monthly Calendar</h2>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col s={12}>
+                    <h3 style={{fontSize: '1.4rem'}}>Members</h3>
+                    <Collapsible popout>
+                      <CollapsibleItem header='Group Member 1'>
+                        This is the monthly calendar view, with room ID: {this.props.match.params.roomID}
+                      </CollapsibleItem>
+                      <CollapsibleItem header='Group Member 2'>
+                        <Row>
+                          <Col s={10}>
+                            <MuiThemeProvider muiTheme={getMuiTheme()}>
+                              <Table
+                                selectable={false}>
+                                <TableHeader
+                                  displaySelectAll={false}
+                                  adjustForCheckbox={false}>
+                                  <TableRow>
+                                    <TableHeaderColumn>Chore</TableHeaderColumn>
+                                    <TableHeaderColumn>Time</TableHeaderColumn>
+                                    <TableHeaderColumn>Edit</TableHeaderColumn>
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody
+                                  displayRowCheckbox={false}>
+                                  <TableRow>
+                                    <TableRowColumn>Clean Dishes</TableRowColumn>
+                                    <TableRowColumn>Mon</TableRowColumn>
+                                    <TableRowColumn><IconButton><EditIcon/></IconButton></TableRowColumn>
+                                  </TableRow>
+                                  <TableRow>
+                                    <TableRowColumn>Do Laundry</TableRowColumn>
+                                    <TableRowColumn>Sun</TableRowColumn>
+                                    <TableRowColumn><IconButton><EditIcon/></IconButton></TableRowColumn>
+                                  </TableRow>
+                                </TableBody>
+                              </Table>
+                            </MuiThemeProvider>
+                          </Col>
+                          <Col s={2}>
+                            <MuiThemeProvider muiTheme={getMuiTheme()}>
+                              <IconButton iconStyle={{height: 36, width: 36}} tooltip="Add Chore Card" onTouchTap={this.handleOpen}><ActionAddNote/></IconButton>
+                            </MuiThemeProvider>
+                          </Col>
+                        </Row>
+                      </CollapsibleItem>
+                      <CollapsibleItem header='Group Member 3'>
+                        Lorem ipsum dolor sit amet.
+                      </CollapsibleItem>
+                    </Collapsible>
+                  </Col>
+                </Row>
+              </section>
+            :
+              <section>
+                {/* <MuiThemeProvider muiTheme={getMuiTheme()}>
+                  <Drawer containerStyle={{top: '65px', boxShadow: 'none'}} open={this.state.open}>
+                    <div style={{height: 50}}></div>
+                    <div style={{marginLeft: 50, height: 90}}>Jimmy</div>
+                    <div style={{marginLeft: 50, height: 90}}>Jeff</div>
+                  </Drawer>
+                </MuiThemeProvider> */}
+                <div>
+                  <div className="container-fluid">
+                      <div className="row seven-cols">
+                          <div className="col-md-1 center">Deck
+                                 <button onClick={this.onAddItem}>Add Item</button>     
+                          </div>                
+                          <div className="col-md-1 center">Sunday</div>
+                          <div className="col-md-1 center">Monday</div>
+                          <div className="col-md-1 center">Tuesday</div>
+                          <div className="col-md-1 center">Wednesday</div>
+                          <div className="col-md-1 center">Thursday</div>
+                          <div className="col-md-1 center">Friday</div>
+                          <div className="col-md-1 center">Saturday</div>
+                      </div>
+                  </div>
+                    <ResponsiveReactGridLayout
+                        {...this.props}
+                        layouts={this.state.layouts}
+                        onBreakpointChange={this.onBreakpointChange}
+                        onLayoutChange={this.onLayoutChange}
+                        // WidthProvider option
+                        measureBeforeMount={true}>
+                        {this.generateDOM()}
+                    </ResponsiveReactGridLayout>
+                </div>
+              </section>
+            }
+          </div>
+
+        );
+    }
 }
 
+// Generate the layout of the chore cards
+// Returns an array of objects
+// x is the x position on the grid, defaults to 8, the chore deck column 
+// y is the y position on the grid
+// w and h are width and height
+// i is the div key of the card
 function generateLayout() {
-    return _.map(_.range(0, 20), function (item, i) {
+    return _.map(_.range(0, 10), function (item, i) {
         var y = Math.ceil(Math.random() * 4) + 1;
         return {
-            x: _.random(0, 5) * 2 % 12,
-            y: Math.floor(i / 6) * y,
-            w: 1.5,
+            x: 0,
+            y: Infinity, // puts card at the bottom
+            w: 1,
             h: 2,
             i: i.toString(),
             isResizable: false,
-            static: Math.random() < 0.05
         };
     });
 }
