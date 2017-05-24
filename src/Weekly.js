@@ -14,7 +14,6 @@ import ActionAddNote from 'material-ui/svg-icons/action/note-add';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 
 //var choresRef = firebase.database().ref("groups/dw23498xz/chores");
-
 /*This file handles display of the weekly calendar*/
 
 class Weekly extends Component {
@@ -82,12 +81,26 @@ class Weekly extends Component {
         this.setState({items: _.reject(this.state.items, {i: i})});
     }   
 
-  componentWillReceiveProps = (newProps) => {
-    //Check for prop changes, and set state from here if something new comes up, since render does not re render component.
-    if(newProps.isAuth !== this.state.isAuth) {
-      this.setState({isAuth: newProps.isAuth, userID: newProps.userID});
+    componentWillReceiveProps = (newProps) => {
+        //Check for prop changes, and set state from here if something new comes up, since render does not re render component.
+        if(newProps.isAuth !== this.state.isAuth) {
+        this.setState({isAuth: newProps.isAuth, userID: newProps.userID});
+        }
+    
+        // Saves the user color and handle info to state
+        if (this.state.userID != null) {
+            firebase.database().ref('users/' + this.state.userID).on('value', (snapshot) => {
+            const userData = snapshot.val();
+            if (userData != null) {
+                this.setState({
+                    userColor: userData.color,
+                    userHandle: userData.handle
+                });
+            }
+            }) 
+        }
     }
-  }
+
     componentDidMount = () => {
         this.setState({mounted: true});
         this.updateWindowDimensions();
@@ -115,16 +128,6 @@ class Weekly extends Component {
             }
             console.log(this.state.chores);
         })       
-
-        firebase.database().ref('users/' + this.state.userID).on('value', (snapshot) => {
-            const testData = snapshot.val();
-            if (testData != null) {
-                this.setState({
-                    testData: testData
-                });
-            }
-            console.log(this.state.testData);
-        })  
     }
 
     componentWillUnmount = () => {
@@ -167,7 +170,6 @@ class Weekly extends Component {
 
 
     render() {
-        console.log(this.state.userID);
         return (
           <div>
             {this.state.isMobile ?
