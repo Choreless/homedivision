@@ -82,12 +82,13 @@ class Weekly extends Component {
         this.setState({items: _.reject(this.state.items, {i: i})});
     }   
 
+  componentWillReceiveProps = (newProps) => {
+    //Check for prop changes, and set state from here if something new comes up, since render does not re render component.
+    if(newProps.isAuth !== this.state.isAuth) {
+      this.setState({isAuth: newProps.isAuth, userID: newProps.userID});
+    }
+  }
     componentDidMount = () => {
-        var user = firebase.auth().currentUser;
-        console.log(user);
-                this.setState({
-                    user: this.user
-                });
         this.setState({mounted: true});
         this.updateWindowDimensions();
         window.addEventListener('resize', this.updateWindowDimensions);
@@ -113,8 +114,17 @@ class Weekly extends Component {
                 });
             }
             console.log(this.state.chores);
-            console.log(this.state.user);
         })       
+
+        firebase.database().ref('users/' + this.state.userID).on('value', (snapshot) => {
+            const testData = snapshot.val();
+            if (testData != null) {
+                this.setState({
+                    testData: testData
+                });
+            }
+            console.log(this.state.testData);
+        })  
     }
 
     componentWillUnmount = () => {
@@ -157,6 +167,7 @@ class Weekly extends Component {
 
 
     render() {
+        console.log(this.state.userID);
         return (
           <div>
             {this.state.isMobile ?
