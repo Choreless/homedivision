@@ -22,7 +22,7 @@ class Weekly extends Component {
       mounted: false,
       layouts: {lg: this.props.initialLayout},
       open: true,
-      groupID: 'dw23498xz',  
+      groupID: null,  
       chores: [],   
       newCounter: 0     
     }
@@ -38,7 +38,7 @@ class Weekly extends Component {
         rowHeight: 30,
         onLayoutChange: function() {},
         cols: {lg: 8, md: 8, sm: 8, xs: 8, xxs: 8},
-        initialLayout: generateLayout(),
+        initialLayout: grabLayout(),
     };  
 
   createElement(el) {
@@ -99,6 +99,17 @@ class Weekly extends Component {
             }
             }) 
         }
+
+        // Sets the current groupID the user is in
+        firebase.database().ref().on('value', (snapshot) => {
+            const generalRef = snapshot.val();
+           // console.log(generalRef.users[this.state.userID].group);
+            if (generalRef.users[this.state.userID].group != null) {
+                this.setState({
+                    groupID: generalRef.users[this.state.userID].group
+                });
+            }
+        })
     }
 
     componentDidMount = () => {
@@ -116,14 +127,13 @@ class Weekly extends Component {
             // No user is signed in.
                         console.log("outside user");
         }
-        });*/
-
-        // grabs the group data from firebase
+    });*/
+        // grabs the group data from firebase, and save the chores list in the state as an array
         firebase.database().ref('groups/' + this.state.groupID).on('value', (snapshot) => {
-            const currentChores = snapshot.val();
-            if (currentChores != null) {
+            const currentGroup = snapshot.val();
+            if (currentGroup != null) {
                 this.setState({
-                    chores: currentChores
+                    chores: currentGroup.chores
                 });
             }
             console.log(this.state.chores);
@@ -157,7 +167,10 @@ class Weekly extends Component {
         });
       };
 
-
+      onLayoutChange = () => {
+        console.log("changed desu");
+                console.log(this.state.layouts);
+      }
     // Creates the chore cards
     generateDOM = () => {
         return _.map(this.state.layouts.lg, function (l, i) {
@@ -293,4 +306,24 @@ function generateLayout() {
     });
 }
 
+function grabLayout() {
+        firebase.database().ref('groups/' + this.state.groupID).on('value', (snapshot) => {
+        const currentGroup = snapshot.val();
+        if (currentGroup != null) {
+            console.log(currentGroup);
+        }
+    })  
+}
+
 export default Weekly;
+
+/*
+col 0: deck
+col 1: sunday
+col 2: monday
+col 3: tueday
+col 4: wed
+col 5: thur
+col 6: friday
+col 7: saturday
+*/ 
