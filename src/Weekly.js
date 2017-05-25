@@ -38,7 +38,7 @@ class Weekly extends Component {
         rowHeight: 30,
         onLayoutChange: function() {},
         cols: {lg: 8, md: 8, sm: 8, xs: 8, xxs: 8},
-        initialLayout: grabLayout(),
+        initialLayout: generateLayout(),
     };  
 
   createElement(el) {
@@ -110,6 +110,7 @@ class Weekly extends Component {
                 });
             }
         })
+                this.grabLayout();
     }
 
     componentDidMount = () => {
@@ -180,6 +181,17 @@ class Weekly extends Component {
                 </div>);
             });
         }
+
+    grabLayout() {
+        console.log(this.state.groupID);
+        firebase.database().ref('groups/' + this.state.groupID).on('value', (snapshot) => {
+        const currentGroup = snapshot.val();
+                    //console.log(currentGroup);
+        if (currentGroup != null) {
+            console.log(currentGroup);
+        }
+    })  
+}     
 
 
     render() {
@@ -304,15 +316,6 @@ function generateLayout() {
             isResizable: false,
         };
     });
-}
-
-function grabLayout() {
-        firebase.database().ref('groups/' + this.state.groupID).on('value', (snapshot) => {
-        const currentGroup = snapshot.val();
-        if (currentGroup != null) {
-            console.log(currentGroup);
-        }
-    })  
 }
 
 export default Weekly;
