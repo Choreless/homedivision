@@ -48,25 +48,8 @@ class Weekly extends Component {
         onLayoutChange: function() {},
     };  
 
-  // el is a chore card object
-  createElement(el) {
-    var removeStyle = {
-      position: 'absolute',
-      right: '2px',
-      top: 0,
-      cursor: 'pointer'
-    };
-    var i = el.i;
-    console.log(el);
-    return (
-      <div key={i} data-grid={el}>
-      </div>
-    );
-  }
-
     onAddItem() {
         /*eslint no-console: 0*/
-     console.log('adding', 'n' + this.state.newCounter);
         this.setState({
             // Add a new item. It must have a unique key!
          items: this.state.items.concat({
@@ -165,30 +148,24 @@ class Weekly extends Component {
         console.log("changed desu");
                 console.log(this.state.layouts);
       }
-    // Creates the chore cards
-    generateDOM = () => {
-        console.log(this.state.layouts.lg);
-        return _.map(this.state.layouts.lg, function (l, i) {
-            return (
-                <div key={i} className={''}>
-                <span className="text">Chore name here</span>
-                </div>);
-            });
-        }
-                     
-    generateLayout() {
-        return _.map(_.range(0, 10), function (item, i) {
-        //var y = Math.ceil(Math.random() * 4) + 1;
-        return {
-            x: 0,
-            y: Infinity, // puts card at the bottom
-            w: 1,
-            h: 2,
-            i: i.toString(),
-            isResizable: false,
+
+    // Creates each chore card 
+    // el is a chore card object
+    createElement(el) {
+        var removeStyle = {
+        position: 'absolute',
+        right: '2px',
+        top: 0,
+        cursor: 'pointer'
         };
-    });
-        }                 
+        var i = el.i;
+        console.log(el);
+        return (
+        <div key={i} data-grid={el}>chore name here
+        </div>
+        );
+    }      
+
     // Get current chore card layout of group from firebase
     grabLayout(groupID) {
         // array of objects to be returned, represents chore cards in screen
@@ -205,7 +182,8 @@ class Weekly extends Component {
                                 h: 2,
                                 i: i.toString(),
                                 isResizable: false,
-                                add: layoutRef[i].add
+                                add: layoutRef[i].add,
+                                choreName: layoutRef[i].chore
                             }
                 currentLayout.push(card);
             }
@@ -311,7 +289,7 @@ class Weekly extends Component {
                         onLayoutChange={this.onLayoutChange}
                         // WidthProvider option
                         measureBeforeMount={true}>
-                        {_.map(this.state.items, this.generateDOM)}
+                        {_.map(this.state.items, this.createElement)}
                     </ResponsiveReactGridLayout>
                 </div>
               </section>
