@@ -48,6 +48,7 @@ class Weekly extends Component {
         onLayoutChange: function() {},
     };  
 
+  // el is a chore card object
   createElement(el) {
     var removeStyle = {
       position: 'absolute',
@@ -55,13 +56,10 @@ class Weekly extends Component {
       top: 0,
       cursor: 'pointer'
     };
-    var i = el.add ? '+' : el.i;
+    var i = el.i;
+    console.log(el);
     return (
       <div key={i} data-grid={el}>
-        {el.add ?
-          <span className="add text" onClick={this.onAddItem} title="You can add an item by clicking here, too.">Add +</span>
-        : <span className="text">{i}</span>}
-        <span className="remove" style={removeStyle} onClick={this.onRemoveItem.bind(this, i)}>x</span>
       </div>
     );
   }
@@ -124,11 +122,12 @@ class Weekly extends Component {
         this.setState({
             items: this.grabLayout(groupID)    
         });
+
+        this.setState({
+            layouts:{lg: this.state.items}
+        })        
     }
 
-    componentWillMount = () => {
-      
-    }
     componentDidMount = () => {
         this.setState({mounted: true});
         this.updateWindowDimensions();
@@ -168,6 +167,7 @@ class Weekly extends Component {
       }
     // Creates the chore cards
     generateDOM = () => {
+        console.log(this.state.layouts.lg);
         return _.map(this.state.layouts.lg, function (l, i) {
             return (
                 <div key={i} className={''}>
@@ -203,7 +203,7 @@ class Weekly extends Component {
                                 y: Infinity,
                                 w: 1,
                                 h: 2,
-                                i: i,
+                                i: i.toString(),
                                 isResizable: false,
                                 add: layoutRef[i].add
                             }
@@ -217,6 +217,8 @@ class Weekly extends Component {
 
     render() {
         console.log(this.state.items);
+        console.log(this.state.layouts);
+        console.log(this.props.initialLayout);
         return (
           <div>
             {this.state.isMobile ?
@@ -309,7 +311,7 @@ class Weekly extends Component {
                         onLayoutChange={this.onLayoutChange}
                         // WidthProvider option
                         measureBeforeMount={true}>
-                        {_.map(this.state.items)}
+                        {_.map(this.state.items, this.generateDOM)}
                     </ResponsiveReactGridLayout>
                 </div>
               </section>
@@ -327,8 +329,10 @@ class Weekly extends Component {
 // w and h are width and height
 // i is the div key of the card
 
+
+// set inital layout to be no cards
 function generateLayout() {
-    return _.map(_.range(0, 10), function (item, i) {
+    return _.map(_.range(0, 0), function (item, i) {
         //var y = Math.ceil(Math.random() * 4) + 1;
         return {
             x: 0,
