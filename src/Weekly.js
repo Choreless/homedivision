@@ -110,7 +110,7 @@ class Weekly extends Component {
                 });
             }
         })
-                this.grabLayout();
+        this.grabLayout();
     }
 
     componentDidMount = () => {
@@ -182,15 +182,30 @@ class Weekly extends Component {
             });
         }
 
+    // Get current chore card layout of group from firebase
     grabLayout() {
-        console.log(this.state.groupID);
-        firebase.database().ref('groups/' + this.state.groupID).on('value', (snapshot) => {
-        const currentGroup = snapshot.val();
-                    //console.log(currentGroup);
-        if (currentGroup != null) {
-            console.log(currentGroup);
-        }
-    })  
+        // array of objects to be returned, represents chore cards in screen
+        var currentLayout = [];
+        if (this.state.groupID != null) {
+            firebase.database().ref('groups/' + this.state.groupID + '/layout').on('value', (snapshot) => {
+            // saves the layout field in firebase
+            const layoutRef = snapshot.val();
+            if (layoutRef != null) {
+                for (var i = 0; i < layoutRef.length; i++) {
+                    var card =  {
+                                    x: layoutRef[i].x,
+                                    y: Infinity,
+                                    w: 1,
+                                    h: 2,
+                                    i: i,
+                                    isResizable: false
+                                }
+                    currentLayout.push(card);
+                }
+            }
+        })  
+    }
+    return currentLayout;
 }     
 
 
@@ -306,7 +321,7 @@ class Weekly extends Component {
 // i is the div key of the card
 function generateLayout() {
     return _.map(_.range(0, 10), function (item, i) {
-        var y = Math.ceil(Math.random() * 4) + 1;
+        //var y = Math.ceil(Math.random() * 4) + 1;
         return {
             x: 0,
             y: Infinity, // puts card at the bottom
