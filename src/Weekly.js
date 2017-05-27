@@ -17,15 +17,22 @@ import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 /*This file handles display of the weekly calendar*/
 
 class Weekly extends Component {
-    state = {
-      currentBreakpoint: 'lg',
-      mounted: false,
-      layouts: {lg: this.props.initialLayout},
-      open: true,
-      groupID: null,  
-      chores: [],   
-      newCounter: 0     
-    }
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            currentBreakpoint: 'lg',
+            mounted: false,
+            layouts: {lg: this.props.initialLayout},
+            items: this.generateLayout(),         
+            open: true,
+            userID: this.props.userID,
+            groupID: this.props.groupID,
+            chores: [],   
+            newCounter: 0   
+        };
+    }    
+
 
     static propTypes = {
         onLayoutChange: PropTypes.func.isRequired
@@ -36,9 +43,9 @@ class Weekly extends Component {
     static defaultProps = {
         className: "layout",
         rowHeight: 30,
-        onLayoutChange: function() {},
         cols: {lg: 8, md: 8, sm: 8, xs: 8, xxs: 8},
         initialLayout: generateLayout(),
+        onLayoutChange: function() {},
     };  
 
   createElement(el) {
@@ -86,10 +93,25 @@ class Weekly extends Component {
         if(newProps.isAuth !== this.state.isAuth) {
         this.setState({isAuth: newProps.isAuth, userID: newProps.userID});
         }
-    
+    }
+
+    componentWillMount = () => {
+        console.log(this.state.items);
+        console.log(this.state);
+        // Sets the current groupID the user is in
+        firebase.database().ref().on('value', (snapshot) => {
+            const generalRef = snapshot.val();
+           // console.log(generalRef.users[this.state.userID].group);
+            if (generalRef.users[this.props.userID].group != null) {
+                this.setState({
+                    groupID: generalRef.users[this.props.userID].group
+                });
+            }
+        })
+        console.log(this.props.userID);
         // Saves the user color and handle info to state
-        if (this.state.userID != null) {
-            firebase.database().ref('users/' + this.state.userID).on('value', (snapshot) => {
+        if (this.props.userID != null) {
+            firebase.database().ref('users/' + this.props.userID).on('value', (snapshot) => {
             const userData = snapshot.val();
             if (userData != null) {
                 this.setState({
@@ -98,21 +120,8 @@ class Weekly extends Component {
                 });
             }
             }) 
-        }
-
-        // Sets the current groupID the user is in
-        firebase.database().ref().on('value', (snapshot) => {
-            const generalRef = snapshot.val();
-           // console.log(generalRef.users[this.state.userID].group);
-            if (generalRef.users[this.state.userID].group != null) {
-                this.setState({
-                    groupID: generalRef.users[this.state.userID].group
-                });
-            }
-        })
-        this.grabLayout();
+        }        
     }
-
     componentDidMount = () => {
         this.setState({mounted: true});
         this.updateWindowDimensions();
@@ -181,7 +190,20 @@ class Weekly extends Component {
                 </div>);
             });
         }
-
+                     
+    generateLayout() {
+        return _.map(_.range(0, 10), function (item, i) {
+        //var y = Math.ceil(Math.random() * 4) + 1;
+        return {
+            x: 0,
+            y: Infinity, // puts card at the bottom
+            w: 1,
+            h: 2,
+            i: i.toString(),
+            isResizable: false,
+        };
+    });
+        }                 
     // Get current chore card layout of group from firebase
     grabLayout() {
         // array of objects to be returned, represents chore cards in screen
@@ -210,6 +232,7 @@ class Weekly extends Component {
 
 
     render() {
+               console.log(this.state);
         return (
           <div>
             {this.state.isMobile ?
@@ -319,6 +342,7 @@ class Weekly extends Component {
 // y is the y position on the grid
 // w and h are width and height
 // i is the div key of the card
+
 function generateLayout() {
     return _.map(_.range(0, 10), function (item, i) {
         //var y = Math.ceil(Math.random() * 4) + 1;
