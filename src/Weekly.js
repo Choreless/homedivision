@@ -23,9 +23,9 @@ class Weekly extends Component {
         this.state = {
             currentBreakpoint: 'lg',
             mounted: false,
-            layouts: {lg: this.props.initialLayout},
-            items: this.generateLayout(),         
+            layouts: {lg: this.props.initialLayout},      
             open: true,
+            items: [],
             userID: this.props.userID,
             groupID: this.props.groupID,
             chores: [],   
@@ -89,26 +89,13 @@ class Weekly extends Component {
     }   
 
     componentWillReceiveProps = (newProps) => {
+        var groupID = this.props.location.pathname.split('/')[1]; //grabs groupID from url parameter 
+
         //Check for prop changes, and set state from here if something new comes up, since render does not re render component.
         if(newProps.isAuth !== this.state.isAuth) {
         this.setState({isAuth: newProps.isAuth, userID: newProps.userID});
         }
-    }
 
-    componentWillMount = () => {
-        console.log(this.state.items);
-        console.log(this.state);
-        // Sets the current groupID the user is in
-        firebase.database().ref().on('value', (snapshot) => {
-            const generalRef = snapshot.val();
-           // console.log(generalRef.users[this.state.userID].group);
-            if (generalRef.users[this.props.userID].group != null) {
-                this.setState({
-                    groupID: generalRef.users[this.props.userID].group
-                });
-            }
-        })
-        console.log(this.props.userID);
         // Saves the user color and handle info to state
         if (this.props.userID != null) {
             firebase.database().ref('users/' + this.props.userID).on('value', (snapshot) => {
@@ -120,26 +107,10 @@ class Weekly extends Component {
                 });
             }
             }) 
-        }        
-    }
-    componentDidMount = () => {
-        this.setState({mounted: true});
-        this.updateWindowDimensions();
-        window.addEventListener('resize', this.updateWindowDimensions);
-/*
-        firebase.auth().onAuthStateChanged(function(user) {
-        if (user) {
-            //console.log("inside user");
-                this.setState({
-                    user: user
-                });
-        } else {
-            // No user is signed in.
-                        console.log("outside user");
-        }
-    });*/
-        // grabs the group data from firebase, and save the chores list in the state as an array
-        firebase.database().ref('groups/' + this.state.groupID).on('value', (snapshot) => {
+        }     
+
+         // grabs the group data from firebase, and save the chores list in the state as an array
+        firebase.database().ref('groups/' + groupID).on('value', (snapshot) => {
             const currentGroup = snapshot.val();
             if (currentGroup != null) {
                 this.setState({
@@ -147,7 +118,21 @@ class Weekly extends Component {
                 });
             }
             console.log(this.state.chores);
-        })       
+        }) 
+        console.log(this.state);        
+
+        this.setState({
+            items: this.grabLayout(groupID)    
+        });
+    }
+
+    componentWillMount = () => {
+      
+    }
+    componentDidMount = () => {
+        this.setState({mounted: true});
+        this.updateWindowDimensions();
+        window.addEventListener('resize', this.updateWindowDimensions);  
     }
 
     componentWillUnmount = () => {
@@ -205,34 +190,33 @@ class Weekly extends Component {
     });
         }                 
     // Get current chore card layout of group from firebase
-    grabLayout() {
+    grabLayout(groupID) {
         // array of objects to be returned, represents chore cards in screen
         var currentLayout = [];
-        if (this.state.groupID != null) {
-            firebase.database().ref('groups/' + this.state.groupID + '/layout').on('value', (snapshot) => {
-            // saves the layout field in firebase
-            const layoutRef = snapshot.val();
-            if (layoutRef != null) {
-                for (var i = 0; i < layoutRef.length; i++) {
-                    var card =  {
-                                    x: layoutRef[i].x,
-                                    y: Infinity,
-                                    w: 1,
-                                    h: 2,
-                                    i: i,
-                                    isResizable: false
-                                }
-                    currentLayout.push(card);
-                }
+        firebase.database().ref('groups/' + groupID + '/layout').on('value', (snapshot) => {
+        // saves the layout field in firebase
+        const layoutRef = snapshot.val();
+        if (layoutRef != null) {
+            for (var i = 0; i < layoutRef.length; i++) {
+                var card =  {
+                                x: layoutRef[i].x,
+                                y: Infinity,
+                                w: 1,
+                                h: 2,
+                                i: i,
+                                isResizable: false,
+                                add: layoutRef[i].add
+                            }
+                currentLayout.push(card);
             }
-        })  
-    }
+        }
+    })  
     return currentLayout;
 }     
 
 
     render() {
-               console.log(this.state);
+        console.log(this.state.items);
         return (
           <div>
             {this.state.isMobile ?
@@ -325,7 +309,7 @@ class Weekly extends Component {
                         onLayoutChange={this.onLayoutChange}
                         // WidthProvider option
                         measureBeforeMount={true}>
-                        {this.generateDOM()}
+                        {_.map(this.state.items)}
                     </ResponsiveReactGridLayout>
                 </div>
               </section>
@@ -369,3 +353,6 @@ col 5: thur
 col 6: friday
 col 7: saturday
 */ 
+//                        {this.generateDOM()}
+//                         {_.map(this.state.items, this.createElement)}
+//                         {_.map(this.state.items)}
