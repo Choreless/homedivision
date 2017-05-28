@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import Login from './Login';
 import Home from './Home';
-import CreateRoom from './CreateRoom';
+import CreateGroup from './CreateGroup';
 import Monthly from './Monthly';
 import Weekly from './Weekly';
 import Navigation from './Navigation';
+import UserSettings from './UserSettings';
 import { Route, Switch, Link, Redirect } from 'react-router-dom';
 import firebase from 'firebase';
 
@@ -52,7 +53,8 @@ class App extends Component {
             <Route path="/:groupID/monthly" render={(props)=><Monthly {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle}/>}/>
             <Route path="/:groupID/weekly" render={(props)=><Weekly {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle} groupID={this.state.groupID}/>}/>
             <Route path="/login" component={Login}/>
-            <Route path="/create" render={(props)=><CreateRoom {...props} isAuth={this.state.isAuth}/>}/>
+            <Route path="/create" render={(props)=><CreateGroup {...props} isAuth={this.state.isAuth}/>}/>
+            <Route path="/userSettings" render={(props)=><UserSettings {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle}/>}/>
           </Switch>
         </main>
         <footer>
