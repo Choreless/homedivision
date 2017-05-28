@@ -160,9 +160,9 @@ class Weekly extends Component {
         };
         var i = el.i;
         console.log(el);
+        // no idea if this is the best way to set the innerHTML of the chore card to be the chore name
         return (
-        <div key={i} data-grid={el}>chore name here
-        </div>
+        <div key={i} data-grid={el} dangerouslySetInnerHTML={{ __html: el.choreName + " | " + el.owner }}></div>
         );
     }      
 
@@ -183,7 +183,9 @@ class Weekly extends Component {
                                 i: i.toString(),
                                 isResizable: false,
                                 add: layoutRef[i].add,
-                                choreName: layoutRef[i].chore
+                                choreName: layoutRef[i].chore,
+                                owner: layoutRef[i].owner,
+                                color: layoutRef[i].color
                             }
                 currentLayout.push(card);
             }
