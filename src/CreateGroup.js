@@ -1,70 +1,40 @@
 import React, { Component } from 'react';
-/*This file displays the create/join group page*/
+import firebase from 'firebase';
+import CreateGroupForm from './CreateGroupForm';
+import JoinGroupForm from './JoinGroupForm';
+import {Row, Col} from 'react-materialize';
+import {Tabs, Tab} from 'material-ui';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+
+/*
+  This file displays the create/join group page
+*/
 
 class CreateGroup extends Component {
 
-  componentWillReceiveProps = (newProps) => {
-    //Check for prop changes, and set state from here if something new comes up, since render does not re render component.
+  componentDidMount = () => {
+    if(this.props.isAuth === false) this.props.history.push('/');
   }
 
-  createGroupForm() {
-    return (
-      <div className="container">
-        <h2>Create a New Group</h2>
-        <div>
-          <h4>Group Name</h4>
-          <input type="text" />
-          
-          <h4>Passcode to Join</h4>
-          <input type="text" />
-          
-          <h4>Confirm Passcode to Join</h4>
-          <input type="text" />
-          
-          <button>Create Group</button>
-        </div>
-      </div>
-    );
-  }
-
-  joinGroupForm() {
-    return (
-      <div className="container">
-        <h2>Join a Group</h2>
-        <div>
-          <h4>Passcode to Join</h4>
-          <input type="text" />
-          <button>Join Group</button>
-        </div>
-      </div>
-    );
-  }
-
-  groupForm() {
-    //How are we storing/passing user data? need to check if they are in a group or not
-    //if(!this.state.hasGroup) { 
-      return (
-        <div>
-          {this.joinGroupForm()}
-          {this.createGroupForm()}
-        </div>
-      );
-    //} else {
-      //leave a group?
-    //}
-  }
-
-//How should i deal with authentication?
-/*
-  <section className="container">
-    <p>This is the create group page. Testing passed in prop via routing: {this.props.auth ? 'Auth is true' : 'Auth is false'}</p>
-  </section>
-*/
   render() {
     return (
-      <div>
-        {this.groupForm()}
-      </div>
+      <section className="container">
+        <Row>
+          <Col s={12}>
+            <MuiThemeProvider muiTheme={getMuiTheme()}>
+              <Tabs inkBarStyle={{backgroundColor: '#000', zIndex: '10'}}>
+                <Tab buttonStyle={{backgroundColor: '#fff', color: '#000'}} label="Join">
+                  <JoinGroupForm history={this.props.history} />
+                </Tab>
+                <Tab buttonStyle={{backgroundColor: '#fff', color: '#000'}} label="Create">
+                  <CreateGroupForm history={this.props.history} />
+                </Tab>
+              </Tabs>
+            </MuiThemeProvider>
+          </Col>
+        </Row>
+      </section>
     );
   }
 }
