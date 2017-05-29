@@ -1,17 +1,25 @@
 import React, { Component } from 'react';
-import { Row, Col } from 'react-materialize';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import { TextField, RaisedButton, List, ListItem, Subheader, CircularProgress, Checkbox, DatePicker, FlatButton, Dialog } from 'material-ui';
+import { TextField, RaisedButton, FlatButton, Dialog } from 'material-ui';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 
 class UserSettings extends Component {
 
   state = {
+    nickname: undefined,
+    oldPassword: undefined,
+    newPassword: undefined,
+    confirmNewPassword: undefined,
+    email: undefined,
     isAuth: undefined,
     open: false,
     loading: undefined,
-    nonAuthText: ''
+    nonAuthText: '',
+    nicknameDisabled: true,
+    passwordDisabled: true,
+    emailDisabled: true,
+    icon: undefined
   }
 
   validate = (value, validations) => {
@@ -111,54 +119,77 @@ class UserSettings extends Component {
 
   }
 
+  handleChange = (event) => {
+      var field = event.target.name;
+      var value = event.target.value;
+      var changes = {}; //object to hold changes
+      changes[field] = value; //change this field
+      this.setState(changes); //update state
+      this.setState({errorText: ''});
+      if(this.state.nickname) this.setState({nicknameDisabled: false});
+      if(this.state.oldPassword && this.state.newPassword && this.state.confirmNewPassword) this.setState({passwordDisabled: false});
+      if(this.state.email) this.setState({emailDisabled: false});
+  }
+
+/*   <RaisedButton type="submit" label="Change Nickname" primary={true} labelStyle={{color: '#fff'}} onTouchTap={this.updateNickname}/>   */
 
   render() {
     //Variables go here
     return (
-      <section className="container">
+      <div className="container">
         <h2>User Settings</h2>
         <div style={{color: '#E53935'}}>{this.state.errorText}</div>
         <div>
           <h4>Update Nickname</h4>
-          <form role="form" /*onSubmit={this.signIn}*/>
-            <div className="updateNickname">
+          <form role="form" onSubmit={this.updateNickname}>
+            <div className="input-field">
               <MuiThemeProvider muiTheme={getMuiTheme()}>
                 <TextField id="signin-user" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="New Nickname" name="user" type="text" onChange={this.handleUserValidate} errorText={!this.state.uservalidate && this.state.user ? 'Must be at least 3 characters in length and not contain special characters or spaces':''} />
               </MuiThemeProvider>
-              
+            </div>
+            <div className="input-field">
+              <MuiThemeProvider muiTheme={getMuiTheme()}>
+                <RaisedButton type="submit" label={!this.state.icon && 'Update Nickname'} icon={this.state.icon} primary={true} disabled={this.state.nicknameDisabled} labelStyle={{color: '#fff'}} onTouchTap={this.updateNickname}/>
+              </MuiThemeProvider>
             </div>
           </form>
         </div>
         <div>
           <h4>Update Password</h4>
-          <form role="form" /*onSubmit={this.signIn}*/>
-            <div className="confirmPassword">
+          <form role="form" onSubmit={this.updatePassword}>
+            <div className="input-field">
               <MuiThemeProvider muiTheme={getMuiTheme()}>
-                <TextField style={{color: '#039BE5'}} floatingLabelText="Old Password" fullWidth={true} type="old_password" name="old_password" />
+                <TextField style={{color: '#039BE5'}} floatingLabelText="Old Password" fullWidth={true} type="password" name="old_password" />
               </MuiThemeProvider>
             </div>
-          </form>
-          <form role="form" /*onSubmit={this.signIn}*/>
-            <div className="newPassword">
+            <div className="input-field">
               <MuiThemeProvider muiTheme={getMuiTheme()}>
-                <TextField style={{color: '#039BE5'}} floatingLabelText="New Password" fullWidth={true} type="new_password" name="new_password" />
+                <TextField style={{color: '#039BE5'}} floatingLabelText="New Password" fullWidth={true} type="password" name="new_password" />
               </MuiThemeProvider>
             </div>
-          </form>
-          <form role="form" /*onSubmit={this.signIn}*/>
-            <div className="form">
+            <div className="input-field">
               <MuiThemeProvider muiTheme={getMuiTheme()}>
                 <TextField id="signin-user" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Confirm New Password" name="match" type="password" onChange={this.handleMatchValidate} errorText={!this.state.matchvalidate && this.state.match ? 'Passwords do not match':''} />
+              </MuiThemeProvider>
+            </div>
+            <div className="input-field">
+              <MuiThemeProvider muiTheme={getMuiTheme()}>
+                <RaisedButton type="submit" label={!this.state.icon && 'Update Password'} icon={this.state.icon} primary={true} disabled={this.state.passwordDisabled} labelStyle={{color: '#fff'}} onTouchTap={this.updatePassword}/>
               </MuiThemeProvider>
             </div>
           </form>
         </div>
         <div>
           <h4>Update Email</h4>
-          <form role="form" /*onSubmit={this.signIn}*/>
-            <div className="updateNickname">
+          <form role="form" onSubmit={this.updateEmail}>
+            <div className="input-field">
               <MuiThemeProvider muiTheme={getMuiTheme()}>
                 <TextField style={{color: '#039BE5'}} floatingLabelText="New Email" fullWidth={true} type="email" name="email" />
+              </MuiThemeProvider>
+            </div>
+            <div className="input-field">
+              <MuiThemeProvider muiTheme={getMuiTheme()}>
+                <RaisedButton type="submit" label={!this.state.icon && 'Update Email Address'} icon={this.state.icon} primary={true} disabled={this.state.emailDisabled} labelStyle={{color: '#fff'}} onTouchTap={this.updateEmail}/>
               </MuiThemeProvider>
             </div>
           </form>
@@ -166,7 +197,7 @@ class UserSettings extends Component {
         <div>
           <h4>Update Personal Color</h4>
         </div>
-      </section>
+      </div>
     );
   } 
 }
