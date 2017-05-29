@@ -98,9 +98,11 @@ class Weekly extends Component {
                     chores: currentGroup.chores
                 });
             }
-            console.log(this.state.chores);
         }) 
-        console.log(this.state);        
+
+        this.setState({
+            groupID: groupID
+        });
 
         this.setState({
             items: this.grabLayout(groupID)    
@@ -134,32 +136,49 @@ class Weekly extends Component {
         });
       };
 
-      onLayoutChange = (layout, layouts) => {
-        this.props.onLayoutChange(layout, layouts);
-      };
-
-      onNewLayout = () => {
+      onNewLayout = () => {         
         this.setState({
           layouts: {lg: generateLayout()}
         });
       };
 
-      onLayoutChange = () => {
-        console.log("changed desu");
-                console.log(this.state.layouts);
+      onLayoutChange = (newLayout) => {
+        console.log(newLayout);
+        // this code below is broken af...creates a bunch of of child nodes 
+        // firebase.database().ref('groups/' + this.state.groupID + '/layout/' + 1).on('value', (snapshot) => {
+        //     const layoutRef = snapshot.val();
+        //     console.log(layoutRef);
+        // })
+        //var layout = [];
+        //for (var i = 0; i < newLayout.length; i++) {
+            // layout[i] = {
+            //                     x: newLayout[i].x,
+            //                 }
+        //     firebase.database().ref('groups/' + this.state.groupID + '/layout/' + i).update({
+        //                         x: newLayout[i].x,
+        //     });
+        // }
+        //console.log(layout);
+                // firebase.database().ref('groups/' + this.state.groupID).update({
+                //     layout
+                // });
+                // firebase.database().ref('groups/' + this.state.groupID + '/layout').on('value', (snapshot) => {
+                //     const testRef = snapshot.val();
+                //     console.log(testRef);
+                // });
       }
 
     // Creates each chore card 
     // el is a chore card object
     createElement(el) {
         var removeStyle = {
-        position: 'absolute',
-        right: '2px',
-        top: 0,
-        cursor: 'pointer'
+            position: 'absolute',
+            right: '2px',
+            top: 0,
+            cursor: 'pointer'
         };
-        var i = el.i;
         console.log(el);
+        var i = el.i;
         // no idea if this is the best way to set the innerHTML of the chore card to be the chore name
         return (
         <div key={i} data-grid={el} dangerouslySetInnerHTML={{ __html: el.choreName + " | " + el.owner }}></div>
@@ -190,15 +209,20 @@ class Weekly extends Component {
                 currentLayout.push(card);
             }
         }
-    })  
-    return currentLayout;
-}     
+        })  
+        return currentLayout;
+    }    
+
+    isEmpty(obj) {
+        for(var key in obj) {
+            if(obj.hasOwnProperty(key))
+                return false;
+        }
+        return true;       
+    }
 
 
     render() {
-        console.log(this.state.items);
-        console.log(this.state.layouts);
-        console.log(this.props.initialLayout);
         return (
           <div>
             {this.state.isMobile ?
@@ -337,6 +361,4 @@ col 5: thur
 col 6: friday
 col 7: saturday
 */ 
-//                        {this.generateDOM()}
-//                         {_.map(this.state.items, this.createElement)}
-//                         {_.map(this.state.items)}
+// potential bug: i of card is manually set atm. what if a card gets removed? might have to change the i attribute of card to be the index position of the layout 
