@@ -4,20 +4,45 @@ import firebase from 'firebase';
 let fbcontroller = {
 // jimmy's calls (wekkly view updates mainly chore cards)
 
-    // adds chore card for the given chore
-    addChoreCard: (chore) => {
+    // adds chore card for the given chore to the given group
+    addChoreCard: (group, chore) => {
         //default values
-        isResizeable = false;
-        x = 0;
-        y = Infinity;
-        color = "#fff";
-        user = "";
-        w = 1;
-        h = 2;
-    },
-    // takes in a card number and updates its color and position and user
-    updateChoreCard: (card, color, pos, user) => {
+        let vals = {
+            isResizeable: boolean = false,
+            x: number = 0,
+            y: number = Infinity,
+            color: string = "#fff",
+            user: string = "",
+            w: number = 1,
+            h: number = 2
+        }
+        
+        // creates new card in firebase and returns key
+        var newCardKey = firebase.database().ref('groups/' + group + '/layout').push(); 
 
+        // populates card with default info
+        firebase.database().ref('groups/' + group + '/layout/' + newCardKey).set({
+            color: vals.color,
+            owner: vals.user,
+            x: vals.x,
+            y: vals.y,
+            w: vals.w,
+            h: vals.h,
+            chore: chore,
+            isResizeable: vals.isResizeable
+        }, (error) => {
+            console.log(error.message);
+        });
+    },
+    // takes in a card number and updates its color and position and user for the given group id
+    updateChoreCard: (group, card, color, pos, user) => {
+        firebase.database().ref('groups/' + group + '/layout/' + card).update({
+            color: color,
+            owner : user,
+            x: pos
+        }, (error) => {
+            console.log(error.message);
+        });
     },
 
 // isaac's stuff (join/create group)
