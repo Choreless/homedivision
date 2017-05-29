@@ -4,7 +4,7 @@ import firebase from 'firebase';
 import {TextField, RaisedButton, CircularProgress} from 'material-ui';
 
 class JoinGroupForm extends Component{
-    
+
     state = {
         passcode: undefined,
         errorText: '',
@@ -12,27 +12,18 @@ class JoinGroupForm extends Component{
         icon: undefined
     };
 
+
     //handle join group button
     joinGroup = event => {
         event.preventDefault();
-        var validPasscode = false;
-        
+        let temp = this.state.passcode.trim();
         //check if passcode is valid
-        var db = firebase.database();
-        var ref = db.ref("groups");
-        ref.once("value", function(data) {
-            console.log(data);
-            //validPasscode = does this.state.passcode exist in firebase?
-        });
-
-        if(validPasscode) {
-            //fbcontroller.addUserToGroup(userID, this.state.passcode);
-            this.props.history.push("/" + this.state.passcode + "/weekly");
-        } else {
-            this.setState({errorText: 'Passcode does not belong to a group. Please try a different passcode.'});
-        }
+        firebase.database().ref('groups/' + temp).once('value').then((snapshot) => {
+        if(snapshot.val()) this.props.history.push("/" + temp + "/weekly");
+        else this.setState({errorText: 'Passcode does not belong to a group. Please try a different passcode.'});
+      })
     }
-    
+
     handleChange = (event) => {
         var field = event.target.name;
         var value = event.target.value;
@@ -52,7 +43,7 @@ class JoinGroupForm extends Component{
                     <div className="input-field">
                         <TextField style={{color: '#039BE5'}} floatingLabelText="Passcode to Join" fullWidth={true} type="passcode" name="passcode" onChange={(e) => {this.handleChange(e)}}/>
                     </div>
-                    
+
                     <RaisedButton type="submit" label={!this.state.icon && 'Join Group'} icon={this.state.icon} primary={true} disabled={this.state.disabled} labelStyle={{color: '#fff'}} onTouchTap={this.joinGroup}/>
                 </form>
             </div>
