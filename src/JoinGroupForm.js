@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import firebase from 'firebase';
 //import fbcontroller from './fbcontroller';
-import {TextField, RaisedButton, CircularProgress} from 'material-ui';
+import {TextField, RaisedButton} from 'material-ui';
 
 class JoinGroupForm extends Component{
     
@@ -15,22 +15,18 @@ class JoinGroupForm extends Component{
     //handle join group button
     joinGroup = event => {
         event.preventDefault();
-        var validPasscode = false;
         
         //check if passcode is valid
-        var db = firebase.database();
-        var ref = db.ref("groups");
-        ref.once("value", function(data) {
-            console.log(data);
-            //validPasscode = does this.state.passcode exist in firebase?
+        firebase.database().ref('groups/' + this.state.passcode).on('value', (snapshot) => {
+            if (snapshot.val() != null) {
+                //fbcontroller.addUserToGroup(userID, this.state.passcode);
+                
+                //redirect to the weekly page, but we don't have props.history 
+                //this.props.history.push("/" + this.state.passcode + "/weekly");
+            } else {
+                this.setState({errorText: 'Passcode does not belong to a group. Please try a different passcode.'});
+            }
         });
-
-        if(validPasscode) {
-            //fbcontroller.addUserToGroup(userID, this.state.passcode);
-            this.props.history.push("/" + this.state.passcode + "/weekly");
-        } else {
-            this.setState({errorText: 'Passcode does not belong to a group. Please try a different passcode.'});
-        }
     }
     
     handleChange = (event) => {

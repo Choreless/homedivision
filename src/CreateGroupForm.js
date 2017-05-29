@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 //import fbcontroller from './fbcontroller';
-import {TextField, RaisedButton, CircularProgress} from 'material-ui';
+import {TextField, RaisedButton} from 'material-ui';
 
 class CreateGroupForm extends Component{
     
