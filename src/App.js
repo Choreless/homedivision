@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import Login from './Login';
 import Home from './Home';
-import CreateGroup from './CreateGroup';
+import CreateRoom from './CreateRoom';
 import Monthly from './Monthly';
 import Weekly from './Weekly';
-import GSettings from './GroupSettings';
 import Navigation from './Navigation';
 import { Route, Switch, Link, Redirect } from 'react-router-dom';
 import firebase from 'firebase';
@@ -13,7 +12,7 @@ import firebase from 'firebase';
 
 class App extends Component {
   state = {
-    isAuth: undefined
+    isAuth: false
   }
 
   //Upon mounting component, initialize listener. Set state variables if user is authed.
@@ -27,6 +26,7 @@ class App extends Component {
          if(snapshot.val()) {
            this.setState({
              userHandle: snapshot.val().handle,
+             groupID: snapshot.val().group
             });
          }
        });
@@ -49,12 +49,10 @@ class App extends Component {
         <main>
           <Switch>
             <Route exact path="/" component={Home} />
-            <Route path="/:roomID/monthly" render={(props)=><Monthly {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle}/>}/>
-            <Route path="/:roomID/weekly" render={(props)=><Weekly {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle}/>}/>
-            <Route path="/:roomID/settings" render={(props)=><GSettings {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle}/>}/>
+            <Route path="/:groupID/monthly" render={(props)=><Monthly {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle}/>}/>
+            <Route path="/:groupID/weekly" render={(props)=><Weekly {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle} groupID={this.state.groupID}/>}/>
             <Route path="/login" component={Login}/>
-            <Route path="/create" render={(props)=><CreateGroup {...props} isAuth={this.state.isAuth}/>}/>
-            
+            <Route path="/create" render={(props)=><CreateRoom {...props} isAuth={this.state.isAuth}/>}/>
           </Switch>
         </main>
         <footer>

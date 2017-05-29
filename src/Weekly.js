@@ -14,19 +14,20 @@ import ActionAddNote from 'material-ui/svg-icons/action/note-add';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 
 //var choresRef = firebase.database().ref("groups/dw23498xz/chores");
-
 /*This file handles display of the weekly calendar*/
 
 class Weekly extends Component {
     state = {
+      popoverOpen: false,
       currentBreakpoint: 'lg',
       mounted: false,
       layouts: {lg: this.props.initialLayout},
       open: true,
-      groupID: 'dw23498xz',
+      items: [],
+      userID: this.props.userID,
+      groupID: this.props.groupID,
       chores: [],
-      newCounter: 0,
-      popoverOpen: false,
+      newCounter: 0
     }
 
     static propTypes = {
@@ -38,32 +39,14 @@ class Weekly extends Component {
     static defaultProps = {
         className: "layout",
         rowHeight: 30,
-        onLayoutChange: function() {},
         cols: {lg: 8, md: 8, sm: 8, xs: 8, xxs: 8},
         initialLayout: generateLayout(),
     };
 
-  createElement(el) {
-    var removeStyle = {
-      position: 'absolute',
-      right: '2px',
-      top: 0,
-      cursor: 'pointer'
-    };
-    var i = el.add ? '+' : el.i;
-    return (
-      <div key={i} data-grid={el}>
-        {el.add ?
-          <span className="add text" onClick={this.onAddItem} title="You can add an item by clicking here, too.">Add +</span>
-        : <span className="text">{i}</span>}
-        <span className="remove" style={removeStyle} onClick={this.onRemoveItem.bind(this, i)}>x</span>
-      </div>
-    );
-  }
+
 
     onAddItem() {
         /*eslint no-console: 0*/
-     console.log('adding', 'n' + this.state.newCounter);
         this.setState({
             // Add a new item. It must have a unique key!
          items: this.state.items.concat({
@@ -83,49 +66,48 @@ class Weekly extends Component {
         this.setState({items: _.reject(this.state.items, {i: i})});
     }
 
-  componentWillReceiveProps = (newProps) => {
-    //Check for prop changes, and set state from here if something new comes up, since render does not re render component.
-    if(newProps.isAuth !== this.state.isAuth) {
-      this.setState({isAuth: newProps.isAuth, userID: newProps.userID});
+    componentWillReceiveProps = (newProps) => {
+        var groupID = this.props.location.pathname.split('/')[1]; //grabs groupID from url parameter
+
+        //Check for prop changes, and set state from here if something new comes up, since render does not re render component.
+        if(newProps.isAuth !== this.state.isAuth) {
+        this.setState({isAuth: newProps.isAuth, userID: newProps.userID});
+        }
+
+        // Saves the user color and handle info to state
+        if (this.props.userID !== null) {
+            firebase.database().ref('users/' + this.props.userID).on('value', (snapshot) => {
+            const userData = snapshot.val();
+            if (userData !== null) {
+                this.setState({
+                    userColor: userData.color,
+                    userHandle: userData.handle
+                });
+            }
+          })
+        }
     }
-  }
+
     componentDidMount = () => {
+        // grabs the group data from firebase, and save the chores list in the state as an array
+       firebase.database().ref('groups/' + this.props.match.params.groupID).on('value', (snapshot) => {
+           const currentGroup = snapshot.val();
+           if (currentGroup != null) {
+               this.setState({
+                   chores: currentGroup.chores
+               });
+           }
+       })
+       this.setState({
+           items: this.grabLayout(this.props.match.params.groupID)
+       });
+
+       this.setState({
+           layouts:{lg: this.state.items}
+       })
         this.setState({mounted: true});
         this.updateWindowDimensions();
         window.addEventListener('resize', this.updateWindowDimensions);
-/*
-        firebase.auth().onAuthStateChanged(function(user) {
-        if (user) {
-            //console.log("inside user");
-                this.setState({
-                    user: user
-                });
-        } else {
-            // No user is signed in.
-                        console.log("outside user");
-        }
-        });*/
-
-        // grabs the group data from firebase
-        firebase.database().ref('groups/' + this.state.groupID).on('value', (snapshot) => {
-            const currentChores = snapshot.val();
-            if (currentChores != null) {
-                this.setState({
-                    chores: currentChores
-                });
-            }
-            console.log(this.state.chores);
-        })
-
-        firebase.database().ref('users/' + this.state.userID).on('value', (snapshot) => {
-            const testData = snapshot.val();
-            if (testData != null) {
-                this.setState({
-                    testData: testData
-                });
-            }
-            console.log(this.state.testData);
-        })
     }
 
     componentWillUnmount = () => {
@@ -145,27 +127,88 @@ class Weekly extends Component {
         });
       };
 
-      onLayoutChange = (layout, layouts) => {
-        this.props.onLayoutChange(layout, layouts);
-      };
-
       onNewLayout = () => {
         this.setState({
           layouts: {lg: generateLayout()}
         });
       };
 
+      onLayoutChange = (newLayout) => {
+        console.log(newLayout);
+        // this code below is broken af...creates a bunch of of child nodes
+        // firebase.database().ref('groups/' + this.state.groupID + '/layout/' + 1).on('value', (snapshot) => {
+        //     const layoutRef = snapshot.val();
+        //     console.log(layoutRef);
+        // })
+        //var layout = [];
+        //for (var i = 0; i < newLayout.length; i++) {
+            // layout[i] = {
+            //                     x: newLayout[i].x,
+            //                 }
+        //     firebase.database().ref('groups/' + this.state.groupID + '/layout/' + i).update({
+        //                         x: newLayout[i].x,
+        //     });
+        // }
+        //console.log(layout);
+                // firebase.database().ref('groups/' + this.state.groupID).update({
+                //     layout
+                // });
+                // firebase.database().ref('groups/' + this.state.groupID + '/layout').on('value', (snapshot) => {
+                //     const testRef = snapshot.val();
+                //     console.log(testRef);
+                // });
+      }
 
-    // Creates the chore cards
-    //Can get attribute of each card
-    generateDOM = () => {
-        return _.map(this.state.layouts.lg, (l, i) => {
-            return (
-                <div key={i} onTouchTap={(e) => this.handleTouchTap(e, l, i)}>
-                <span>Chore name here</span>
-                </div>);
-            });
+    createElement(el) {
+        var removeStyle = {
+            position: 'absolute',
+            right: '2px',
+            top: 0,
+            cursor: 'pointer'
+        };
+        console.log(el);
+        var i = el.i;
+        // no idea if this is the best way to set the innerHTML of the chore card to be the chore name
+        return (
+        <div key={i} data-grid={el} dangerouslySetInnerHTML={{ __html: el.choreName + " | " + el.owner }}></div>
+        );
+    }
+
+    // Get current chore card layout of group from firebase
+    grabLayout(groupID) {
+        // array of objects to be returned, represents chore cards in screen
+        var currentLayout = [];
+        firebase.database().ref('groups/' + groupID + '/layout').on('value', (snapshot) => {
+        // saves the layout field in firebase
+        const layoutRef = snapshot.val();
+        if (layoutRef != null) {
+            for (var i = 0; i < layoutRef.length; i++) {
+                var card =  {
+                                x: layoutRef[i].x,
+                                y: Infinity,
+                                w: 1,
+                                h: 2,
+                                i: i.toString(),
+                                isResizable: false,
+                                add: layoutRef[i].add,
+                                choreName: layoutRef[i].chore,
+                                owner: layoutRef[i].owner,
+                                color: layoutRef[i].color
+                            }
+                currentLayout.push(card);
+            }
         }
+        })
+        return currentLayout;
+    }
+
+    isEmpty(obj) {
+        for(var key in obj) {
+            if(obj.hasOwnProperty(key))
+                return false;
+        }
+        return true;
+    }
 
 //i is the index. l is the object containing x/y coords.
     handleTouchTap = (event, l, i) => {
@@ -260,7 +303,7 @@ class Weekly extends Component {
                   <div className="container-fluid">
                       <div className="row seven-cols">
                           <div className="col-md-1 center">Deck
-                                 <button onClick={this.onAddItem}>Add Item</button>
+                                 <button onTouchTap={this.onAddItem}>Add Item</button>
                           </div>
                           <div className="col-md-1 center">Sunday</div>
                           <div className="col-md-1 center">Monday</div>
@@ -278,7 +321,7 @@ class Weekly extends Component {
                         onLayoutChange={this.onLayoutChange}
                         // WidthProvider option
                         measureBeforeMount={true}>
-                        {this.generateDOM()}
+                        {_.map(this.state.items, this.createElement)}
                     </ResponsiveReactGridLayout>
                 </div>
                 <MuiThemeProvider muiTheme={getMuiTheme()}>
@@ -310,9 +353,12 @@ class Weekly extends Component {
 // y is the y position on the grid
 // w and h are width and height
 // i is the div key of the card
+
+
+// set inital layout to be no cards
 function generateLayout() {
-    return _.map(_.range(0, 10), function (item, i) {
-        var y = Math.ceil(Math.random() * 4) + 1;
+    return _.map(_.range(0, 0), function (item, i) {
+        //var y = Math.ceil(Math.random() * 4) + 1;
         return {
             x: 0,
             y: Infinity, // puts card at the bottom
@@ -325,3 +371,15 @@ function generateLayout() {
 }
 
 export default Weekly;
+
+/*
+col 0: deck
+col 1: sunday
+col 2: monday
+col 3: tueday
+col 4: wed
+col 5: thur
+col 6: friday
+col 7: saturday
+*/
+// potential bug: i of card is manually set atm. what if a card gets removed? might have to change the i attribute of card to be the index position of the layout
