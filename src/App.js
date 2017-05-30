@@ -13,7 +13,7 @@ import firebase from 'firebase';
 
 class App extends Component {
   state = {
-    isAuth: false
+    isAuth: undefined
   }
 
   //Upon mounting component, initialize listener. Set state variables if user is authed.
