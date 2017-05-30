@@ -35,6 +35,10 @@ class GroupSettings extends Component {
       this.setState({errorText: ''});
   }
 
+  componentWillMount = () => {
+    this.setState({isAuth: this.props.isAuth});
+  }
+
   handleOpen = () => {
     this.setState({open: true});
   };

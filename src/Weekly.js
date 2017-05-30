@@ -41,21 +41,22 @@ class Weekly extends Component {
         rowHeight: 30,
         cols: {lg: 8, md: 8, sm: 8, xs: 8, xxs: 8},
         initialLayout: generateLayout(),
+        onLayoutChange: () => {}
     };
 
 
 
-    onAddItem() {
+    onAddItem = () => {
         /*eslint no-console: 0*/
         this.setState({
             // Add a new item. It must have a unique key!
-         items: this.state.items.concat({
+         items: this.state.items.concat([{
             i: 'n' + this.state.newCounter,
             x: 0, // on the deck col
             y: Infinity, // puts it at the bottom
             w: 1,
             h: 2
-        }),
+        }]),
     // Increment the counter to ensure key is always unique.
     newCounter: this.state.newCounter + 1
     });
@@ -134,8 +135,23 @@ class Weekly extends Component {
       };
 
       onLayoutChange = (newLayout) => {
-        console.log(newLayout);
+        for(let i = 0; i < newLayout.length; i++) {
+          newLayout[i].isDraggable = true;
+          newLayout[i]['maxH'] = false;
+          newLayout[i]['maxW'] = false;
+          newLayout[i]['minH'] = false;
+          newLayout[i]['minW'] = false;
+        }
+        console.log('onLayoutChange', newLayout);
         // this code below is broken af...creates a bunch of of child nodes
+        // firebase.database().ref('groups/'+this.props.match.params.groupID).set({
+        //   layout: newLayout
+        // }).then(() => {
+        //   console.log('Succesfully updated');
+        // }).catch((err) => {
+        //   alert('Error occured', err);
+        // })
+        
         // firebase.database().ref('groups/' + this.state.groupID + '/layout/' + 1).on('value', (snapshot) => {
         //     const layoutRef = snapshot.val();
         //     console.log(layoutRef);
