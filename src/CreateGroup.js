@@ -13,6 +13,10 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
 class CreateGroup extends Component {
 
+  componentDidMount = () => {
+    if(this.props.isAuth === false) this.props.history.push('/');
+  }
+
   render() {
     return (
       <section className="container">
@@ -21,10 +25,10 @@ class CreateGroup extends Component {
             <MuiThemeProvider muiTheme={getMuiTheme()}>
               <Tabs inkBarStyle={{backgroundColor: '#000', zIndex: '10'}}>
                 <Tab buttonStyle={{backgroundColor: '#fff', color: '#000'}} label="Join">
-                  <JoinGroupForm />
+                  <JoinGroupForm history={this.props.history}  />
                 </Tab>
                 <Tab buttonStyle={{backgroundColor: '#fff', color: '#000'}} label="Create">
-                  <CreateGroupForm />
+                  <CreateGroupForm history={this.props.history} userID={this.props.userID} />
                 </Tab>
               </Tabs>
             </MuiThemeProvider>

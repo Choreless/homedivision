@@ -60,7 +60,9 @@ class SignUpForm extends Component {
 				var userRef = firebase.database().ref('users/'+firebaseUser.uid);
         var userData = {
           handle:handle,
-          // avatar:'https://www.gravatar.com/avatar/'
+          group: false,
+          color: false,
+          email: email
         }
         var userPromise = userRef.set(userData); //update entry in JOITC, return promise for chaining
         //return Promise.all(profilePromise, userPromise); //do both at once!

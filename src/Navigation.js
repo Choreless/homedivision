@@ -14,6 +14,14 @@ class Navigation extends Component {
     open: false,
   }
 
+  componentWillReceiveProps = (newProps) => {
+    if(newProps.groupID !== undefined) {
+      firebase.database().ref('groups/'+newProps.groupID).once('value').then((snapshot) => {
+        this.setState({name: snapshot.val().name})
+      })
+    }
+  }
+
   handleToggle = () => {
     this.setState({open: !this.state.open});
   }
@@ -39,7 +47,8 @@ class Navigation extends Component {
   }
 
   render() {
-    let links = [{link: '/', body: 'Home'}, {link: '/login', body: 'Login'}, {link: '/create', body: 'Create Group'}, {link: '/dw23498xz/weekly', body: 'Test Weekly'}, {link: '/dw23498xz/settings', body: 'Group Settings'},  {link: '/userSettings', body: 'User Settings'}];
+
+    let links = [{link: '/', body: 'Home'}, {link: '/login', body: 'Login'}, {link: '/create', body: 'Create Group'}, {link: '/dw23498xz/weekly', body: 'Test Weekly'}, {link: '/dw23498xz/settings', body: 'Group Settings'},  {link: '/settings', body: 'User Settings'}];
     let drawerlinks = _.map(links, (elem, index) => {
       let activeStyle = this.handleActiveLink(elem.link);
       return (
@@ -66,7 +75,7 @@ class Navigation extends Component {
                     style={{backgroundColor: '#000', boxShadow: 'none'}}
                     onLeftIconButtonTouchTap={this.handleToggle}
                     id="navbar-appbarz" //Remove the "z" to make it so that the menu shows up only on mobile.
-                    title={<span style={{color: '#fff'}}>Logo</span>}
+                    title={<span style={{color: '#fff'}}>Logo {this.state.name && '- '+this.state.name}</span>}
                   />
                 </ToolbarGroup>
                 <ToolbarGroup className="hide-on-med-and-down">
