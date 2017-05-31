@@ -137,12 +137,13 @@ class Weekly extends Component {
       onLayoutChange = (newLayout) => {
         for(let i = 0; i < newLayout.length; i++) {
           newLayout[i].isDraggable = true;
-          newLayout[i]['maxH'] = false;
-          newLayout[i]['maxW'] = false;
-          newLayout[i]['minH'] = false;
-          newLayout[i]['minW'] = false;
+          newLayout[i]['maxH'] = 10;
+          newLayout[i]['maxW'] = 10;
+          newLayout[i]['minH'] = 1;
+          newLayout[i]['minW'] = 0;
         }
         console.log('onLayoutChange', newLayout);
+        console.log(this.state.items);
         // this code below is broken af...creates a bunch of of child nodes
         // firebase.database().ref('groups/'+this.props.match.params.groupID).set({
         //   layout: newLayout
@@ -182,7 +183,7 @@ class Weekly extends Component {
             top: 0,
             cursor: 'pointer'
         };
-        console.log(el);
+        //console.log(el);
         var i = el.i;
         // no idea if this is the best way to set the innerHTML of the chore card to be the chore name
         return (
@@ -229,7 +230,7 @@ class Weekly extends Component {
 //i is the index. l is the object containing x/y coords.
     handleTouchTap = (event, l, i) => {
       // This prevents ghost click.
-      console.log(l);
+      //console.log(l);
       event.preventDefault();
       this.setState({
         popoverOpen: true,
