@@ -77,7 +77,7 @@ class Weekly extends Component {
 
         // Saves the user color and handle info to state
         if (this.props.userID !== null) {
-            firebase.database().ref('users/' + this.props.userID).on('value', (snapshot) => {
+            firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
             const userData = snapshot.val();
             if (userData !== null) {
                 this.setState({
@@ -91,7 +91,7 @@ class Weekly extends Component {
 
     componentDidMount = () => {
         // grabs the group data from firebase, and save the chores list in the state as an array
-       firebase.database().ref('groups/' + this.props.match.params.groupID).on('value', (snapshot) => {
+       firebase.database().ref('groups/' + this.props.match.params.groupID).once('value').then((snapshot) => {
            const currentGroup = snapshot.val();
            if (currentGroup != null) {
                this.setState({
@@ -101,7 +101,7 @@ class Weekly extends Component {
        })
        
        this.setState({
-           items: this.grabLayout(this.props.match.params.groupID)
+           items: this.grabLayout()
        });
 
        this.setState({
@@ -137,23 +137,29 @@ class Weekly extends Component {
 
       onLayoutChange = (newLayout) => {
           console.log(newLayout);
+          console.log(this.state.items);
         for(let i = 0; i < newLayout.length; i++) {
           newLayout[i].isDraggable = true;
           newLayout[i]['maxH'] = 10;
           newLayout[i]['maxW'] = 10;
           newLayout[i]['minH'] = 1;
           newLayout[i]['minW'] = 0;
+          newLayout[i]['chore'] = this.state.items[i].chore;
         }
         console.log('onLayoutChange', newLayout);
         console.log(this.state.items);
         // this code below is broken af...creates a bunch of of child nodes
         firebase.database().ref('groups/'+this.props.match.params.groupID).update({
-          testLayout: newLayout
+          layout: newLayout
         }).then(() => {
           console.log('Succesfully updated');
         }).catch((err) => {
           alert('Error occured', err);
         })
+
+      //   this.setState({
+      //      items: this.grabLayout()
+      //  });
         
         // firebase.database().ref('groups/' + this.state.groupID + '/layout/' + 1).on('value', (snapshot) => {
         //     const layoutRef = snapshot.val();
@@ -188,47 +194,41 @@ class Weekly extends Component {
         var i = el.i;
         // no idea if this is the best way to set the innerHTML of the chore card to be the chore name
         return (
-        <div key={i} data-grid={el} dangerouslySetInnerHTML={{ __html: el.choreName + " | " + el.owner }}></div>
+        <div key={i} data-grid={el}>{el.chore}</div>
         );
     }
     
     // Get current chore card layout of group from firebase
-    grabLayout(groupID) {
+    grabLayout = () => {
         // array of objects to be returned, represents chore cards in screen
         var currentLayout = [];
-        firebase.database().ref('groups/' + groupID + '/layout').on('value', (snapshot) => {
+        firebase.database().ref('groups/' + this.props.match.params.groupID + '/layout').once('value').then((snapshot) => {
+          this.setState({items: snapshot.val()})
+          console.log(snapshot.val())
         // saves the layout field in firebase
-        const layoutRef = snapshot.val();
-        console.log(layoutRef);
-        if (layoutRef != null) {
-            for (var i = 0; i < layoutRef.length; i++) {
-                var card =  {
-                                x: layoutRef[i].x,
-                                y: Infinity,
-                                w: 1,
-                                h: 2,
-                                i: i.toString(),
-                                isResizable: false,
-                                add: layoutRef[i].add,
-                                choreName: layoutRef[i].chore,
-                                owner: layoutRef[i].owner,
-                                color: layoutRef[i].color
-                            }
-                currentLayout.push(card);
-            }
-        }
-        console.log(currentLayout);
-      })
-      console.log(currentLayout);
-        return currentLayout;
-    }
-
-    isEmpty(obj) {
-        for(var key in obj) {
-            if(obj.hasOwnProperty(key))
-                return false;
-        }
-        return true;
+      //   const layoutRef = snapshot.val();
+      //   console.log(layoutRef);
+      //   if (layoutRef !== null) {
+      //       for (var i = 0; i < layoutRef.length; i++) {
+      //           var card =  {
+      //                           x: layoutRef[i].x,
+      //                           y: Infinity,
+      //                           w: 1,
+      //                           h: 2,
+      //                           i: i.toString(),
+      //                           isResizable: false,
+      //                           add: layoutRef[i].add,
+      //                           choreName: layoutRef[i].chore,
+      //                           owner: layoutRef[i].owner,
+      //                           color: layoutRef[i].color
+      //                       }
+      //           currentLayout.push(card);
+      //       }
+      //   }
+      // })
+      //   console.log(currentLayout);
+      //   return currentLayout;
+        });
     }
 
 //i is the index. l is the object containing x/y coords.
@@ -250,7 +250,6 @@ class Weekly extends Component {
 
 
     render() {
-        console.log(this.state.items);
         return (
           <div>
             {this.state.isMobile ?
