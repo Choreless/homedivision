@@ -23,11 +23,11 @@ class UserSettings extends Component {
     emailvalidate: false,
     passwordvalidate: false,
     matchvalidate: false,
-    uservalidate: false
+    uservalidate: false,
   }
 
-  componentDidMount = () => {
-    if(this.props.isAuth === false) this.props.history.push('/');
+  componentDidMount = () => { 
+    if(this.props.isAuth === false || this.props.isAuth === undefined) this.props.history.push('/');
   }
 
   validate = (value, validations) => {
@@ -87,7 +87,7 @@ class UserSettings extends Component {
     else if(value !== undefined){ //valid and has input
       //errors.style = 'has-success' //show success coloring
     }
-    else { //valid and no input
+    else { //valid and no input`
       errors.isValid = false; //make false anyway
     }
     return errors; //return data object
@@ -97,6 +97,7 @@ class UserSettings extends Component {
     this.handleChange(event);
     let errors = this.validate(event.target.value, {required:true, minLength:3, user:true});
     this.setState({uservalidate: errors.isValid});
+    console.log(this.props.userHandle);
   }
 
   handlePasswordValidate = (event) => {
@@ -177,6 +178,7 @@ class UserSettings extends Component {
           <h4>Update Nickname</h4>
           <form role="form" onSubmit={this.updateNickname}>
             <div className="form-group">
+              <h6>Your current nickname is: {this.props.userHandle}</h6>
               <MuiThemeProvider muiTheme={getMuiTheme()}>
                 <TextField id="changeNickname" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="New Nickname" name="user" type="text" onChange={(e) => {this.handleUserValidate(e);}} errorText={!this.state.uservalidate && this.state.user ? 'Must be at least 3 characters in length and not contain special characters or spaces':''} />
               </MuiThemeProvider>
@@ -219,6 +221,7 @@ class UserSettings extends Component {
           <h4>Update Email</h4>
           <form role="form" onSubmit={this.updateEmail}>
             <div className="form-group">
+              <h6>Your current email is: {this.props.userEmail}</h6>
               <MuiThemeProvider muiTheme={getMuiTheme()}>
                 <TextField id="signin-email" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Email" name="email" type="email" onChange={(e) => {this.handleEmailValidate(e);}} errorText={!this.state.emailvalidate && this.state.email ? 'Not a valid email address':''} />
               </MuiThemeProvider>
