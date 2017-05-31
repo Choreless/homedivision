@@ -99,6 +99,7 @@ class Weekly extends Component {
                });
            }
        })
+       
        this.setState({
            items: this.grabLayout(this.props.match.params.groupID)
        });
@@ -135,6 +136,7 @@ class Weekly extends Component {
       };
 
       onLayoutChange = (newLayout) => {
+          console.log(newLayout);
         for(let i = 0; i < newLayout.length; i++) {
           newLayout[i].isDraggable = true;
           newLayout[i]['maxH'] = 10;
@@ -145,13 +147,13 @@ class Weekly extends Component {
         console.log('onLayoutChange', newLayout);
         console.log(this.state.items);
         // this code below is broken af...creates a bunch of of child nodes
-        // firebase.database().ref('groups/'+this.props.match.params.groupID).set({
-        //   layout: newLayout
-        // }).then(() => {
-        //   console.log('Succesfully updated');
-        // }).catch((err) => {
-        //   alert('Error occured', err);
-        // })
+        firebase.database().ref('groups/'+this.props.match.params.groupID).update({
+          testLayout: newLayout
+        }).then(() => {
+          console.log('Succesfully updated');
+        }).catch((err) => {
+          alert('Error occured', err);
+        })
         
         // firebase.database().ref('groups/' + this.state.groupID + '/layout/' + 1).on('value', (snapshot) => {
         //     const layoutRef = snapshot.val();
@@ -183,14 +185,13 @@ class Weekly extends Component {
             top: 0,
             cursor: 'pointer'
         };
-        //console.log(el);
         var i = el.i;
         // no idea if this is the best way to set the innerHTML of the chore card to be the chore name
         return (
         <div key={i} data-grid={el} dangerouslySetInnerHTML={{ __html: el.choreName + " | " + el.owner }}></div>
         );
     }
-
+    
     // Get current chore card layout of group from firebase
     grabLayout(groupID) {
         // array of objects to be returned, represents chore cards in screen
@@ -198,6 +199,7 @@ class Weekly extends Component {
         firebase.database().ref('groups/' + groupID + '/layout').on('value', (snapshot) => {
         // saves the layout field in firebase
         const layoutRef = snapshot.val();
+        console.log(layoutRef);
         if (layoutRef != null) {
             for (var i = 0; i < layoutRef.length; i++) {
                 var card =  {
@@ -215,7 +217,9 @@ class Weekly extends Component {
                 currentLayout.push(card);
             }
         }
-        })
+        console.log(currentLayout);
+      })
+      console.log(currentLayout);
         return currentLayout;
     }
 
@@ -246,6 +250,7 @@ class Weekly extends Component {
 
 
     render() {
+        console.log(this.state.items);
         return (
           <div>
             {this.state.isMobile ?
