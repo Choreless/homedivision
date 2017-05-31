@@ -3,6 +3,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { TextField, RaisedButton, FlatButton, Dialog } from 'material-ui';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
+import firebase from 'firebase';
 
 class UserSettings extends Component {
 
@@ -23,6 +24,10 @@ class UserSettings extends Component {
     passwordvalidate: false,
     matchvalidate: false,
     uservalidate: false
+  }
+
+  componentDidMount = () => {
+    if(this.props.isAuth === false) this.props.history.push('/');
   }
 
   validate = (value, validations) => {
