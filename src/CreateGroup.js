@@ -13,8 +13,8 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
 class CreateGroup extends Component {
 
-  componentDidMount = () => {
-    if(this.props.isAuth === false) this.props.history.push('/');
+  componentDidMount = () => { 
+    if(this.props.isAuth === false || this.props.isAuth === undefined) this.props.history.push('/');
   }
 
   render() {

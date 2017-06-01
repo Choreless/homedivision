@@ -77,7 +77,7 @@ class Weekly extends Component {
 
         // Saves the user color and handle info to state
         if (this.props.userID !== null) {
-            firebase.database().ref('users/' + this.props.userID).on('value', (snapshot) => {
+            firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
             const userData = snapshot.val();
             if (userData !== null) {
                 this.setState({
@@ -91,7 +91,7 @@ class Weekly extends Component {
 
     componentDidMount = () => {
         // grabs the group data from firebase, and save the chores list in the state as an array
-       firebase.database().ref('groups/' + this.props.match.params.groupID).on('value', (snapshot) => {
+       firebase.database().ref('groups/' + this.props.match.params.groupID).once('value').then((snapshot) => {
            const currentGroup = snapshot.val();
            if (currentGroup != null) {
                this.setState({
@@ -99,8 +99,9 @@ class Weekly extends Component {
                });
            }
        })
+       
        this.setState({
-           items: this.grabLayout(this.props.match.params.groupID)
+           items: this.grabLayout()
        });
 
        this.setState({
@@ -135,44 +136,25 @@ class Weekly extends Component {
       };
 
       onLayoutChange = (newLayout) => {
+          console.log(newLayout);
+          console.log(this.state.items);
         for(let i = 0; i < newLayout.length; i++) {
           newLayout[i].isDraggable = true;
-          newLayout[i]['maxH'] = false;
-          newLayout[i]['maxW'] = false;
-          newLayout[i]['minH'] = false;
-          newLayout[i]['minW'] = false;
+          newLayout[i]['maxH'] = 10;
+          newLayout[i]['maxW'] = 10;
+          newLayout[i]['minH'] = 1;
+          newLayout[i]['minW'] = 0;
+          newLayout[i]['chore'] = this.state.items[i].chore;
         }
         console.log('onLayoutChange', newLayout);
-        // this code below is broken af...creates a bunch of of child nodes
-        // firebase.database().ref('groups/'+this.props.match.params.groupID).set({
-        //   layout: newLayout
-        // }).then(() => {
-        //   console.log('Succesfully updated');
-        // }).catch((err) => {
-        //   alert('Error occured', err);
-        // })
-        
-        // firebase.database().ref('groups/' + this.state.groupID + '/layout/' + 1).on('value', (snapshot) => {
-        //     const layoutRef = snapshot.val();
-        //     console.log(layoutRef);
-        // })
-        //var layout = [];
-        //for (var i = 0; i < newLayout.length; i++) {
-            // layout[i] = {
-            //                     x: newLayout[i].x,
-            //                 }
-        //     firebase.database().ref('groups/' + this.state.groupID + '/layout/' + i).update({
-        //                         x: newLayout[i].x,
-        //     });
-        // }
-        //console.log(layout);
-                // firebase.database().ref('groups/' + this.state.groupID).update({
-                //     layout
-                // });
-                // firebase.database().ref('groups/' + this.state.groupID + '/layout').on('value', (snapshot) => {
-                //     const testRef = snapshot.val();
-                //     console.log(testRef);
-                // });
+        console.log(this.state.items);
+        firebase.database().ref('groups/'+this.props.match.params.groupID).update({
+          layout: newLayout
+        }).then(() => {
+          console.log('Succesfully updated');
+        }).catch((err) => {
+          alert('Error occured', err);
+        })
       }
 
     createElement(el) {
@@ -182,54 +164,25 @@ class Weekly extends Component {
             top: 0,
             cursor: 'pointer'
         };
-        console.log(el);
         var i = el.i;
-        // no idea if this is the best way to set the innerHTML of the chore card to be the chore name
         return (
-        <div key={i} data-grid={el} dangerouslySetInnerHTML={{ __html: el.choreName + " | " + el.owner }}></div>
+        <div key={i} data-grid={el}>{el.chore}</div>
         );
     }
-
+    
     // Get current chore card layout of group from firebase
-    grabLayout(groupID) {
+    grabLayout = () => {
         // array of objects to be returned, represents chore cards in screen
         var currentLayout = [];
-        firebase.database().ref('groups/' + groupID + '/layout').on('value', (snapshot) => {
-        // saves the layout field in firebase
-        const layoutRef = snapshot.val();
-        if (layoutRef != null) {
-            for (var i = 0; i < layoutRef.length; i++) {
-                var card =  {
-                                x: layoutRef[i].x,
-                                y: Infinity,
-                                w: 1,
-                                h: 2,
-                                i: i.toString(),
-                                isResizable: false,
-                                add: layoutRef[i].add,
-                                choreName: layoutRef[i].chore,
-                                owner: layoutRef[i].owner,
-                                color: layoutRef[i].color
-                            }
-                currentLayout.push(card);
-            }
-        }
-        })
-        return currentLayout;
-    }
-
-    isEmpty(obj) {
-        for(var key in obj) {
-            if(obj.hasOwnProperty(key))
-                return false;
-        }
-        return true;
+        firebase.database().ref('groups/' + this.props.match.params.groupID + '/layout').once('value').then((snapshot) => {
+          this.setState({items: snapshot.val()})
+        });
     }
 
 //i is the index. l is the object containing x/y coords.
     handleTouchTap = (event, l, i) => {
       // This prevents ghost click.
-      console.log(l);
+      //console.log(l);
       event.preventDefault();
       this.setState({
         popoverOpen: true,
@@ -398,4 +351,3 @@ col 5: thur
 col 6: friday
 col 7: saturday
 */
-// potential bug: i of card is manually set atm. what if a card gets removed? might have to change the i attribute of card to be the index position of the layout
