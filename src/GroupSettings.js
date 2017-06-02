@@ -6,7 +6,6 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { TextField, RaisedButton, List, ListItem, Subheader, CircularProgress, Checkbox, DatePicker, FlatButton, Dialog } from 'material-ui';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import moment from 'moment';
-import firebase from 'firebase';
 import _ from 'lodash';
 
 /*This file displays the create/join room page*/

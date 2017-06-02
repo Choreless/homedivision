@@ -8,13 +8,13 @@ let fbcontroller = {
     addChoreCard: (group, chore) => {
         //default values
         let vals = {
-            isResizeable: boolean = false,
-            x: number = 0,
-            y: number = Infinity,
-            color: string = "#fff",
-            user: string = "",
-            w: number = 1,
-            h: number = 2
+            isResizeable: false,
+            x: 0,
+            y: Infinity,
+            color: "#fff",
+            user: "",
+            w: 1,
+            h: 2
         }
         
         // creates new card in firebase and returns key
