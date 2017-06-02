@@ -6,7 +6,12 @@ import './home.css';
 
 /*This file is the landing page*/
 
+
 class Home extends Component {
+  handleSignUpButton = () => {
+    this.props.history.push("/login");
+  };
+
   render() {
     return (
       <section className="container">
@@ -17,7 +22,7 @@ class Home extends Component {
         </div>
         <div className="button">
           <MuiThemeProvider muiTheme={getMuiTheme()}>
-            <RaisedButton label={'Sign in/up'} primary={true} labelStyle={{color: '#fff'}}/>
+            <RaisedButton label={'Sign in/up'} primary={true} labelStyle={{color: '#fff'}} onTouchTap={this.handleSignUpButton} />
           </MuiThemeProvider>
         </div>
       </section>

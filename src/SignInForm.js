@@ -39,8 +39,15 @@ class SignInForm extends Component{
     /* Sign in the user */
     firebase.auth().signInWithEmailAndPassword(email, password)
       .then((user) => {
+        //Need to check if they belong to a group
         //Upon successful signin, move them to weekly calendar.
-        this.props.history.push('/dw23498xz/weekly');
+        firebase.database().ref('users/'+user.uid).once('value').then((snapshot) => {
+          if(snapshot.val().group) {
+            this.props.history.push(snapshot.val().group + '/weekly');
+          } else {
+            this.props.history.push('/create');
+          }
+        })
       })
       .catch((err) => {
         this.setState({disabled: false});

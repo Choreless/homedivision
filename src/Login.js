@@ -25,7 +25,7 @@ class Login extends Component {
             <MuiThemeProvider muiTheme={getMuiTheme()}>
               <Tabs inkBarStyle={{backgroundColor: '#000', zIndex: '10'}}>
                 <Tab buttonStyle={{backgroundColor: '#fff', color: '#000'}} label="Sign In">
-                  <SignInForm history={this.props.history}/>
+                  <SignInForm history={this.props.history} userID={this.props.userID}/>
                 </Tab>
                 <Tab buttonStyle={{backgroundColor: '#fff', color: '#000'}} label="Sign Up">
                   <SignUpForm history={this.props.history}/>

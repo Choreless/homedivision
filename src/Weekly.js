@@ -69,6 +69,10 @@ class Weekly extends Component {
     }
 
     componentDidMount = () => {
+      this.layoutRef = firebase.database().ref('groups/'+this.props.match.params.groupID + '/layout');
+      this.layoutRef.on('value', (snapshot) => {
+        this.setState({items: snapshot.val()});
+      })
         // grabs the group data from firebase, and save the chores list in the state as an array
        firebase.database().ref('groups/' + this.props.match.params.groupID).once('value').then((snapshot) => {
            const currentGroup = snapshot.val();
@@ -78,6 +82,12 @@ class Weekly extends Component {
                });
            }
        })
+        
+        firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
+           this.setState({
+               userColor: snapshot.val().color
+           })
+        })             
 
        this.setState({
            items: this.grabLayout()
@@ -93,6 +103,7 @@ class Weekly extends Component {
 
     componentWillUnmount = () => {
       window.removeEventListener('resize', this.updateWindowDimensions);
+      this.layoutRef.off();
     }
 
     updateWindowDimensions = () => {
@@ -123,11 +134,11 @@ class Weekly extends Component {
           newLayout[i]['minW'] = 0;
           newLayout[i]['chore'] = this.state.items[i].chore;
           newLayout[i]['i'] = i.toString();
-            
+
           // A chore card is assigned an owner only if its not in the deck (at x=0)
           if (newLayout[i]['x'] !== 0) { //chore card is on a day of a week
               newLayout[i]['owner'] = this.props.userID;
-          } else { //the chore card is now in the deck 
+          } else { //the chore card is now in the deck
               newLayout[i]['owner'] = "";
           }
         }
@@ -168,7 +179,7 @@ class Weekly extends Component {
             this.setState({
                 items: this.state.items.concat([addedChore])
             })
-        }    
+        }
         this.setState({ // ensure key is always unique
             newCounter: this.state.newCounter + 1
         })
@@ -191,7 +202,7 @@ class Weekly extends Component {
 //    // Increment the counter to ensure key is always unique.
 //    newCounter: this.state.newCounter + 1
 //    });
-        
+
     }
 
     onRemoveItem = (i) => {
@@ -199,16 +210,21 @@ class Weekly extends Component {
         var newItems = this.state.items;
         newItems.splice(i, 1);
         this.setState({
-            items: newItems
+            items: newItems,
+            popoverOpen: false,
         })
 //        this.setState({items: _.reject(this.state.items, {i: i})});
-        console.log(this.state.items);
     }
 
     createElement = (el) => {
         //var i = el.i;
+        var cardColor = "#ffffff";   
+        if (el.x !== 0) {
+            cardColor = this.state.userColor;
+        }
+        var cardStyle = {background: cardColor};
         return (
-        <div onTouchTap={(event) => this.handleTouchTap(event, el.i)} key={el.i} data-grid={el}>{el.chore}</div>
+        <div style={cardStyle} onTouchTap={(event) => this.handleTouchTap(event, el.i)} key={el.i} data-grid={el}>{el.chore}</div>
         );
     }
 
@@ -222,10 +238,10 @@ class Weekly extends Component {
     }
 
 //i is the index. l is the object containing x/y coords.
-    handleTouchTap = (index) => {
+    handleTouchTap = (event, index) => {
     // need to fix bug of event not being passedd into here so popover is showing up top left
       // This prevents ghost click.
-      //event.preventDefault();
+      event.preventDefault();
       this.setState({
         popoverOpen: true,
         anchorEl: event.currentTarget

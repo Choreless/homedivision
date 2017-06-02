@@ -31,6 +31,7 @@ class CreateGroupForm extends Component{
         }).catch((err) =>{
           alert('Error occured', err);
         })
+        
     }
 
     handleChange = (event) => {
@@ -48,6 +49,13 @@ class CreateGroupForm extends Component{
       this.props.history.push('/' + this.state.groupcode + '/weekly')
     };
 
+    handleEmail = () => {
+      let subject = "Choreless Group Invite";
+      let body = "You've been invited to join a Choreless Group. Your group passcode is: " + this.state.passcode;
+      body += "To join the group visit https://github.com/HomeDivision/Choreless. Log in or create an account, then use the above passcode to join the group.";
+      window.open('mailto:?subject=' + subject + '&body=' + body);
+    };
+
     render() {
       const actions = [
         <FlatButton
@@ -55,6 +63,11 @@ class CreateGroupForm extends Component{
           primary={true}
           onTouchTap={this.handleClose}
         />,
+        <FlatButton
+          label="Invite others"
+          primary={true}
+          onTouchTap={this.handleEmail}
+        />
       ];
         return (
             <div className="container">
