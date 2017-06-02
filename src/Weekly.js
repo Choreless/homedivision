@@ -29,7 +29,7 @@ class Weekly extends Component {
       groupID: this.props.groupID,
       chores: [],
       newCounter: 0,
-      currentChore: 0
+      currentCard: 0
     }
 
     static propTypes = {
@@ -208,7 +208,7 @@ class Weekly extends Component {
     createElement = (el) => {
         //var i = el.i;
         return (
-        <div onTouchTap={(this.handleTouchTap)} key={el.i} data-grid={el}>{el.chore}</div>
+        <div onTouchTap={(event) => this.handleTouchTap(event, el.i)} key={el.i} data-grid={el}>{el.chore}</div>
         );
     }
 
@@ -222,14 +222,18 @@ class Weekly extends Component {
     }
 
 //i is the index. l is the object containing x/y coords.
-    handleTouchTap = (event, el) => {
+    handleTouchTap = (index) => {
+    // need to fix bug of event not being passedd into here so popover is showing up top left
       // This prevents ghost click.
-      event.preventDefault();
+      //event.preventDefault();
       this.setState({
         popoverOpen: true,
-        anchorEl: event.currentTarget,
+        anchorEl: event.currentTarget
       });
-        console.log(event);
+        this.setState({
+            currentCard: index
+        })
+        console.log(index);
     };
 
     handleRequestClose = () => {
@@ -307,7 +311,7 @@ class Weekly extends Component {
                       <Menu>
                         <MenuItem primaryText="Mark as Complete" />
                         <MenuItem primaryText="Edit Chore" />
-                        <MenuItem primaryText="Remove" onTouchTap={() => this.onRemoveItem(0)}/>
+                        <MenuItem primaryText="Remove" onTouchTap={() => this.onRemoveItem(this.state.currentCard)}/>
                       </Menu>
                       </Popover>
                     </MuiThemeProvider>
