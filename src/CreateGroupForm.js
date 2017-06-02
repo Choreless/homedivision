@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-//import fbcontroller from './fbcontroller';
 import {TextField, RaisedButton, CircularProgress, Dialog, FlatButton} from 'material-ui';
 import firebase from 'firebase';
 import randomatic from 'randomatic';
@@ -20,8 +19,6 @@ class CreateGroupForm extends Component{
         let passcode = randomatic('A0', 5);
         let groupcode = randomatic('Aa0', 9);
         this.setState({passcode: passcode, groupcode: groupcode});
-        // fbcontroller.createGroup(this.state.groupName);
-        // redirect to groupsettings
         firebase.database().ref('groups/'+groupcode).set({
           members: [this.props.userID],
           passcode: passcode,
