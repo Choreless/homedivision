@@ -122,9 +122,11 @@ class Weekly extends Component {
           newLayout[i]['minW'] = 0;
           newLayout[i]['chore'] = this.state.items[i].chore;
           newLayout[i]['i'] = i.toString();
-          if (newLayout[i]['x'] !== 0) {
+            
+          // A chore card is assigned an owner only if its not in the deck (at x=0)
+          if (newLayout[i]['x'] !== 0) { //chore card is on a day of a week
               newLayout[i]['owner'] = this.props.userID;
-          } else {
+          } else { //the chore card is now in the deck 
               newLayout[i]['owner'] = "";
           }
         }
