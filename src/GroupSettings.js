@@ -6,8 +6,8 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { TextField, RaisedButton, List, ListItem, Subheader, CircularProgress, Checkbox, DatePicker, FlatButton, Dialog } from 'material-ui';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import moment from 'moment';
-import firebase from 'firebase';
 import _ from 'lodash';
+import fbcontroller from './fbcontroller';
 
 /*This file displays the create/join room page*/
 
@@ -19,7 +19,7 @@ class GroupSettings extends Component {
     nonAuthText: '',
     groupID: this.props.groupID,
     chores:[],
-    users:[]
+    members:[]
   }
 
   componentDidMount = () => {
@@ -29,16 +29,17 @@ class GroupSettings extends Component {
       if (currentGroup != null) {
         this.setState({
           chores: currentGroup.chores,
-          users: currentGroup.members
+          members: currentGroup.members
         });
         firebase.database().ref('users').once('value').then((snapshot) => {
-          const users = snapshot.val();
-          if (users != null) {
-            for(let i = 0; i < this.state.users.length; i++){
-                let currentUser = users[i];
-                console.log(users);
-            }
-          }
+          console.log(snapshot);
+          // const users = snapshot.val();
+          // if (users != null) {
+          //   for(let i = 0; i < this.state.users.length; i++){
+          //       let currentUser = users[i];
+          //       console.log(users);
+          //   }
+          // }
         })
       }
     });
