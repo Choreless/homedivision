@@ -29,6 +29,7 @@ class Weekly extends Component {
       groupID: this.props.groupID,
       chores: [],
       newCounter: 0,
+      currentCard: 0
     }
 
     static propTypes = {
@@ -121,6 +122,14 @@ class Weekly extends Component {
           newLayout[i]['minH'] = 1;
           newLayout[i]['minW'] = 0;
           newLayout[i]['chore'] = this.state.items[i].chore;
+          newLayout[i]['i'] = i.toString();
+            
+          // A chore card is assigned an owner only if its not in the deck (at x=0)
+          if (newLayout[i]['x'] !== 0) { //chore card is on a day of a week
+              newLayout[i]['owner'] = this.props.userID;
+          } else { //the chore card is now in the deck 
+              newLayout[i]['owner'] = "";
+          }
         }
         firebase.database().ref('groups/'+this.props.match.params.groupID).update({
           layout: newLayout
@@ -132,36 +141,74 @@ class Weekly extends Component {
       }
 
     onAddItem = () => {
+        // *******does not re-render the calendar, might have to call forceUpdate()*******
         /*eslint no-console: 0*/
-        this.setState({
-            // Add a new item. It must have a unique key!
-         items: this.state.items.concat([{
-            i: 'n' + this.state.newCounter,
-            x: 0, // on the deck col
-            y: Infinity, // puts it at the bottom
-            w: 1,
-            h: 2
-        }]),
-    // Increment the counter to ensure key is always unique.
-    newCounter: this.state.newCounter + 1
-    });
+        var addedChore = {
+                            i: 'n' + this.state.newCounter,
+                            x: 0, // on the deck col
+                            y: Infinity, // puts it at the bottom
+                            w: 1,
+                            h: 2,
+                            isResizable: false,
+                            chore: "added chore",
+                            maxW: 10,
+                            maxH: 10,
+                            minH: 1,
+                            minW: 0,
+                            isDraggable: true
+                        }
+        // if there are no chore cards, set this to be the first item
+        if (this.state.items == null) {
+            var newLayout = []
+            newLayout.push(addedChore);
+            this.setState({
+                items: newLayout,
+            })
+        } else { // add new chore card to item
+            this.setState({
+                items: this.state.items.concat([addedChore])
+            })
+        }    
+        this.setState({ // ensure key is always unique
+            newCounter: this.state.newCounter + 1
+        })
+//        this.setState({
+//            // Add a new item. It must have a unique key!
+//         items: this.state.items.concat([{
+//            i: 'n' + this.state.newCounter,
+//            x: 0, // on the deck col
+//            y: Infinity, // puts it at the bottom
+//            w: 1,
+//            h: 2,
+//            isResizable: false,
+//            chore: "added chore",
+//            maxW: 10,
+//            maxH: 10,
+//            minH: 1,
+//            minW: 0,
+//            isDraggable: true
+//        }]),
+//    // Increment the counter to ensure key is always unique.
+//    newCounter: this.state.newCounter + 1
+//    });
+        
     }
 
     onRemoveItem = (i) => {
         console.log('removing', i);
-        this.setState({items: _.reject(this.state.items, {i: i})});
+        var newItems = this.state.items;
+        newItems.splice(i, 1);
+        this.setState({
+            items: newItems
+        })
+//        this.setState({items: _.reject(this.state.items, {i: i})});
+        console.log(this.state.items);
     }
 
     createElement = (el) => {
-        var removeStyle = {
-            position: 'absolute',
-            right: '2px',
-            top: 0,
-            cursor: 'pointer'
-        };
-        var i = el.i;
+        //var i = el.i;
         return (
-        <div onTouchTap={this.handleTouchTap} key={i} data-grid={el}>{el.chore}</div>
+        <div onTouchTap={(event) => this.handleTouchTap(event, el.i)} key={el.i} data-grid={el}>{el.chore}</div>
         );
     }
 
@@ -175,13 +222,18 @@ class Weekly extends Component {
     }
 
 //i is the index. l is the object containing x/y coords.
-    handleTouchTap = (event) => {
+    handleTouchTap = (index) => {
+    // need to fix bug of event not being passedd into here so popover is showing up top left
       // This prevents ghost click.
-      event.preventDefault();
+      //event.preventDefault();
       this.setState({
         popoverOpen: true,
-        anchorEl: event.currentTarget,
+        anchorEl: event.currentTarget
       });
+        this.setState({
+            currentCard: index
+        })
+        console.log(index);
     };
 
     handleRequestClose = () => {
@@ -228,7 +280,7 @@ class Weekly extends Component {
                   <div className="container-fluid">
                       <div className="row seven-cols">
                           <div className="col-md-1 center">Deck
-                                 <button onTouchTap={this.onAddItem}>Add Item</button>
+                                 <button onTouchTap={() => this.onAddItem()}>Add Item</button>
                           </div>
                           <div className="col-md-1 center">Sunday</div>
                           <div className="col-md-1 center">Monday</div>
@@ -259,7 +311,7 @@ class Weekly extends Component {
                       <Menu>
                         <MenuItem primaryText="Mark as Complete" />
                         <MenuItem primaryText="Edit Chore" />
-                        <MenuItem primaryText="Remove" />
+                        <MenuItem primaryText="Remove" onTouchTap={() => this.onRemoveItem(this.state.currentCard)}/>
                       </Menu>
                       </Popover>
                     </MuiThemeProvider>
