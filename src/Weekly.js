@@ -204,10 +204,10 @@ class Weekly extends Component {
         var newItems = this.state.items;
         newItems.splice(i, 1);
         this.setState({
-            items: newItems
+            items: newItems,
+            popoverOpen: false,
         })
 //        this.setState({items: _.reject(this.state.items, {i: i})});
-        console.log(this.state.items);
     }
 
     createElement = (el) => {
