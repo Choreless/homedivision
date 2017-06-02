@@ -5,6 +5,9 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { TextField, RaisedButton, List, ListItem, Subheader, CircularProgress, Checkbox, DatePicker, FlatButton, Dialog } from 'material-ui';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
+import moment from 'moment';
+import firebase from 'firebase';
+import _ from 'lodash';
 
 /*This file displays the create/join room page*/
 
@@ -53,6 +56,10 @@ class GroupSettings extends Component {
     }
   }
 
+  componentWillMount = () => {
+    this.setState({isAuth: this.props.isAuth});
+  }
+
   handleChange = (event) => {
       var field = event.target.name;
       var value = event.target.value;
@@ -62,20 +69,30 @@ class GroupSettings extends Component {
       this.setState({errorText: ''});
   }
 
-  componentWillMount = () => {
-    this.setState({isAuth: this.props.isAuth});
+  formatDate = (date) => {
+    return moment(date).format('ddd, MMMM D YYYY');
   }
 
   handleOpen = () => {
     this.setState({open: true});
   };
 
+  handleAddChore = () => {
+    //Add to firebase from here.
+    console.log('Add chore from this function');
+    this.setState({open: false});
+  }
+
   handleClose = () => {
     this.setState({open: false});
   };
 
   handleCheck = (elem, isChecked) => {
-    console.log('Checkbox status', isChecked);
+    this.setState({recurring: isChecked});
+  }
+
+  handleDate = (date) => {
+    this.setState({choreDate: date})
   }
 
   //handle signIn button
@@ -94,9 +111,22 @@ class GroupSettings extends Component {
       <FlatButton
         label="Ok"
         primary={true}
-        onTouchTap={this.handleClose}
+        onTouchTap={this.handleAddChore}
       />,
     ];
+    let chores;
+    if(this.state.chores.length > 0) {
+      chores = _.map(this.state.chores, (elem, index) => {
+        return (
+          <ListItem key={'chore-'+index} rightIcon={<EditIcon/>}>{elem.name}</ListItem>
+        )
+      })
+    } else {
+      chores = <div>There are no chores for this group yet</div>
+    }
+
+
+
     return (
       <section className="container">
         {this.state.isAuth === undefined &&
@@ -121,7 +151,7 @@ class GroupSettings extends Component {
                 <form role="form" onSubmit={this.saveSettings}>
                   <div className="input-field">
                     <MuiThemeProvider muiTheme={getMuiTheme()}>
-                      <TextField style={{color: '#039BE5'}} defaultValue="Exodia" floatingLabelText="Group Name" fullWidth={true} type="text" name="group_name" onChange={(e) => {this.handleChange(e)}} />
+                      <TextField style={{color: '#039BE5'}} floatingLabelText="Group Name" fullWidth={true} type="text" name="group_name" onChange={(e) => {this.handleChange(e)}} />
                     </MuiThemeProvider>
                   </div>
                   <div className="input-field">
@@ -143,8 +173,7 @@ class GroupSettings extends Component {
                       <List>
                         <Subheader>Chores</Subheader>
                         <RaisedButton style={{marginTop: 5, marginBottom: 20}} label="Add Chore" secondary={true} labelStyle={{color: '#fff'}} onTouchTap={this.handleOpen}/>
-                        <ListItem rightIcon={<EditIcon/>}>Wash Dishes</ListItem>
-                        <ListItem rightIcon={<EditIcon/>}>Clean Bathroom</ListItem>
+                        {chores}
                       </List>
                     </MuiThemeProvider>
                   </div>
@@ -168,6 +197,22 @@ class GroupSettings extends Component {
                 onRequestClose={this.handleClose}
               >
                 <TextField style={{color: '#039BE5'}} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChange(e)}} />
+                {/* <Row>
+                  <Col s={12}>
+                    <TextField type="text" name="chore_name" floatingLabelText="Chore Name" onChange={(e) => {this.handleChange(e)}}/>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col s={12}>
+                    <DatePicker firstDayOfWeek={0}
+                      container="dialog"
+                      formatDate={this.formatDate}
+                      onChange={(n, date) => {this.handleDate(date)}}
+                      hintText="Date Picker" />
+                  </Col>
+                </Row>
+
+                <Checkbox onCheck={(e, isChecked) => {this.handleCheck(e, isChecked)}} label="Recurring"/> */}
               </Dialog>
             </MuiThemeProvider>
           </div>
