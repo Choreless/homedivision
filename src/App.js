@@ -7,7 +7,7 @@ import Weekly from './Weekly';
 import Navigation from './Navigation';
 import UserSettings from './UserSettings';
 import GroupSettings from './GroupSettings';
-import { Route, Switch, Link, Redirect } from 'react-router-dom';
+import { Route, Switch, Link, Redirect, withRouter } from 'react-router-dom';
 import firebase from 'firebase';
 
 /*This file handles the display of routes and navigation, as well as footer. */
@@ -54,7 +54,7 @@ class App extends Component {
             <Route path="/:groupID/monthly" render={(props)=><Monthly {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle}/>}/>
             <Route path="/:groupID/weekly" render={(props)=><Weekly {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle} groupID={this.state.groupID}/>}/>
             <Route path="/:groupID/settings" render={(props)=><GroupSettings {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle} groupID={this.state.groupID}/>}/>
-            <Route path="/login" component={Login}/>
+            <Route path="/login" component={Login} userID={this.state.userID}/>
             <Route path="/create" render={(props)=><CreateGroup {...props} isAuth={this.state.isAuth} userID={this.state.userID}/>}/>
             <Route path="/settings" render={(props)=><UserSettings {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle}/>}/>
           </Switch>
@@ -67,4 +67,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default withRouter(App);

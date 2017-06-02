@@ -24,41 +24,6 @@ class GroupSettings extends Component {
     members:[]
   }
 
-  componentDidMount = () => {
-    firebase.database().ref('groups/' + this.props.match.params.groupID).once('value').then((snapshot) => {
-      const currentGroup = snapshot.val();
-      console.log(currentGroup)
-      if (currentGroup != null){
-        firebase.database().ref('users').once('value').then((snapshot) => {
-            const users = snapshot.val();
-            console.log(users);
-            if (users != null) {
-                let tempMembers = [];
-                currentGroup.members.forEach((currentUserID) => {
-                  console.log(currentUserID);
-                  let currentUser = users[currentUserID];
-                  tempMembers.push(currentUser.handle);
-                });
-                let tempChores = [];
-                if(currentGroup.chores != null){
-                  currentGroup.chores.forEach((chore) => {
-                    console.log(chore);
-                    tempChores.push(chore);
-                  });
-                }
-                this.setState({
-                  groupName: currentGroup.name,
-                  passcode: currentGroup.passcode,
-                  members: tempMembers,
-                  groupID: this.props.match.params.groupID,
-                  chores: tempChores
-                });
-            }
-          });
-      }
-    });
-   }
-
   componentWillReceiveProps = (newProps) => {
     //Check for prop changes, and set state from here if something new comes up, since render does not re render component.
     var groupID = this.props.location.pathname.split('/')[1]; //grabs groupID from url parameter
@@ -71,8 +36,48 @@ class GroupSettings extends Component {
     }
   }
 
-  componentWillMount = () => {
+  componentDidMount = () => {
     this.setState({isAuth: this.props.isAuth});
+    this.choreRef = firebase.database().ref('groups/'+this.props.match.params.groupID + '/chores');
+    this.choreRef.on('value', (snapshot) => {
+      this.setState({chores: snapshot.val()});
+    })
+    firebase.database().ref('groups/' + this.props.match.params.groupID).once('value').then((snapshot) => {
+      const currentGroup = snapshot.val();
+      console.log(currentGroup)
+      if (currentGroup !== null){
+        firebase.database().ref('users').once('value').then((snapshot) => {
+            const users = snapshot.val();
+            console.log(users);
+            if (users !== null) {
+                let tempMembers = [];
+                currentGroup.members.forEach((currentUserID) => {
+                  console.log(currentUserID);
+                  let currentUser = users[currentUserID];
+                  tempMembers.push(currentUser.handle);
+                });
+                // let tempChores = [];
+                // if(currentGroup.chores !== null){
+                //   currentGroup.chores.forEach((chore) => {
+                //     console.log(chore);
+                //     tempChores.push(chore);
+                //   });
+                // }
+                this.setState({
+                  groupName: currentGroup.name,
+                  passcode: currentGroup.passcode,
+                  members: tempMembers,
+                  groupID: this.props.match.params.groupID,
+                  chores: currentGroup.chores || []
+                });
+            }
+          });
+      }
+    });
+   }
+
+  componentWillUnmount = () => {
+    this.choreRef.off();
   }
 
   handleChange = (event) => {
@@ -114,7 +119,7 @@ class GroupSettings extends Component {
   saveSettings = event => {
     event.preventDefault(); //don't submit
     console.log('Callback for saving settings');
-    fbcontroller.updateGroupName(this.props.match.params.groupID, this.state.groupName);
+    fbcontroller.updateGroupName(this.props.match.params.groupID, this.state.groupName.trim());
   }
 
   render() {
@@ -134,7 +139,7 @@ class GroupSettings extends Component {
     if(this.state.chores.length > 0) {
       chores = _.map(this.state.chores, (elem, index) => {
         return (
-          <ListItem key={'chore-'+index} rightIcon={<EditIcon/>}>{elem.name}</ListItem>
+          <ListItem key={'chore-'+index} rightIcon={<EditIcon/>}>{elem}</ListItem>
         )
       })
     } else {
@@ -167,12 +172,12 @@ class GroupSettings extends Component {
                 <form role="form" onSubmit={this.saveSettings}>
                   <div className="input-field">
                     <MuiThemeProvider muiTheme={getMuiTheme()}>
-                      <TextField style={{color: '#039BE5'}} floatingLabelText={this.state.groupName} fullWidth={true} type="text" name="groupName" onChange={(e) => {this.handleChange(e)}} />
+                      <TextField style={{color: '#039BE5'}} value={this.state.groupName} floatingLabelText="Group Name" fullWidth={true} type="text" name="groupName" onChange={(e) => {this.handleChange(e)}} />
                     </MuiThemeProvider>
                   </div>
                   <div className="input-field">
                     <MuiThemeProvider muiTheme={getMuiTheme()}>
-                      <TextField style={{color: '#039BE5'}} floatingLabelText={this.state.passcode} fullWidth={true} type="text" name="passcode" disabled/>
+                      <TextField style={{color: '#039BE5'}} value={this.state.passcode} floatingLabelText={'Passcode'} fullWidth={true} type="text" name="passcode" disabled/>
                     </MuiThemeProvider>
                   </div>
                   <div className="input-field">

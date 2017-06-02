@@ -42,6 +42,7 @@ class Navigation extends Component {
     firebase.auth().signOut().then(() => {
       if(location.pathname !== '/') this.props.history.push('/')
       else this.forceUpdate();
+      location.reload();
     }).catch((err) => {
       alert(err);
     })
@@ -51,7 +52,7 @@ class Navigation extends Component {
     let links;
     if(this.props.isAuth && !this.props.groupID) {
       //Person is logged in, not assigned to group, display create group
-      links = [{link: '/', body: 'Home'}, {link: '/create', body: 'Create Group'}, {link: '/dw23498xz/weekly', body: 'Test Weekly'}, {link: '/dw23498xz/settings', body: 'Group Settings'},  {link: '/settings', body: 'User Settings'}];
+      links = [{link: '/', body: 'Home'}, {link: '/create', body: 'Create Group'}, {link: '/dw23498xz/weekly', body: 'Test Weekly'}, {link: '/settings', body: 'User Settings'}];
     } else if(!this.props.isAuth && !this.props.groupID) {
       //Person not logged, and not assigned to group
       links = [{link: '/', body: 'Home'}, {link: '/login', body: 'Login'}, {link: '/dw23498xz/weekly', body: 'Test Weekly'}];
