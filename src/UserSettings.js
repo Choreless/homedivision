@@ -11,10 +11,9 @@ class UserSettings extends Component {
 
   state = {
     nickname: undefined,
-    oldPassword: undefined,
     newPassword: undefined,
     confirmNewPassword: undefined,
-    email: undefined,
+    currentEmail: undefined,
     isAuth: undefined,
     open: false,
     loading: undefined,
@@ -26,22 +25,28 @@ class UserSettings extends Component {
     passwordvalidate: false,
     matchvalidate: false,
     uservalidate: false,
-    userColor: undefined
+    userColor: undefined,
+    currentUser: undefined
   }
 
   componentDidMount = () => { 
     if(this.props.isAuth === false || this.props.isAuth === undefined) this.props.history.push('/');
 
     if (this.props.userID !== null) {
-            firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
-            const userData = snapshot.val();
-            if (userData !== null) {
-                this.setState({
-                    userColor: userData.color,
-                });
-            }
-          })
+        firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
+        const userData = snapshot.val();
+        if (userData !== null) {
+          this.setState({
+            userColor: userData.color,
+          });
         }
+      })
+    }
+
+    var user = firebase.auth().currentUser;
+    if(user != null) {
+      this.setState({currentEmail: user.email});
+    }
   }
 
   validate = (value, validations) => {
@@ -136,16 +141,25 @@ class UserSettings extends Component {
   }
 
   updatePassword = (event) => {
-  
+    var user = firebase.auth().currentUser;
+    if(user != null) {
+      user.updatePassword(document.getElementById("changePassword").value);
+    } else {
+      alert("No current user found!");
+    }
   }
 
   updateEmail = (event) => {
-    
+    var user = firebase.auth().currentUser;
+    if(user != null) {
+      user.updateEmail(document.getElementById("changeEmail").value);
+    } else {
+      alert("No current user found!");
+    }
   }
 
   updateColor = (color, event) => {
     fbcontroller.updateUserInfo(this.props.userID, this.props.userHandle, color.hex);
-    console.log(this.props.userID + " " +  this.props.userHandle + " " + color.hex);
   }
 
   handleChange = (event) => {
@@ -206,20 +220,15 @@ class UserSettings extends Component {
 
         <div>
           <h4>Update Password</h4>
-          <form role="form" onSubmit={this.updatePassword}>
-            <div className="form-group">
-              <MuiThemeProvider muiTheme={getMuiTheme()}>
-                <TextField id="changePassword" style={{color: '#039BE5'}} floatingLabelText="Old Password" fullWidth={true} type="password" name="old_password" />
-              </MuiThemeProvider>
-            </div>
+          <form role="form">
             <div className="form-group">
                 <MuiThemeProvider muiTheme={getMuiTheme()}>
-                  <TextField style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="New Password" name="new_password" type="password" onChange={(e) => {this.handlePasswordValidate(e);}} errorText={!this.state.passwordvalidate && this.state.new_password ? 'Must contain at least 1 digit and alpha and be between 6-20 characters': ''} />
+                  <TextField id="changePassword" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="New Password" name="new_password" type="password" onChange={(e) => {this.handlePasswordValidate(e);}} errorText={!this.state.passwordvalidate && this.state.new_password ? 'Must contain at least 1 digit and alpha and be between 6-20 characters': ''} />
                 </MuiThemeProvider>
             </div>
             <div className="form-group">
               <MuiThemeProvider muiTheme={getMuiTheme()}>
-                <TextField id="signin-user" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Confirm New Password" name="match" type="password" onChange={(e) => {this.handleMatchValidate(e);}} errorText={!this.state.matchvalidate && this.state.match ? 'Passwords do not match':''} />
+                <TextField style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Confirm New Password" name="match" type="password" onChange={(e) => {this.handleMatchValidate(e);}} errorText={!this.state.matchvalidate && this.state.match ? 'Passwords do not match':''} />
               </MuiThemeProvider>
             </div>
             <div className="form-group">
@@ -232,9 +241,9 @@ class UserSettings extends Component {
 
         <div>
           <h4>Update Email</h4>
-          <form role="form" onSubmit={this.updateEmail}>
+          <form role="form">
             <div className="form-group">
-              <h6>Your current email is: {this.props.userEmail}</h6>
+              <h6>Your current email is: {this.state.currentEmail}</h6>
               <MuiThemeProvider muiTheme={getMuiTheme()}>
                 <TextField id="changeEmail" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Email" name="email" type="email" onChange={(e) => {this.handleEmailValidate(e);}} errorText={!this.state.emailvalidate && this.state.email ? 'Not a valid email address':''} />
               </MuiThemeProvider>
