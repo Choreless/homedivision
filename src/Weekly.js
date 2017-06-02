@@ -121,6 +121,12 @@ class Weekly extends Component {
           newLayout[i]['minH'] = 1;
           newLayout[i]['minW'] = 0;
           newLayout[i]['chore'] = this.state.items[i].chore;
+          newLayout[i]['i'] = i.toString();
+          if (newLayout[i]['x'] !== 0) {
+              newLayout[i]['owner'] = this.props.userID;
+          } else {
+              newLayout[i]['owner'] = "";
+          }
         }
         firebase.database().ref('groups/'+this.props.match.params.groupID).update({
           layout: newLayout
@@ -149,7 +155,13 @@ class Weekly extends Component {
 
     onRemoveItem = (i) => {
         console.log('removing', i);
-        this.setState({items: _.reject(this.state.items, {i: i})});
+        var newItems = this.state.items;
+        newItems.splice(i, 1);
+        this.setState({
+            items: newItems
+        })
+//        this.setState({items: _.reject(this.state.items, {i: i})});
+        console.log(this.state.items);
     }
 
     createElement = (el) => {
@@ -259,7 +271,7 @@ class Weekly extends Component {
                       <Menu>
                         <MenuItem primaryText="Mark as Complete" />
                         <MenuItem primaryText="Edit Chore" />
-                        <MenuItem primaryText="Remove" />
+                        <MenuItem primaryText="Remove" onTouchTap={() => this.onRemoveItem(0)}/>
                       </Menu>
                       </Popover>
                     </MuiThemeProvider>
