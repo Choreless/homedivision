@@ -12,6 +12,7 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { IconButton, Dialog, DatePicker, FlatButton, Checkbox, Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn, Drawer, MenuItem, Menu, Popover } from 'material-ui';
 import ActionAddNote from 'material-ui/svg-icons/action/note-add';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
+import RaisedButton from 'material-ui/RaisedButton';
 
 //var choresRef = firebase.database().ref("groups/dw23498xz/chores");
 /*This file handles display of the weekly calendar*/
@@ -27,7 +28,7 @@ class Weekly extends Component {
       userID: this.props.userID,
       groupID: this.props.groupID,
       chores: [],
-      newCounter: 0
+      newCounter: 0,
     }
 
     static propTypes = {
@@ -44,29 +45,6 @@ class Weekly extends Component {
         onLayoutChange: () => {}
     };
 
-
-
-    onAddItem = () => {
-        /*eslint no-console: 0*/
-        this.setState({
-            // Add a new item. It must have a unique key!
-         items: this.state.items.concat([{
-            i: 'n' + this.state.newCounter,
-            x: 0, // on the deck col
-            y: Infinity, // puts it at the bottom
-            w: 1,
-            h: 2
-        }]),
-    // Increment the counter to ensure key is always unique.
-    newCounter: this.state.newCounter + 1
-    });
-    }
-
-    onRemoveItem(i) {
-        console.log('removing', i);
-        this.setState({items: _.reject(this.state.items, {i: i})});
-    }
-
     componentWillReceiveProps = (newProps) => {
         var groupID = this.props.location.pathname.split('/')[1]; //grabs groupID from url parameter
 
@@ -77,7 +55,7 @@ class Weekly extends Component {
 
         // Saves the user color and handle info to state
         if (this.props.userID !== null) {
-            firebase.database().ref('users/' + this.props.userID).on('value', (snapshot) => {
+            firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
             const userData = snapshot.val();
             if (userData !== null) {
                 this.setState({
@@ -91,7 +69,7 @@ class Weekly extends Component {
 
     componentDidMount = () => {
         // grabs the group data from firebase, and save the chores list in the state as an array
-       firebase.database().ref('groups/' + this.props.match.params.groupID).on('value', (snapshot) => {
+       firebase.database().ref('groups/' + this.props.match.params.groupID).once('value').then((snapshot) => {
            const currentGroup = snapshot.val();
            if (currentGroup != null) {
                this.setState({
@@ -99,9 +77,9 @@ class Weekly extends Component {
                });
            }
        })
-       
+
        this.setState({
-           items: this.grabLayout(this.props.match.params.groupID)
+           items: this.grabLayout()
        });
 
        this.setState({
@@ -136,49 +114,45 @@ class Weekly extends Component {
       };
 
       onLayoutChange = (newLayout) => {
-          console.log(newLayout);
         for(let i = 0; i < newLayout.length; i++) {
           newLayout[i].isDraggable = true;
           newLayout[i]['maxH'] = 10;
           newLayout[i]['maxW'] = 10;
           newLayout[i]['minH'] = 1;
           newLayout[i]['minW'] = 0;
+          newLayout[i]['chore'] = this.state.items[i].chore;
         }
-        console.log('onLayoutChange', newLayout);
-        console.log(this.state.items);
-        // this code below is broken af...creates a bunch of of child nodes
         firebase.database().ref('groups/'+this.props.match.params.groupID).update({
-          testLayout: newLayout
+          layout: newLayout
         }).then(() => {
           console.log('Succesfully updated');
         }).catch((err) => {
           alert('Error occured', err);
         })
-        
-        // firebase.database().ref('groups/' + this.state.groupID + '/layout/' + 1).on('value', (snapshot) => {
-        //     const layoutRef = snapshot.val();
-        //     console.log(layoutRef);
-        // })
-        //var layout = [];
-        //for (var i = 0; i < newLayout.length; i++) {
-            // layout[i] = {
-            //                     x: newLayout[i].x,
-            //                 }
-        //     firebase.database().ref('groups/' + this.state.groupID + '/layout/' + i).update({
-        //                         x: newLayout[i].x,
-        //     });
-        // }
-        //console.log(layout);
-                // firebase.database().ref('groups/' + this.state.groupID).update({
-                //     layout
-                // });
-                // firebase.database().ref('groups/' + this.state.groupID + '/layout').on('value', (snapshot) => {
-                //     const testRef = snapshot.val();
-                //     console.log(testRef);
-                // });
       }
 
-    createElement(el) {
+    onAddItem = () => {
+        /*eslint no-console: 0*/
+        this.setState({
+            // Add a new item. It must have a unique key!
+         items: this.state.items.concat([{
+            i: 'n' + this.state.newCounter,
+            x: 0, // on the deck col
+            y: Infinity, // puts it at the bottom
+            w: 1,
+            h: 2
+        }]),
+    // Increment the counter to ensure key is always unique.
+    newCounter: this.state.newCounter + 1
+    });
+    }
+
+    onRemoveItem = (i) => {
+        console.log('removing', i);
+        this.setState({items: _.reject(this.state.items, {i: i})});
+    }
+
+    createElement = (el) => {
         var removeStyle = {
             position: 'absolute',
             right: '2px',
@@ -186,55 +160,23 @@ class Weekly extends Component {
             cursor: 'pointer'
         };
         var i = el.i;
-        // no idea if this is the best way to set the innerHTML of the chore card to be the chore name
         return (
-        <div key={i} data-grid={el} dangerouslySetInnerHTML={{ __html: el.choreName + " | " + el.owner }}></div>
+        <div onTouchTap={this.handleTouchTap} key={i} data-grid={el}>{el.chore}</div>
         );
     }
-    
+
     // Get current chore card layout of group from firebase
-    grabLayout(groupID) {
+    grabLayout = () => {
         // array of objects to be returned, represents chore cards in screen
         var currentLayout = [];
-        firebase.database().ref('groups/' + groupID + '/layout').on('value', (snapshot) => {
-        // saves the layout field in firebase
-        const layoutRef = snapshot.val();
-        console.log(layoutRef);
-        if (layoutRef != null) {
-            for (var i = 0; i < layoutRef.length; i++) {
-                var card =  {
-                                x: layoutRef[i].x,
-                                y: Infinity,
-                                w: 1,
-                                h: 2,
-                                i: i.toString(),
-                                isResizable: false,
-                                add: layoutRef[i].add,
-                                choreName: layoutRef[i].chore,
-                                owner: layoutRef[i].owner,
-                                color: layoutRef[i].color
-                            }
-                currentLayout.push(card);
-            }
-        }
-        console.log(currentLayout);
-      })
-      console.log(currentLayout);
-        return currentLayout;
-    }
-
-    isEmpty(obj) {
-        for(var key in obj) {
-            if(obj.hasOwnProperty(key))
-                return false;
-        }
-        return true;
+        firebase.database().ref('groups/' + this.props.match.params.groupID + '/layout').once('value').then((snapshot) => {
+          this.setState({items: snapshot.val()})
+        });
     }
 
 //i is the index. l is the object containing x/y coords.
-    handleTouchTap = (event, l, i) => {
+    handleTouchTap = (event) => {
       // This prevents ghost click.
-      //console.log(l);
       event.preventDefault();
       this.setState({
         popoverOpen: true,
@@ -250,7 +192,11 @@ class Weekly extends Component {
 
 
     render() {
-        console.log(this.state.items);
+      let chores = _.map(this.state.items, (elem,index) => {
+        return (
+          <li key={'Chore-'+index}>{elem.chore}</li>
+        )
+      })
         return (
           <div>
             {this.state.isMobile ?
@@ -262,53 +208,10 @@ class Weekly extends Component {
                 </Row>
                 <Row>
                   <Col s={12}>
-                    <h3 style={{fontSize: '1.4rem'}}>Members</h3>
-                    <Collapsible popout>
-                      <CollapsibleItem header='Group Member 1'>
-                        This is the monthly calendar view, with room ID: {this.props.match.params.roomID}
-                      </CollapsibleItem>
-                      <CollapsibleItem header='Group Member 2'>
-                        <Row>
-                          <Col s={10}>
-                            <MuiThemeProvider muiTheme={getMuiTheme()}>
-                              <Table
-                                selectable={false}>
-                                <TableHeader
-                                  displaySelectAll={false}
-                                  adjustForCheckbox={false}>
-                                  <TableRow>
-                                    <TableHeaderColumn>Chore</TableHeaderColumn>
-                                    <TableHeaderColumn>Time</TableHeaderColumn>
-                                    <TableHeaderColumn>Edit</TableHeaderColumn>
-                                  </TableRow>
-                                </TableHeader>
-                                <TableBody
-                                  displayRowCheckbox={false}>
-                                  <TableRow>
-                                    <TableRowColumn>Clean Dishes</TableRowColumn>
-                                    <TableRowColumn>Mon</TableRowColumn>
-                                    <TableRowColumn><IconButton><EditIcon/></IconButton></TableRowColumn>
-                                  </TableRow>
-                                  <TableRow>
-                                    <TableRowColumn>Do Laundry</TableRowColumn>
-                                    <TableRowColumn>Sun</TableRowColumn>
-                                    <TableRowColumn><IconButton><EditIcon/></IconButton></TableRowColumn>
-                                  </TableRow>
-                                </TableBody>
-                              </Table>
-                            </MuiThemeProvider>
-                          </Col>
-                          <Col s={2}>
-                            <MuiThemeProvider muiTheme={getMuiTheme()}>
-                              <IconButton iconStyle={{height: 36, width: 36}} tooltip="Add Chore Card" onTouchTap={this.handleOpen}><ActionAddNote/></IconButton>
-                            </MuiThemeProvider>
-                          </Col>
-                        </Row>
-                      </CollapsibleItem>
-                      <CollapsibleItem header='Group Member 3'>
-                        Lorem ipsum dolor sit amet.
-                      </CollapsibleItem>
-                    </Collapsible>
+                    List of chores <br/>
+                    <ul>
+                      {chores}
+                    </ul>
                   </Col>
                 </Row>
               </section>
@@ -345,22 +248,22 @@ class Weekly extends Component {
                         measureBeforeMount={true}>
                         {_.map(this.state.items, this.createElement)}
                     </ResponsiveReactGridLayout>
+                    <MuiThemeProvider muiTheme={getMuiTheme()}>
+                      <Popover
+                        open={this.state.popoverOpen}
+                        anchorEl={this.state.anchorEl}
+                        anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                        targetOrigin={{horizontal: 'left', vertical: 'top'}}
+                        onRequestClose={this.handleRequestClose}
+                      >
+                      <Menu>
+                        <MenuItem primaryText="Mark as Complete" />
+                        <MenuItem primaryText="Edit Chore" />
+                        <MenuItem primaryText="Remove" />
+                      </Menu>
+                      </Popover>
+                    </MuiThemeProvider>
                 </div>
-                <MuiThemeProvider muiTheme={getMuiTheme()}>
-                  <Popover
-                    open={this.state.popoverOpen}
-                    anchorEl={this.state.anchorEl}
-                    anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-                    targetOrigin={{horizontal: 'left', vertical: 'top'}}
-                    onRequestClose={this.handleRequestClose}
-                  >
-                    <Menu>
-                      <MenuItem primaryText="Mark as Complete" />
-                      <MenuItem primaryText="Edit Chore" />
-                      <MenuItem primaryText="Remove" />
-                    </Menu>
-                  </Popover>
-                </MuiThemeProvider>
               </section>
             }
           </div>
@@ -404,4 +307,3 @@ col 5: thur
 col 6: friday
 col 7: saturday
 */
-// potential bug: i of card is manually set atm. what if a card gets removed? might have to change the i attribute of card to be the index position of the layout
