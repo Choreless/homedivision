@@ -47,7 +47,7 @@ class SignUpForm extends Component {
     this.setState({disabled: true});
     this.setState({icon: <CircularProgress size={26}/>});
     firebase.auth().createUserWithEmailAndPassword(email, password)
-      .then(function(firebaseUser) {
+      .then((firebaseUser) => {
         //include information (for app-level content)
         //firebaseUser.sendEmailVerification();
         //var link = 'https://www.gravatar.com/avatar/' + md5(email);

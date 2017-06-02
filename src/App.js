@@ -46,7 +46,7 @@ class App extends Component {
     return (
       <div>
         <header>
-          <Navigation userHandle={this.state.userHandle} groupID={this.state.groupID} />
+          <Navigation isAuth={this.state.isAuth} userID={this.state.userID} userHandle={this.state.userHandle} groupID={this.state.groupID} />
         </header>
         <main>
           <Switch>
