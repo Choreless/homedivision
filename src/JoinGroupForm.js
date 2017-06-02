@@ -22,8 +22,17 @@ class JoinGroupForm extends Component{
           let check = false;
           for(let group in snapshot.val()) {
             if(snapshot.val()[group].passcode === temp) {
-              this.props.history.push("/" + temp + "/weekly");
+              firebase.database().ref('users/' + this.props.userID).update({
+                group: group
+              })
+              let temp = snapshot.val()[group].members
+              if(temp === undefined) temp = [];
+              firebase.database().ref('groups/' + group).update({
+                members: temp.concat(this.props.userID)
+              })
+              this.props.history.push("/" + group + "/weekly");
               check = true;
+              break;
             }
           }
           if(!check) this.setState({errorText: 'Passcode does not belong to a group. Please try a different passcode.'});

@@ -15,11 +15,12 @@ class Navigation extends Component {
   }
 
   componentWillReceiveProps = (newProps) => {
-    if(newProps.groupID !== undefined) {
+    if(newProps.groupID) {
       firebase.database().ref('groups/'+newProps.groupID).once('value').then((snapshot) => {
         this.setState({name: snapshot.val().name})
       })
     }
+    this.setState({isAuth: newProps.isAuth, userID: newProps.userID})
   }
 
   handleToggle = () => {
@@ -47,8 +48,18 @@ class Navigation extends Component {
   }
 
   render() {
-
-    let links = [{link: '/', body: 'Home'}, {link: '/login', body: 'Login'}, {link: '/create', body: 'Create Group'}, {link: '/dw23498xz/weekly', body: 'Test Weekly'}, {link: '/dw23498xz/settings', body: 'Group Settings'},  {link: '/settings', body: 'User Settings'}];
+    let links;
+    if(this.props.isAuth && !this.props.groupID) {
+      //Person is logged in, not assigned to group, display create group
+      links = [{link: '/', body: 'Home'}, {link: '/create', body: 'Create Group'}, {link: '/dw23498xz/weekly', body: 'Test Weekly'}, {link: '/dw23498xz/settings', body: 'Group Settings'},  {link: '/settings', body: 'User Settings'}];
+    } else if(!this.props.isAuth && !this.props.groupID) {
+      //Person not logged, and not assigned to group
+      links = [{link: '/', body: 'Home'}, {link: '/login', body: 'Login'}, {link: '/dw23498xz/weekly', body: 'Test Weekly'}];
+    } else if(this.props.isAuth && this.props.groupID) {
+      links = [{link: '/', body: 'Home'}, {link: '/dw23498xz/weekly', body: 'Test Weekly'},{link: '/' + this.props.groupID +'/weekly', body: 'Weekly Calendar'}, {link: '/' + this.props.groupID + '/settings', body: 'Group Settings'},  {link: '/settings', body: 'User Settings'}];
+    } else {
+      links = [{link: '/', body: 'Home'}, {link: '/login', body: 'Login'}, {link: '/dw23498xz/weekly', body: 'Test Weekly'}];
+    }
     let drawerlinks = _.map(links, (elem, index) => {
       let activeStyle = this.handleActiveLink(elem.link);
       return (

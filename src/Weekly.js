@@ -77,7 +77,7 @@ class Weekly extends Component {
                });
            }
        })
-       
+
        this.setState({
            items: this.grabLayout()
        });
@@ -147,12 +147,12 @@ class Weekly extends Component {
     });
     }
 
-    onRemoveItem(i) {
+    onRemoveItem = (i) => {
         console.log('removing', i);
         this.setState({items: _.reject(this.state.items, {i: i})});
     }
 
-    createElement(el) {
+    createElement = (el) => {
         var removeStyle = {
             position: 'absolute',
             right: '2px',
@@ -161,10 +161,10 @@ class Weekly extends Component {
         };
         var i = el.i;
         return (
-        <div key={i} data-grid={el}>{el.chore}</div>
+        <div onTouchTap={this.handleTouchTap} key={i} data-grid={el}>{el.chore}</div>
         );
     }
-    
+
     // Get current chore card layout of group from firebase
     grabLayout = () => {
         // array of objects to be returned, represents chore cards in screen
@@ -175,9 +175,8 @@ class Weekly extends Component {
     }
 
 //i is the index. l is the object containing x/y coords.
-    handleTouchTap = (event, l, i) => {
+    handleTouchTap = (event) => {
       // This prevents ghost click.
-      console.log(l);
       event.preventDefault();
       this.setState({
         popoverOpen: true,
@@ -284,8 +283,7 @@ class Weekly extends Component {
                         onBreakpointChange={this.onBreakpointChange}
                         onLayoutChange={this.onLayoutChange}
                         // WidthProvider option
-                        measureBeforeMount={true}
-                        onTouchTap={this.handleTouchTap}>
+                        measureBeforeMount={true}>
                         {_.map(this.state.items, this.createElement)}
                     </ResponsiveReactGridLayout>
                     <MuiThemeProvider muiTheme={getMuiTheme()}>

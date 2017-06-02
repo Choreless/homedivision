@@ -25,7 +25,7 @@ class CreateGroup extends Component {
             <MuiThemeProvider muiTheme={getMuiTheme()}>
               <Tabs inkBarStyle={{backgroundColor: '#000', zIndex: '10'}}>
                 <Tab buttonStyle={{backgroundColor: '#fff', color: '#000'}} label="Join">
-                  <JoinGroupForm history={this.props.history}  />
+                  <JoinGroupForm history={this.props.history} userID={this.props.userID}  />
                 </Tab>
                 <Tab buttonStyle={{backgroundColor: '#fff', color: '#000'}} label="Create">
                   <CreateGroupForm history={this.props.history} userID={this.props.userID} />
