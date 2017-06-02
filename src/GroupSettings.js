@@ -58,10 +58,6 @@ class GroupSettings extends Component {
 
   componentWillMount = () => {
     this.setState({isAuth: this.props.isAuth});
-    firebase.database().ref('groups/' + this.props.match.params.groupID).once('value').then((snapshot) => {
-      if(snapshot.val().chores) this.setState({chores: snapshot.val().chores});
-      if(snapshot.val().members) this.setState({members:snapshot.val().members})
-    });
   }
 
   handleChange = (event) => {
@@ -83,9 +79,7 @@ class GroupSettings extends Component {
 
   handleAddChore = () => {
     //Add to firebase from here.
-    console.log(this.state.choreDate);
-    console.log(this.state.recurring);
-    console.log(this.state.chore_name);
+    console.log('Add chore from this function');
     this.setState({open: false});
   }
 
