@@ -17,7 +17,9 @@ class GroupSettings extends Component {
     open: false,
     loading: undefined,
     nonAuthText: '',
-    groupID: this.props.groupID,
+    groupID: '',
+    passcode: '',
+    groupName: '',
     chores:[],
     members:[]
   }
@@ -26,21 +28,33 @@ class GroupSettings extends Component {
     firebase.database().ref('groups/' + this.props.match.params.groupID).once('value').then((snapshot) => {
       const currentGroup = snapshot.val();
       console.log(currentGroup)
-      if (currentGroup != null) {
-        this.setState({
-          chores: currentGroup.chores,
-          members: currentGroup.members
-        });
+      if (currentGroup != null){
         firebase.database().ref('users').once('value').then((snapshot) => {
-          console.log(snapshot);
-          // const users = snapshot.val();
-          // if (users != null) {
-          //   for(let i = 0; i < this.state.users.length; i++){
-          //       let currentUser = users[i];
-          //       console.log(users);
-          //   }
-          // }
-        })
+            const users = snapshot.val();
+            console.log(users);
+            if (users != null) {
+                let tempMembers = [];
+                currentGroup.members.forEach((currentUserID) => {
+                  console.log(currentUserID);
+                  let currentUser = users[currentUserID];
+                  tempMembers.push(currentUser.handle);
+                });
+                let tempChores = [];
+                if(currentGroup.chores != null){
+                  currentGroup.chores.forEach((chore) => {
+                    console.log(chore);
+                    tempChores.push(chore);
+                  });
+                }
+                this.setState({
+                  groupName: currentGroup.name,
+                  passcode: currentGroup.passcode,
+                  members: tempMembers,
+                  groupID: this.props.match.params.groupID,
+                  chores: tempChores
+                });
+            }
+          });
       }
     });
    }
@@ -79,8 +93,8 @@ class GroupSettings extends Component {
   };
 
   handleAddChore = () => {
-    //Add to firebase from here.
-    console.log('Add chore from this function');
+    this.state.chores.push(this.state.description)
+    fbcontroller.updateChores(this.state.groupID, this.state.chores)
     this.setState({open: false});
   }
 
@@ -100,6 +114,7 @@ class GroupSettings extends Component {
   saveSettings = event => {
     event.preventDefault(); //don't submit
     console.log('Callback for saving settings');
+    fbcontroller.updateGroupName(this.props.match.params.groupID, this.state.groupName);
   }
 
   render() {
@@ -152,12 +167,12 @@ class GroupSettings extends Component {
                 <form role="form" onSubmit={this.saveSettings}>
                   <div className="input-field">
                     <MuiThemeProvider muiTheme={getMuiTheme()}>
-                      <TextField style={{color: '#039BE5'}} floatingLabelText="Group Name" fullWidth={true} type="text" name="group_name" onChange={(e) => {this.handleChange(e)}} />
+                      <TextField style={{color: '#039BE5'}} floatingLabelText={this.state.groupName} fullWidth={true} type="text" name="groupName" onChange={(e) => {this.handleChange(e)}} />
                     </MuiThemeProvider>
                   </div>
                   <div className="input-field">
                     <MuiThemeProvider muiTheme={getMuiTheme()}>
-                      <TextField style={{color: '#039BE5'}} defaultValue={this.props.match.params.groupID} floatingLabelText="Group Passcode (Send to invite friends)" fullWidth={true} type="text" name="passcode" disabled/>
+                      <TextField style={{color: '#039BE5'}} floatingLabelText={this.state.passcode} fullWidth={true} type="text" name="passcode" disabled/>
                     </MuiThemeProvider>
                   </div>
                   <div className="input-field">

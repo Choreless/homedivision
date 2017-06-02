@@ -30,8 +30,6 @@ let fbcontroller = {
             h: vals.h,
             chore: chore,
             isResizeable: vals.isResizeable
-        }, (error) => {
-            console.log(error.message);
         });
     },
     // takes in a card number and updates its color and position and user for the given group id
@@ -40,8 +38,6 @@ let fbcontroller = {
             color: color,
             owner : user,
             x: pos
-        }, (error) => {
-            console.log(error.message);
         });
     },
 
@@ -62,18 +58,12 @@ let fbcontroller = {
     updateGroupName: (group, name) => {
         firebase.database().ref('groups/' + group).update({
             name: name
-        }, (error) => {
-            console.log(error.message);
         });
     },
     
-    // adds a chore with description
-    addChore: (group, description) => {
-        var newChoreKey = firebase.database().ref('groups/' + group + '/chores').push(); 
-        firebase.database().ref('groups/' + group + '/chores/' + newChoreKey).set(description, 
-        (error) => {
-            console.log(error.message);
-        });
+    // updates chore list with given list
+    updateChores: (group, newChores) => {
+        firebase.database().ref('groups/' + group).update({chores: newChores});
     },
 
 // albert's stuff (user settings)
@@ -83,8 +73,6 @@ let fbcontroller = {
         firebase.database().ref('users/' + user).update({
             handle: name,
             color: color
-        }, (error) => {
-            console.log("update user info error: " + error.message);
         });
     },
 
