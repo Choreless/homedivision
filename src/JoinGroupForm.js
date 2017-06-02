@@ -18,10 +18,17 @@ class JoinGroupForm extends Component{
         event.preventDefault();
         let temp = this.state.passcode.trim();
         //check if passcode is valid
-        firebase.database().ref('groups/' + temp).once('value').then((snapshot) => {
-        if(snapshot.val()) this.props.history.push("/" + temp + "/weekly");
-        else this.setState({errorText: 'Passcode does not belong to a group. Please try a different passcode.'});
-      })
+        firebase.database().ref('groups').once('value').then((snapshot) => {
+          let check = false;
+          for(let group in snapshot.val()) {
+            if(snapshot.val()[group].passcode === temp) {
+              this.props.history.push("/" + temp + "/weekly");
+              check = true;
+            }
+          }
+          if(!check) this.setState({errorText: 'Passcode does not belong to a group. Please try a different passcode.'});
+
+        })
     }
 
     handleChange = (event) => {
