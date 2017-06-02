@@ -49,7 +49,7 @@ let fbcontroller = {
 
     // takes in user given name for group and will generate a passcode
     createGroup: (name) => {
-
+        
     },
     // add userid to group using groupid
     addUserToGroup: (user, group) => {
@@ -59,29 +59,53 @@ let fbcontroller = {
 // thomas' stuff (group settings)
     
     // updates group name to given name
-    updateGroupName: (name) => {
-
+    updateGroupName: (group, name) => {
+        firebase.database().ref('groups/' + group).update({
+            name: name
+        }, (error) => {
+            console.log(error.message);
+        });
     },
     
     // adds a chore with description
-    addChore: (description) => {
-
+    addChore: (group, description) => {
+        var newChoreKey = firebase.database().ref('groups/' + group + '/chores').push(); 
+        firebase.database().ref('groups/' + group + '/chores/' + newChoreKey).set(description, 
+        (error) => {
+            console.log(error.message);
+        });
     },
 
 // albert's stuff (user settings)
 
-    // updates name and color for current user
-    updateUserInfo: (name, color) => {
-
+    // updates name and color for given user
+    updateUserInfo: (user, name, color) => {
+        firebase.database().ref('users/' + user).update({
+            handle: name,
+            color: color
+        }, (error) => {
+            console.log(error.message);
+        });
     },
 
-    // updates email and password for current user
+    // updates email and password for given user
     updateUserLoginInfo: (email, password) => {
 
     }
 
 // Jeff's stuff (add if you need anything buddy)
 
+}
+
+function makeid()
+{
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < 6; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
 }
 
 export default fbcontroller;
