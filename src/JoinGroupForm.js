@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import firebase from 'firebase';
-//import fbcontroller from './fbcontroller';
-import {TextField, RaisedButton, CircularProgress} from 'material-ui';
+import {TextField, RaisedButton} from 'material-ui';
 
 class JoinGroupForm extends Component{
 
@@ -9,48 +8,56 @@ class JoinGroupForm extends Component{
         passcode: undefined,
         errorText: '',
         disabled: true,
-        icon: undefined
+        icon: undefined,
+        currentMembers: undefined
     };
 
     //handle join group button
     joinGroup = event => {
         event.preventDefault();
-        let groupCode = this.state.passcode.trim();
+        var groupID = null;
+        
         //check if passcode is valid
         firebase.database().ref('groups').once('value').then((snapshot) => {
-          let validPasscode = false;
+          let groupCode = this.state.passcode.trim();
           for(let group in snapshot.val()) {
             if(snapshot.val()[group].passcode === groupCode) {
-              validPasscode = true;
+              groupID = group;
               break;
             }
-          }
+        }
 
-          if(validPasscode) {
+        if(groupID != null) {
             // check that user is not already in the group
-            var currentMembers = [];
-            firebase.database().ref('groups/' + groupCode + '/members').once('value').then((snapshot) => {
-                currentMembers = snapshot.val();
+            firebase.database().ref('groups/' + groupID + '/members').once('value').then((snapshot) => {
+                var currentMembers = snapshot.val();
+                let userExists = false;
+                
+                // loop through current members and check for match
+                for(let userID in currentMembers) {
+                    if (userID === this.props.userID) {
+                        userExists = true;
+                        break;
+                    }
+                }
+                
+                if(!userExists) {
+                    //add user to currentMembers
+                    currentMembers.push(this.props.userID);                
+                    firebase.database().ref('groups/' + groupID).update({
+                        members: currentMembers
+                    }).then(() => {  
+                        firebase.database().ref('users/' + this.props.userID).update({
+                            group: groupID
+                        })
+                    }).catch((err) =>{
+                        alert('Error occured', err);
+                    })
+
+                    //redirect 
+                    this.props.history.push("/" + groupID + "/weekly");
+                }
             });
-
-            //loop through current members and check for match
-                //value[userID] get userid from member object
-                this.props.userID
-            
-            // add user to the group
-            //add user to currentMembers
-            firebase.database().ref('groups/' + groupcode).update({
-                members: currentMembers
-            }).then(() => {  
-                firebase.database().ref('users/' + this.props.userID).update({
-                    group: groupcode
-                })
-            }).catch((err) =>{
-                alert('Error occured', err);
-            })
-
-            //redirect 
-            this.props.history.push("/" + temp + "/weekly");
           } else {
             this.setState({errorText: 'Passcode does not belong to a group. Please try a different passcode.'});
           }
