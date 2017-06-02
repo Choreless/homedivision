@@ -4,6 +4,8 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { TextField, RaisedButton, FlatButton, Dialog } from 'material-ui';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import firebase from 'firebase';
+import fbcontroller from './fbcontroller'
+import { CirclePicker } from 'react-color';
 
 class UserSettings extends Component {
 
@@ -24,10 +26,22 @@ class UserSettings extends Component {
     passwordvalidate: false,
     matchvalidate: false,
     uservalidate: false,
+    userColor: undefined
   }
 
   componentDidMount = () => { 
     if(this.props.isAuth === false || this.props.isAuth === undefined) this.props.history.push('/');
+
+    if (this.props.userID !== null) {
+            firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
+            const userData = snapshot.val();
+            if (userData !== null) {
+                this.setState({
+                    userColor: userData.color,
+                });
+            }
+          })
+        }
   }
 
   validate = (value, validations) => {
@@ -72,7 +86,7 @@ class UserSettings extends Component {
 
       //handle password type
       if(validations.password){
-        valid = /^(?=.*\d+)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%]{6,15}$/.test(value)
+        valid = /^(?=.*\d+)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%]{6,20}$/.test(value)
         if(!valid){
           errors.password = true;
           errors.isValid = false;
@@ -97,7 +111,6 @@ class UserSettings extends Component {
     this.handleChange(event);
     let errors = this.validate(event.target.value, {required:true, minLength:3, user:true});
     this.setState({uservalidate: errors.isValid});
-    console.log(this.props.userHandle);
   }
 
   handlePasswordValidate = (event) => {
@@ -119,29 +132,29 @@ class UserSettings extends Component {
   }
 
   updateNickname = (event) => {
-    
+    fbcontroller.updateUserInfo(this.props.userID, document.getElementById("changeNickname").value, this.state.userColor); 
   }
 
   updatePassword = (event) => {
-
+  
   }
 
   updateEmail = (event) => {
-
+    
   }
 
-  updateColor = (event) => {
-
+  updateColor = (color, event) => {
+    fbcontroller.updateUserInfo(this.props.userID, this.props.userHandle, color.hex);
+    console.log(this.props.userID + " " +  this.props.userHandle + " " + color.hex);
   }
 
   handleChange = (event) => {
-      var field = event.target.name;
-      var value = event.target.value;
-      var changes = {}; //object to hold changes
-      changes[field] = value; //change this field
-      this.setState(changes); //update state
-      this.setState({errorText: ''});
-      if(this.state.emailvalidate) this.setState({emailDisabled: false});
+    var field = event.target.name;
+    var value = event.target.value;
+    var changes = {}; //object to hold changes
+    changes[field] = value; //change this field
+    this.setState(changes); //update state
+    this.setState({errorText: ''});
   }
 
   render() {
@@ -176,14 +189,14 @@ class UserSettings extends Component {
 
         <div>
           <h4>Update Nickname</h4>
-          <form role="form" onSubmit={this.updateNickname}>
+          <form role="form">
             <div className="form-group">
               <h6>Your current nickname is: {this.props.userHandle}</h6>
               <MuiThemeProvider muiTheme={getMuiTheme()}>
                 <TextField id="changeNickname" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="New Nickname" name="user" type="text" onChange={(e) => {this.handleUserValidate(e);}} errorText={!this.state.uservalidate && this.state.user ? 'Must be at least 3 characters in length and not contain special characters or spaces':''} />
               </MuiThemeProvider>
             </div>
-            <div className="form-group">
+            <div>
               <MuiThemeProvider muiTheme={getMuiTheme()}>
                 <RaisedButton type="submit" label={!this.state.icon && 'Update Nickname'} icon={this.state.icon} primary={true} disabled={nicknameDisabled} labelStyle={{color: '#fff'}} onTouchTap={this.updateNickname}/>
               </MuiThemeProvider>
@@ -196,12 +209,12 @@ class UserSettings extends Component {
           <form role="form" onSubmit={this.updatePassword}>
             <div className="form-group">
               <MuiThemeProvider muiTheme={getMuiTheme()}>
-                <TextField style={{color: '#039BE5'}} floatingLabelText="Old Password" fullWidth={true} type="password" name="old_password" />
+                <TextField id="changePassword" style={{color: '#039BE5'}} floatingLabelText="Old Password" fullWidth={true} type="password" name="old_password" />
               </MuiThemeProvider>
             </div>
             <div className="form-group">
                 <MuiThemeProvider muiTheme={getMuiTheme()}>
-                  <TextField style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="New Password" name="new_password" type="password" onChange={(e) => {this.handlePasswordValidate(e);}} errorText={!this.state.passwordvalidate && this.state.new_password ? 'Must contain at least 1 digit and alpha and be between 6-15 characters': ''} />
+                  <TextField style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="New Password" name="new_password" type="password" onChange={(e) => {this.handlePasswordValidate(e);}} errorText={!this.state.passwordvalidate && this.state.new_password ? 'Must contain at least 1 digit and alpha and be between 6-20 characters': ''} />
                 </MuiThemeProvider>
             </div>
             <div className="form-group">
@@ -223,7 +236,7 @@ class UserSettings extends Component {
             <div className="form-group">
               <h6>Your current email is: {this.props.userEmail}</h6>
               <MuiThemeProvider muiTheme={getMuiTheme()}>
-                <TextField id="signin-email" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Email" name="email" type="email" onChange={(e) => {this.handleEmailValidate(e);}} errorText={!this.state.emailvalidate && this.state.email ? 'Not a valid email address':''} />
+                <TextField id="changeEmail" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Email" name="email" type="email" onChange={(e) => {this.handleEmailValidate(e);}} errorText={!this.state.emailvalidate && this.state.email ? 'Not a valid email address':''} />
               </MuiThemeProvider>
             </div>
             <div className="form-group">
@@ -236,6 +249,11 @@ class UserSettings extends Component {
 
         <div>
           <h4>Update Personal Color</h4>
+            <CirclePicker 
+              color= {this.state.userColor}
+              onChange={this.updateColor}
+              width="400px"
+            />
         </div>
       </div>
     );
