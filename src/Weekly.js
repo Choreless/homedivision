@@ -29,6 +29,7 @@ class Weekly extends Component {
       groupID: this.props.groupID,
       chores: [],
       newCounter: 0,
+      currentChore: 0
     }
 
     static propTypes = {
@@ -156,18 +157,19 @@ class Weekly extends Component {
                             minW: 0,
                             isDraggable: true
                         }
+        // if there are no chore cards, set this to be the first item
         if (this.state.items == null) {
             var newLayout = []
             newLayout.push(addedChore);
             this.setState({
                 items: newLayout,
             })
-        } else {
+        } else { // add new chore card to item
             this.setState({
                 items: this.state.items.concat([addedChore])
             })
         }    
-        this.setState({
+        this.setState({ // ensure key is always unique
             newCounter: this.state.newCounter + 1
         })
 //        this.setState({
@@ -204,15 +206,9 @@ class Weekly extends Component {
     }
 
     createElement = (el) => {
-        var removeStyle = {
-            position: 'absolute',
-            right: '2px',
-            top: 0,
-            cursor: 'pointer'
-        };
-        var i = el.i;
+        //var i = el.i;
         return (
-        <div onTouchTap={this.handleTouchTap} key={i} data-grid={el}>{el.chore}</div>
+        <div onTouchTap={(this.handleTouchTap)} key={el.i} data-grid={el}>{el.chore}</div>
         );
     }
 
@@ -226,13 +222,14 @@ class Weekly extends Component {
     }
 
 //i is the index. l is the object containing x/y coords.
-    handleTouchTap = (event) => {
+    handleTouchTap = (event, el) => {
       // This prevents ghost click.
       event.preventDefault();
       this.setState({
         popoverOpen: true,
         anchorEl: event.currentTarget,
       });
+        console.log(event);
     };
 
     handleRequestClose = () => {
