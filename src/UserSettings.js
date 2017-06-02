@@ -67,7 +67,7 @@ class UserSettings extends Component {
 
       //handle password type
       if(validations.password){
-        valid = /^(?=.*\d+)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%]{6,15}$/.test(value)
+        valid = /^(?=.*\d+)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%]{6,20}$/.test(value)
         if(!valid){
           errors.password = true;
           errors.isValid = false;
@@ -113,19 +113,19 @@ class UserSettings extends Component {
   }
 
   updateNickname = (event) => {
-    
+   
   }
 
   updatePassword = (event) => {
-
+  
   }
 
   updateEmail = (event) => {
-
+  
   }
 
   updateColor = (event) => {
-
+  
   }
 
   handleChange = (event) => {
@@ -194,7 +194,7 @@ class UserSettings extends Component {
             </div>
             <div className="form-group">
                 <MuiThemeProvider muiTheme={getMuiTheme()}>
-                  <TextField style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="New Password" name="new_password" type="password" onChange={(e) => {this.handlePasswordValidate(e);}} errorText={!this.state.passwordvalidate && this.state.new_password ? 'Must contain at least 1 digit and alpha and be between 6-15 characters': ''} />
+                  <TextField style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="New Password" name="new_password" type="password" onChange={(e) => {this.handlePasswordValidate(e);}} errorText={!this.state.passwordvalidate && this.state.new_password ? 'Must contain at least 1 digit and alpha and be between 6-20 characters': ''} />
                 </MuiThemeProvider>
             </div>
             <div className="form-group">
@@ -228,6 +228,7 @@ class UserSettings extends Component {
 
         <div>
           <h4>Update Personal Color</h4>
+          
         </div>
       </div>
     );
