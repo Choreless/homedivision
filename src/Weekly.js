@@ -140,19 +140,56 @@ class Weekly extends Component {
       }
 
     onAddItem = () => {
+        // *******does not re-render the calendar, might have to call forceUpdate()*******
         /*eslint no-console: 0*/
+        var addedChore = {
+                            i: 'n' + this.state.newCounter,
+                            x: 0, // on the deck col
+                            y: Infinity, // puts it at the bottom
+                            w: 1,
+                            h: 2,
+                            isResizable: false,
+                            chore: "added chore",
+                            maxW: 10,
+                            maxH: 10,
+                            minH: 1,
+                            minW: 0,
+                            isDraggable: true
+                        }
+        if (this.state.items == null) {
+            var newLayout = []
+            newLayout.push(addedChore);
+            this.setState({
+                items: newLayout,
+            })
+        } else {
+            this.setState({
+                items: this.state.items.concat([addedChore])
+            })
+        }    
         this.setState({
-            // Add a new item. It must have a unique key!
-         items: this.state.items.concat([{
-            i: 'n' + this.state.newCounter,
-            x: 0, // on the deck col
-            y: Infinity, // puts it at the bottom
-            w: 1,
-            h: 2
-        }]),
-    // Increment the counter to ensure key is always unique.
-    newCounter: this.state.newCounter + 1
-    });
+            newCounter: this.state.newCounter + 1
+        })
+//        this.setState({
+//            // Add a new item. It must have a unique key!
+//         items: this.state.items.concat([{
+//            i: 'n' + this.state.newCounter,
+//            x: 0, // on the deck col
+//            y: Infinity, // puts it at the bottom
+//            w: 1,
+//            h: 2,
+//            isResizable: false,
+//            chore: "added chore",
+//            maxW: 10,
+//            maxH: 10,
+//            minH: 1,
+//            minW: 0,
+//            isDraggable: true
+//        }]),
+//    // Increment the counter to ensure key is always unique.
+//    newCounter: this.state.newCounter + 1
+//    });
+        
     }
 
     onRemoveItem = (i) => {
@@ -242,7 +279,7 @@ class Weekly extends Component {
                   <div className="container-fluid">
                       <div className="row seven-cols">
                           <div className="col-md-1 center">Deck
-                                 <button onTouchTap={this.onAddItem}>Add Item</button>
+                                 <button onTouchTap={() => this.onAddItem()}>Add Item</button>
                           </div>
                           <div className="col-md-1 center">Sunday</div>
                           <div className="col-md-1 center">Monday</div>
