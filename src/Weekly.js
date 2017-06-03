@@ -126,58 +126,22 @@ class Weekly extends Component {
         });
       };
 
-      onLayoutChange = (newLayout) => {
+       onLayoutChange = (newLayout) => {
         for(let i = 0; i < newLayout.length; i++) {
-            console.log(newLayout[i]);
-            if (newLayout[i].owner === "") {
-              newLayout[i].isDraggable = true;
-              newLayout[i]['maxH'] = 10;
-              newLayout[i]['maxW'] = 10;
-              newLayout[i]['minH'] = 1;
-              newLayout[i]['minW'] = 0;
-              newLayout[i]['chore'] = this.state.items[i].chore;
-              newLayout[i]['i'] = i.toString();
-              newLayout[i]['color'] = this.props.userColor;
+          newLayout[i].isDraggable = true;
+          newLayout[i]['maxH'] = 10;
+          newLayout[i]['maxW'] = 10;
+          newLayout[i]['minH'] = 1;
+          newLayout[i]['minW'] = 0;
+          newLayout[i]['chore'] = this.state.items[i].chore;
+          newLayout[i]['i'] = i.toString();
 
-              // A chore card is assigned an owner only if its not in the deck (at x=0)
-              if (newLayout[i]['x'] !== 0) { //chore card is on a day of a week
-                  newLayout[i]['owner'] = this.props.userID;         
-              } else { //the chore card is now in the deck
-                  newLayout[i]['owner'] = "";
-              }
-            } else if (newLayout[i].owner == this.props.userID) {
-              newLayout[i].isDraggable = true;
-              newLayout[i]['maxH'] = 10;
-              newLayout[i]['maxW'] = 10;
-              newLayout[i]['minH'] = 1;
-              newLayout[i]['minW'] = 0;
-              newLayout[i]['chore'] = this.state.items[i].chore;
-              newLayout[i]['i'] = i.toString();
-              newLayout[i]['color'] = this.props.userColor;
-
-              // A chore card is assigned an owner only if its not in the deck (at x=0)
-              if (newLayout[i]['x'] !== 0) { //chore card is on a day of a week
-                  newLayout[i]['owner'] = this.props.userID;         
-              } else { //the chore card is now in the deck
-                  newLayout[i]['owner'] = "";
-              }                
-            } else {
-              newLayout[i].isDraggable = true;
-              newLayout[i]['maxH'] = 10;
-              newLayout[i]['maxW'] = 10;
-              newLayout[i]['minH'] = 1;
-              newLayout[i]['minW'] = 0;
-              newLayout[i]['chore'] = this.state.items[i].chore;
-              newLayout[i]['i'] = i.toString();
-              newLayout[i]['color'] = this.props.userColor;
-
-              // A chore card is assigned an owner only if its not in the deck (at x=0)
-              if (newLayout[i]['x'] !== 0) { //chore card is on a day of a week
-                  newLayout[i]['owner'] = this.props.userID;         
-              } else { //the chore card is now in the deck
-                  newLayout[i]['owner'] = "";
-              }   
-            }
+          // A chore card is assigned an owner only if its not in the deck (at x=0)
+          if (newLayout[i]['x'] !== 0) { //chore card is on a day of a week
+              newLayout[i]['owner'] = this.props.userID;
+          } else { //the chore card is now in the deck
+              newLayout[i]['owner'] = "";
+          }
         }
         firebase.database().ref('groups/'+this.props.match.params.groupID).update({
           layout: newLayout
