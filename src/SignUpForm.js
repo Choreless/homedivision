@@ -47,7 +47,7 @@ class SignUpForm extends Component {
     this.setState({disabled: true});
     this.setState({icon: <CircularProgress size={26}/>});
     firebase.auth().createUserWithEmailAndPassword(email, password)
-      .then(function(firebaseUser) {
+      .then((firebaseUser) => {
         //include information (for app-level content)
         //firebaseUser.sendEmailVerification();
         //var link = 'https://www.gravatar.com/avatar/' + md5(email);
@@ -60,7 +60,9 @@ class SignUpForm extends Component {
 				var userRef = firebase.database().ref('users/'+firebaseUser.uid);
         var userData = {
           handle:handle,
-          // avatar:'https://www.gravatar.com/avatar/'
+          group: false,
+          color: false,
+          email: email
         }
         var userPromise = userRef.set(userData); //update entry in JOITC, return promise for chaining
         //return Promise.all(profilePromise, userPromise); //do both at once!
@@ -124,7 +126,7 @@ class SignUpForm extends Component {
 
       //handle password type
       if(validations.password){
-        valid = /^(?=.*\d+)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%]{6,15}$/.test(value)
+        valid = /^(?=.*\d+)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%]{6,20}$/.test(value)
         if(!valid){
           errors.password = true;
           errors.isValid = false;
@@ -197,7 +199,7 @@ class SignUpForm extends Component {
               </div>
               <div className="form-group">
                 <MuiThemeProvider muiTheme={getMuiTheme()}>
-                  <TextField id="signin-password" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Password" name="password" type="password" onChange={this.handlePasswordValidate} errorText={!this.state.passwordvalidate && this.state.password ? 'Must contain at least 1 digit and alpha and be between 6-15 characters': ''} />
+                  <TextField id="signin-password" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Password" name="password" type="password" onChange={this.handlePasswordValidate} errorText={!this.state.passwordvalidate && this.state.password ? 'Must contain at least 1 digit and alpha and be between 6-20 characters': ''} />
                 </MuiThemeProvider>
               </div>
               <div className="form-group">
