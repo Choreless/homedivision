@@ -31,7 +31,7 @@ class Weekly extends Component {
       newCounter: 0,
       currentCard: 0,
       value: undefined,
-      currentDay: new Date().getDay() + 1
+      currentDay: new Date().getDay() + 1,
     }
 
     static propTypes = {
@@ -50,20 +50,19 @@ class Weekly extends Component {
 
     componentWillReceiveProps = (newProps) => {
         var groupID = this.props.location.pathname.split('/')[1]; //grabs groupID from url parameter
-
         //Check for prop changes, and set state from here if something new comes up, since render does not re render component.
         if(newProps.isAuth !== this.state.isAuth) {
         this.setState({isAuth: newProps.isAuth, userID: newProps.userID});
         }
-
+        console.log(newProps);
         // Saves the user color and handle info to state
         if (this.props.userID !== null) {
             firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
             const userData = snapshot.val();
             if (userData !== null) {
                 this.setState({
-                    userColor: userData.color,
-                    userHandle: userData.handle
+                    userColor: newProps['userColor'],
+                    userHandle: newProps['handle']
                 });
             }
           })
@@ -85,11 +84,12 @@ class Weekly extends Component {
            }
        })
 
-        firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
-           this.setState({
-               userColor: snapshot.val().color
-           })
-        })
+//        firebase.database().ref('users/' + this.state.userID).once('value').then((snapshot) => {
+//            const userColor = snapshot.val();
+//           this.setState({
+//               userColor: userColor
+//           })
+//        })
 
        this.setState({
            items: this.grabLayout()
@@ -213,9 +213,10 @@ class Weekly extends Component {
 
     createElement = (el) => {
         console.log(el);
+        console.log(this.props);
         var cardColor = "#ffffff";   
         if (el.x !== 0) {
-            cardColor = this.props.userColor;
+            cardColor = this.state.userColor;
         }
         var cardStyle = {background: cardColor};
         return (
