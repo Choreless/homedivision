@@ -146,6 +146,17 @@ class GroupSettings extends Component {
       chores = <div>There are no chores for this group yet</div>
     }
 
+    let members;
+    if(this.state.members.length > 0) {
+      members = _.map(this.state.members, (elem, index) => {
+        return (
+          <ListItem key={'member-'+index} rightIcon={<EditIcon/>}>{elem}</ListItem>
+        )
+      })
+    } else {
+      members = <div>There are no chores for this group yet</div>
+    }
+
 
 
     return (
@@ -184,8 +195,7 @@ class GroupSettings extends Component {
                     <MuiThemeProvider muiTheme={getMuiTheme()}>
                       <List>
                         <Subheader>Group Members</Subheader>
-                        <ListItem rightIcon={<EditIcon/>}>Jeff</ListItem>
-                        <ListItem rightIcon={<EditIcon/>}>Jimmy</ListItem>
+                        {members}
                       </List>
                     </MuiThemeProvider>
                   </div>

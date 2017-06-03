@@ -9,7 +9,7 @@ import _ from 'lodash';
 import { Row, Col, Collapsible, CollapsibleItem} from 'react-materialize';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
-import { IconButton, Dialog, DatePicker, FlatButton, Checkbox, Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn, Drawer, MenuItem, Menu, Popover } from 'material-ui';
+import { IconButton, Dialog, DatePicker, FlatButton, Checkbox, Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn, Drawer, MenuItem, Menu, Popover, SelectField } from 'material-ui';
 import ActionAddNote from 'material-ui/svg-icons/action/note-add';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -29,7 +29,8 @@ class Weekly extends Component {
       groupID: this.props.groupID,
       chores: [],
       newCounter: 0,
-      currentCard: 0
+      currentCard: 0,
+      value: undefined,
     }
 
     static propTypes = {
@@ -82,12 +83,12 @@ class Weekly extends Component {
                });
            }
        })
-        
+
         firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
            this.setState({
                userColor: snapshot.val().color
            })
-        })             
+        })
 
        this.setState({
            items: this.grabLayout()
@@ -151,7 +152,7 @@ class Weekly extends Component {
         })
       }
 
-    onAddItem = () => {
+    onAddItem = (chore) => {
         // *******does not re-render the calendar, might have to call forceUpdate()*******
         /*eslint no-console: 0*/
         var addedChore = {
@@ -161,7 +162,7 @@ class Weekly extends Component {
                             w: 1,
                             h: 2,
                             isResizable: false,
-                            chore: "added chore",
+                            chore: chore,
                             maxW: 10,
                             maxH: 10,
                             minH: 1,
@@ -218,7 +219,7 @@ class Weekly extends Component {
 
     createElement = (el) => {
         //var i = el.i;
-        var cardColor = "#ffffff";   
+        var cardColor = "#ffffff";
         if (el.x !== 0) {
             cardColor = this.state.userColor;
         }
@@ -258,11 +259,17 @@ class Weekly extends Component {
       });
     };
 
+    handleChange = (event, index, value) => {
+      if(value !== null) {
+        this.onAddItem(value);
+        this.setState({value: null});
+      }
+    }
 
     render() {
-      let chores = _.map(this.state.items, (elem,index) => {
+      let chores = _.map(this.state.chores, (elem,index) => {
         return (
-          <li key={'Chore-'+index}>{elem.chore}</li>
+          <MenuItem key={'chore-'+index} value={elem} primaryText={elem} />
         )
       })
         return (
@@ -276,10 +283,41 @@ class Weekly extends Component {
                 </Row>
                 <Row>
                   <Col s={12}>
+                    <Collapsible popout>
+                    	<CollapsibleItem header='Sunday'>
+                    		Lorem ipsum dolor sit amet.
+                    	</CollapsibleItem>
+                    	<CollapsibleItem header='Monday'>
+                    		Lorem ipsum dolor sit amet.
+                    	</CollapsibleItem>
+                    	<CollapsibleItem header='Tuesday'>
+                    		Lorem ipsum dolor sit amet.
+                    	</CollapsibleItem>
+                      <CollapsibleItem header='Wednesday'>
+                    		Lorem ipsum dolor sit amet.
+                    	</CollapsibleItem>
+                      <CollapsibleItem header='Thursday'>
+                    		Lorem ipsum dolor sit amet.
+                    	</CollapsibleItem>
+                      <CollapsibleItem header='Friday'>
+                    		Lorem ipsum dolor sit amet.
+                    	</CollapsibleItem>
+                      <CollapsibleItem header='Saturday'>
+                    		Lorem ipsum dolor sit amet.
+                    	</CollapsibleItem>
+                    </Collapsible>
                     List of chores <br/>
-                    <ul>
-                      {chores}
-                    </ul>
+                    <MuiThemeProvider muiTheme={getMuiTheme()}>
+                      <SelectField
+                        value={this.state.value}
+                        onChange={this.handleChange}
+                        autoWidth={false}
+                        style={{width: 200}}
+                      >
+                        <MenuItem value={null} primaryText=""/>
+                        {chores}
+                      </SelectField>
+                    </MuiThemeProvider>
                   </Col>
                 </Row>
               </section>
@@ -295,16 +333,27 @@ class Weekly extends Component {
                 <div>
                   <div className="container-fluid">
                       <div className="row seven-cols">
-                          <div className="col-md-1 center">Deck
-                                 <button onTouchTap={() => this.onAddItem()}>Add Item</button>
+                          <div className="col-md-1">
+                            <MuiThemeProvider muiTheme={getMuiTheme()}>
+                              <SelectField
+                                floatingLabelText="Select Chore to Add"
+                                value={this.state.value}
+                                onChange={this.handleChange}
+                                autoWidth={false}
+                                style={{width: 200, marginTop: -10}}
+                              >
+                                <MenuItem value={null} primaryText=""/>
+                                {chores}
+                              </SelectField>
+                            </MuiThemeProvider>
                           </div>
-                          <div className="col-md-1 center">Sunday</div>
-                          <div className="col-md-1 center">Monday</div>
-                          <div className="col-md-1 center">Tuesday</div>
-                          <div className="col-md-1 center">Wednesday</div>
-                          <div className="col-md-1 center">Thursday</div>
-                          <div className="col-md-1 center">Friday</div>
-                          <div className="col-md-1 center">Saturday</div>
+                          <div className="col-md-1 center">Sunday <hr/></div>
+                          <div className="col-md-1 center">Monday <hr/></div>
+                          <div className="col-md-1 center">Tuesday <hr/></div>
+                          <div className="col-md-1 center">Wednesday <hr/></div>
+                          <div className="col-md-1 center">Thursday <hr/></div>
+                          <div className="col-md-1 center">Friday <hr/></div>
+                          <div className="col-md-1 center">Saturday <hr/></div>
                       </div>
                   </div>
                     <ResponsiveReactGridLayout
@@ -326,7 +375,6 @@ class Weekly extends Component {
                       >
                       <Menu>
                         <MenuItem primaryText="Mark as Complete" />
-                        <MenuItem primaryText="Edit Chore" />
                         <MenuItem primaryText="Remove" onTouchTap={() => this.onRemoveItem(this.state.currentCard)}/>
                       </Menu>
                       </Popover>
