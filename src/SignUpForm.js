@@ -157,7 +157,6 @@ class SignUpForm extends Component {
     this.handleChange(event);
     let errors = this.validate(event.target.value, {required:true, minLength:6, password:true});
     this.setState({passwordvalidate: errors.isValid})
-    this.handleMatchValidate(event);
   }
 
   handleMatchValidate = (event) => {
