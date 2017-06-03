@@ -126,7 +126,7 @@ class SignUpForm extends Component {
 
       //handle password type
       if(validations.password){
-        valid = /^(?=.*\d+)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%]{6,15}$/.test(value)
+        valid = /^(?=.*\d+)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%]{6,20}$/.test(value)
         if(!valid){
           errors.password = true;
           errors.isValid = false;
@@ -157,6 +157,7 @@ class SignUpForm extends Component {
     this.handleChange(event);
     let errors = this.validate(event.target.value, {required:true, minLength:6, password:true});
     this.setState({passwordvalidate: errors.isValid})
+    this.handleMatchValidate(event);
   }
 
   handleMatchValidate = (event) => {
@@ -199,7 +200,7 @@ class SignUpForm extends Component {
               </div>
               <div className="form-group">
                 <MuiThemeProvider muiTheme={getMuiTheme()}>
-                  <TextField id="signin-password" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Password" name="password" type="password" onChange={this.handlePasswordValidate} errorText={!this.state.passwordvalidate && this.state.password ? 'Must contain at least 1 digit and alpha and be between 6-15 characters': ''} />
+                  <TextField id="signin-password" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Password" name="password" type="password" onChange={this.handlePasswordValidate} errorText={!this.state.passwordvalidate && this.state.password ? 'Must contain at least 1 digit and alpha and be between 6-20 characters': ''} />
                 </MuiThemeProvider>
               </div>
               <div className="form-group">
