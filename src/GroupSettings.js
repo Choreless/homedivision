@@ -268,7 +268,7 @@ class GroupSettings extends Component {
                 open={this.state.open}
                 onRequestClose={this.handleClose}
               >
-              <TextField style={{color: '#039BE5'}} value={this.state.dialogBody} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChange(e)}}/>
+              {getDialogBody}
                 {/* <TextField style={{color: '#039BE5'}} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChange(e)}} />
                 <Row>
                   <Col s={12}>
