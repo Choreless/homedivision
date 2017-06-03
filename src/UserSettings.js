@@ -144,7 +144,7 @@ class UserSettings extends Component {
   }
 
   updateNickname = (event) => {
-    fbcontroller.updateUserInfo(this.props.userID, document.getElementById("changeNickname").value, this.state.userColor);
+    fbcontroller.updateUserInfo(this.props.userID, document.getElementById("changeNickname").value, this.state.userColor, this.props.userEmail);
     this.setState({dialogTitle: "Update Successful"});
     this.setState({dialogText: "Username successfully changed!"});
     this.setState({open: true});
@@ -169,6 +169,7 @@ class UserSettings extends Component {
     var user = firebase.auth().currentUser;
     if(user !== null) {
       user.updateEmail(document.getElementById("changeEmail").value).then(() => {
+        fbcontroller.updateUserInfo(this.props.userID, this.props.userHandle, this.state.userColor, document.getElementById("changeEmail").value);
         this.setState({dialogTitle: "Update Successful"});
         this.setState({dialogText: "Email successfully changed!"});
         this.setState({open: true});
@@ -181,7 +182,7 @@ class UserSettings extends Component {
   }
 
   updateColor = (color, event) => {
-    fbcontroller.updateUserInfo(this.props.userID, this.props.userHandle, color.hex);
+    fbcontroller.updateUserInfo(this.props.userID, this.props.userHandle, color.hex, this.props.userEmail);
   }
 
   handleChange = (event) => {
