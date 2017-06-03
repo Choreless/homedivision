@@ -135,6 +135,7 @@ class Weekly extends Component {
           newLayout[i]['minW'] = 0;
           newLayout[i]['chore'] = this.state.items[i].chore;
           newLayout[i]['i'] = i.toString();
+          newLayout[i]['completed'] = false;
 
           // A chore card is assigned an owner only if its not in the deck (at x=0)
           if (newLayout[i]['x'] !== 0) { //chore card is on a day of a week
@@ -182,26 +183,6 @@ class Weekly extends Component {
         this.setState({ // ensure key is always unique
             newCounter: this.state.newCounter + 1
         })
-//        this.setState({
-//            // Add a new item. It must have a unique key!
-//         items: this.state.items.concat([{
-//            i: 'n' + this.state.newCounter,
-//            x: 0, // on the deck col
-//            y: Infinity, // puts it at the bottom
-//            w: 1,
-//            h: 2,
-//            isResizable: false,
-//            chore: "added chore",
-//            maxW: 10,
-//            maxH: 10,
-//            minH: 1,
-//            minW: 0,
-//            isDraggable: true
-//        }]),
-//    // Increment the counter to ensure key is always unique.
-//    newCounter: this.state.newCounter + 1
-//    });
-
     }
 
     onRemoveItem = (i) => {
@@ -212,7 +193,6 @@ class Weekly extends Component {
             items: newItems,
             popoverOpen: false,
         })
-//        this.setState({items: _.reject(this.state.items, {i: i})});
     }
 
     createElement = (el) => {
