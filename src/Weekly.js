@@ -82,6 +82,12 @@ class Weekly extends Component {
                });
            }
        })
+        
+        firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
+           this.setState({
+               userColor: snapshot.val().color
+           })
+        })             
 
        this.setState({
            items: this.grabLayout()
@@ -212,8 +218,13 @@ class Weekly extends Component {
 
     createElement = (el) => {
         //var i = el.i;
+        var cardColor = "#ffffff";   
+        if (el.x !== 0) {
+            cardColor = this.state.userColor;
+        }
+        var cardStyle = {background: cardColor};
         return (
-        <div onTouchTap={(event) => this.handleTouchTap(event, el.i)} key={el.i} data-grid={el}>{el.chore}</div>
+        <div style={cardStyle} onTouchTap={(event) => this.handleTouchTap(event, el.i)} key={el.i} data-grid={el}>{el.chore}</div>
         );
     }
 

@@ -13,10 +13,10 @@ class UserSettings extends Component {
     nickname: undefined,
     newPassword: undefined,
     confirmNewPassword: undefined,
-    currentEmail: undefined,
     isAuth: undefined,
     open: false,
-    loading: undefined,
+    dialogTitle: '',
+    dialogText: '',
     nonAuthText: '',
     passwordDisabled: true,
     emailDisabled: true,
@@ -30,7 +30,7 @@ class UserSettings extends Component {
   }
 
   componentDidMount = () => { 
-    if(this.props.isAuth === false || this.props.isAuth === undefined) this.props.history.push('/');
+    if(this.props.isAuth === false) this.props.history.push('/');
 
     if (this.props.userID !== null) {
         firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
@@ -42,10 +42,16 @@ class UserSettings extends Component {
         }
       })
     }
-
     var user = firebase.auth().currentUser;
     if(user != null) {
       this.setState({currentEmail: user.email});
+    }
+  }
+
+  componentWillReceiveProps = (newProps) => {
+    //Check for prop changes, and set state from here if something new comes up, since render does not re render component.
+    if(newProps.isAuth !== this.state.isAuth) {
+      this.setState({isAuth: newProps.isAuth});
     }
   }
 
@@ -122,6 +128,7 @@ class UserSettings extends Component {
     this.handleChange(event);
     let errors = this.validate(event.target.value, {required:true, minLength:6, password:true});
     this.setState({passwordvalidate: errors.isValid})
+    this.handleMatchValidate(event);
   }
 
   handleMatchValidate = (event) => {
@@ -137,24 +144,39 @@ class UserSettings extends Component {
   }
 
   updateNickname = (event) => {
-    fbcontroller.updateUserInfo(this.props.userID, document.getElementById("changeNickname").value, this.state.userColor); 
+    fbcontroller.updateUserInfo(this.props.userID, document.getElementById("changeNickname").value, this.state.userColor);
+    this.setState({dialogTitle: "Update Successful"});
+    this.setState({dialogText: "Username successfully changed!"});
+    this.setState({open: true});
   }
 
   updatePassword = (event) => {
     var user = firebase.auth().currentUser;
-    if(user != null) {
-      user.updatePassword(document.getElementById("changePassword").value);
-    } else {
-      alert("No current user found!");
+    if(user !== null) {
+      user.updatePasswprd(document.getElementById("changePassword").value).then(() => {
+      this.setState({dialogTitle: "Update Successful"});
+      this.setState({dialogText: "Password successfully changed!"});
+      this.setState({open: true});
+    }, (error) => {
+      this.setState({dialogTitle: "An error occurred!"});
+      this.setState({dialogText: "Uh oh, it looks like you haven't re-authenticated in a bit! Please log in again to complete this action!"});
+      this.setState({open: true});
+      });
     }
   }
 
   updateEmail = (event) => {
     var user = firebase.auth().currentUser;
-    if(user != null) {
-      user.updateEmail(document.getElementById("changeEmail").value);
-    } else {
-      alert("No current user found!");
+    if(user !== null) {
+      user.updateEmail(document.getElementById("changeEmail").value).then(() => {
+        this.setState({dialogTitle: "Update Successful"});
+        this.setState({dialogText: "Email successfully changed!"});
+        this.setState({open: true});
+      }, (error) => {
+        this.setState({dialogTitle: "An error occurred!"});
+        this.setState({dialogText: "Uh oh, it looks like you haven't re-authenticated in a bit! Please log in again to complete this action!"});
+        this.setState({open: true});
+      });
     }
   }
 
@@ -171,12 +193,29 @@ class UserSettings extends Component {
     this.setState({errorText: ''});
   }
 
+  handleClose = () => {
+    this.setState({open: false});
+    this.props.history.push('/settings');
+  };
+
+  updateSettings = (event) => {
+    event.preventDefault();
+  }
+
   render() {
     //Variables go here
     let nicknameDisabled;
     let passwordDisabled;
     let emailDisabled;
     let colorDisabled;
+
+    const actions = [
+      <FlatButton
+        label="Close"
+        primary={true}
+        onTouchTap={this.handleClose}
+      />,
+    ];
 
     if(this.state.uservalidate) { 
       nicknameDisabled = false;
@@ -195,69 +234,77 @@ class UserSettings extends Component {
     } else {
       emailDisabled = true;
     }
-
+    
     return (
       <div className="container">
-        <h2>User Settings</h2>
-        <div style={{color: '#E53935'}}>{this.state.errorText}</div>
+        <h4>User Settings</h4>
+          <MuiThemeProvider muiTheme={getMuiTheme()}>
+          <Dialog
+            title={this.state.dialogTitle}
+            actions={actions}
+            modal={false}
+            open={this.state.open}
+            onRequestClose={this.handleClose}
+          >
+          {this.state.dialogText}
+          </Dialog>
+        </MuiThemeProvider>
+        
+        <form role="form" onSubmit={this.updateSettings}>
+          <div>
+            <h5>Update Nickname</h5>
+              <div className="form-group">
+                <h6>Your current nickname is: {this.props.userHandle}</h6>
+                <MuiThemeProvider muiTheme={getMuiTheme()}>
+                  <TextField id="changeNickname" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="New Nickname" name="user" type="text" onChange={(e) => {this.handleUserValidate(e);}} errorText={!this.state.uservalidate && this.state.user ? 'Must be at least 3 characters in length and not contain special characters or spaces':''} />
+                </MuiThemeProvider>
+              </div>
+              <div>
+                <MuiThemeProvider muiTheme={getMuiTheme()}>
+                  <RaisedButton type="submit" label={!this.state.icon && 'Update Nickname'} icon={this.state.icon} primary={true} disabled={nicknameDisabled} labelStyle={{color: '#fff'}} onTouchTap={this.updateNickname}/>
+                </MuiThemeProvider>
+              </div>
+          </div>
 
-        <div>
-          <h4>Update Nickname</h4>
-          <form role="form">
-            <div className="form-group">
-              <h6>Your current nickname is: {this.props.userHandle}</h6>
-              <MuiThemeProvider muiTheme={getMuiTheme()}>
-                <TextField id="changeNickname" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="New Nickname" name="user" type="text" onChange={(e) => {this.handleUserValidate(e);}} errorText={!this.state.uservalidate && this.state.user ? 'Must be at least 3 characters in length and not contain special characters or spaces':''} />
-              </MuiThemeProvider>
-            </div>
-            <div>
-              <MuiThemeProvider muiTheme={getMuiTheme()}>
-                <RaisedButton type="submit" label={!this.state.icon && 'Update Nickname'} icon={this.state.icon} primary={true} disabled={nicknameDisabled} labelStyle={{color: '#fff'}} onTouchTap={this.updateNickname}/>
-              </MuiThemeProvider>
-            </div>
-          </form>
-        </div>
-
-        <div>
-          <h4>Update Password</h4>
-          <form role="form">
-            <div className="form-group">
+          <div>
+            <h5>Update Password</h5>
+            
+              <div className="form-group">
                 <MuiThemeProvider muiTheme={getMuiTheme()}>
                   <TextField id="changePassword" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="New Password" name="new_password" type="password" onChange={(e) => {this.handlePasswordValidate(e);}} errorText={!this.state.passwordvalidate && this.state.new_password ? 'Must contain at least 1 digit and alpha and be between 6-20 characters': ''} />
                 </MuiThemeProvider>
-            </div>
-            <div className="form-group">
-              <MuiThemeProvider muiTheme={getMuiTheme()}>
-                <TextField style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Confirm New Password" name="match" type="password" onChange={(e) => {this.handleMatchValidate(e);}} errorText={!this.state.matchvalidate && this.state.match ? 'Passwords do not match':''} />
-              </MuiThemeProvider>
-            </div>
-            <div className="form-group">
-              <MuiThemeProvider muiTheme={getMuiTheme()}>
-                <RaisedButton type="submit" label={!this.state.icon && 'Update Password'} icon={this.state.icon} primary={true} disabled={passwordDisabled} labelStyle={{color: '#fff'}} onTouchTap={this.updatePassword}/>
-              </MuiThemeProvider>
-            </div>
-          </form>
-        </div>
+              </div>
+              <div className="form-group">
+                <MuiThemeProvider muiTheme={getMuiTheme()}>
+                  <TextField style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Confirm New Password" name="match" type="password" onChange={(e) => {this.handleMatchValidate(e);}} errorText={!this.state.matchvalidate && this.state.match ? 'Passwords do not match':''} />
+                </MuiThemeProvider>
+              </div>
+              <div className="form-group">
+                <MuiThemeProvider muiTheme={getMuiTheme()}>
+                  <RaisedButton type="submit" label={!this.state.icon && 'Update Password'} icon={this.state.icon} primary={true} disabled={passwordDisabled} labelStyle={{color: '#fff'}} onTouchTap={this.updatePassword}/>
+                </MuiThemeProvider>
+              </div>
+          </div>
+
+          <div>
+            <h5>Update Email</h5>
+              <div className="form-group">
+                <h6>Your current email is: {this.props.userEmail}</h6>
+                <MuiThemeProvider muiTheme={getMuiTheme()}>
+                  <TextField id="changeEmail" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Email" name="email" type="email" onChange={(e) => {this.handleEmailValidate(e);}} errorText={!this.state.emailvalidate && this.state.email ? 'Not a valid email address':''} />
+                </MuiThemeProvider>
+              </div>
+              <div className="form-group">
+                <MuiThemeProvider muiTheme={getMuiTheme()}>
+                  <RaisedButton type="submit" label={!this.state.icon && 'Update Email Address'} icon={this.state.icon} primary={true} disabled={emailDisabled} labelStyle={{color: '#fff'}} onTouchTap={this.updateEmail}/>
+                </MuiThemeProvider>
+              </div>
+            
+          </div>
+        </form>
 
         <div>
-          <h4>Update Email</h4>
-          <form role="form">
-            <div className="form-group">
-              <h6>Your current email is: {this.state.currentEmail}</h6>
-              <MuiThemeProvider muiTheme={getMuiTheme()}>
-                <TextField id="changeEmail" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Email" name="email" type="email" onChange={(e) => {this.handleEmailValidate(e);}} errorText={!this.state.emailvalidate && this.state.email ? 'Not a valid email address':''} />
-              </MuiThemeProvider>
-            </div>
-            <div className="form-group">
-              <MuiThemeProvider muiTheme={getMuiTheme()}>
-                <RaisedButton type="submit" label={!this.state.icon && 'Update Email Address'} icon={this.state.icon} primary={true} disabled={emailDisabled} labelStyle={{color: '#fff'}} onTouchTap={this.updateEmail}/>
-              </MuiThemeProvider>
-            </div>
-          </form>
-        </div>
-
-        <div>
-          <h4>Update Personal Color</h4>
+          <h5>Update Personal Color</h5>
             <CirclePicker 
               color= {this.state.userColor}
               onChange={this.updateColor}
