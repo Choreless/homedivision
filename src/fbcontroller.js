@@ -68,11 +68,12 @@ let fbcontroller = {
 
 // albert's stuff (user settings)
 
-    // updates name and color for given user
-    updateUserInfo: (user, name, color) => {
+    // updates name, color, email for given user
+    updateUserInfo: (user, name, color, email) => {
         firebase.database().ref('users/' + user).update({
             handle: name,
-            color: color
+            color: color,
+            email: email
         });
     },
 
