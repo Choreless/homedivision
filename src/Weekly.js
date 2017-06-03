@@ -31,6 +31,7 @@ class Weekly extends Component {
       newCounter: 0,
       currentCard: 0,
       value: undefined,
+      currentDay: new Date().getDay() + 1
     }
 
     static propTypes = {
@@ -135,7 +136,11 @@ class Weekly extends Component {
           newLayout[i]['minW'] = 0;
           newLayout[i]['chore'] = this.state.items[i].chore;
           newLayout[i]['i'] = i.toString();
-          newLayout[i]['completed'] = false;
+          if (newLayout[i]['x'] !== this.state.items[i].x) {
+            newLayout[i]['completed'] = false;
+          } else {
+            newLayout[i]['completed'] = this.state.items[i].completed;
+          }
 
           // A chore card is assigned an owner only if its not in the deck (at x=0)
           if (newLayout[i]['x'] !== 0) { //chore card is on a day of a week
@@ -166,7 +171,8 @@ class Weekly extends Component {
                             maxH: 10,
                             minH: 1,
                             minW: 0,
-                            isDraggable: true
+                            isDraggable: true,
+                            completed: false
                         }
         // if there are no chore cards, set this to be the first item
         if (this.state.items == null) {
@@ -195,6 +201,16 @@ class Weekly extends Component {
         })
     }
 
+    onMarkComplete = (i) => {
+        var currentItems = this.state.items;
+        if (currentItems[i].x <= this.state.currentDay) { // cannot mark chore as complete if it assigned on future day
+            currentItems[i].completed = true;
+            firebase.database().ref('groups/'+this.props.match.params.groupID).update({
+            layout: currentItems
+            })        
+        }
+    }
+
     createElement = (el) => {
         console.log(el);
         var cardColor = "#ffffff";   
@@ -203,7 +219,7 @@ class Weekly extends Component {
         }
         var cardStyle = {background: cardColor};
         return (
-        <div style={cardStyle} onTouchTap={(event) => this.handleTouchTap(event, el.i)} key={el.i} data-grid={el}>{el.chore}</div>
+        <div style={cardStyle} onTouchTap={(event) => this.handleTouchTap(event, el.i)} key={el.i} data-grid={el}>{el.chore} Completed: {el.completed.toString()}</div>
         );
     }
 
@@ -227,7 +243,6 @@ class Weekly extends Component {
         this.setState({
             currentCard: index
         })
-        console.log(index);
     };
 
     handleRequestClose = () => {
@@ -351,7 +366,7 @@ class Weekly extends Component {
                         onRequestClose={this.handleRequestClose}
                       >
                       <Menu>
-                        <MenuItem primaryText="Mark as Complete" />
+                        <MenuItem primaryText="Mark as Complete" onTouchTap={() => this.onMarkComplete(this.state.currentCard)}/>
                         <MenuItem primaryText="Remove" onTouchTap={() => this.onRemoveItem(this.state.currentCard)}/>
                       </Menu>
                       </Popover>
