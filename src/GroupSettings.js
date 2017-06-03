@@ -16,12 +16,15 @@ class GroupSettings extends Component {
     isAuth: undefined,
     open: false,
     loading: undefined,
-    nonAuthText: '',
+    nonAuthText: 'hey',
     groupID: '',
     passcode: '',
     groupName: '',
     chores:[],
-    members:[]
+    members:[],
+    memberIDs:[],
+    dialogTitle:'',
+    dialogBody:''
   }
 
   componentWillReceiveProps = (newProps) => {
@@ -44,15 +47,12 @@ class GroupSettings extends Component {
     })
     firebase.database().ref('groups/' + this.props.match.params.groupID).once('value').then((snapshot) => {
       const currentGroup = snapshot.val();
-      console.log(currentGroup)
       if (currentGroup !== null){
         firebase.database().ref('users').once('value').then((snapshot) => {
             const users = snapshot.val();
-            console.log(users);
             if (users !== null) {
                 let tempMembers = [];
                 currentGroup.members.forEach((currentUserID) => {
-                  console.log(currentUserID);
                   let currentUser = users[currentUserID];
                   tempMembers.push(currentUser.handle);
                 });
@@ -68,7 +68,8 @@ class GroupSettings extends Component {
                   passcode: currentGroup.passcode,
                   members: tempMembers,
                   groupID: this.props.match.params.groupID,
-                  chores: currentGroup.chores || []
+                  chores: currentGroup.chores || [],
+                  memberIDs: currentGroup.members
                 });
             }
           });
@@ -93,32 +94,55 @@ class GroupSettings extends Component {
     return moment(date).format('ddd, MMMM D YYYY');
   }
 
-  handleOpen = () => {
-    this.setState({open: true});
+  handleOpen = (title, item) => {
+    this.setState({
+      open: true,
+      dialogTitle: title,
+      dialogBody: item
+    });
   };
 
-  handleAddChore = () => {
-    this.state.chores.push(this.state.description)
-    fbcontroller.updateChores(this.state.groupID, this.state.chores)
-    this.setState({open: false});
+  handleDialogConfirm = () => {
+    switch (this.state.dialogTitle) {
+      case "Add Chore":
+        this.state.chores.push(this.state.description)
+        fbcontroller.updateChores(this.state.groupID, this.state.chores)
+        this.setState({open: false});
+        break;
+      case "Edit Chore":
+        var index = this.state.chores.indexOf(this.state.dialogBody);
+        if (index !== -1) {
+            this.state.chores[index] = this.state.description;
+        }
+        fbcontroller.updateChores(this.state.groupID, this.state.chores)
+        this.setState({open: false});
+        break;
+      case "Remove Member":
+        var index = this.state.members.indexOf(this.state.dialogBody);
+        if (index !== -1) {
+            fbcontroller.removeMemberFromGroup(this.state.groupID, this.state.memberIDs[index]);
+        };
+        this.setState({open: false});
+        break;
+      default:
+        console.log("this shouldnt be happening");
+    }
+    
   }
+
+  handleEmail = () => {
+      let subject = "Choreless Group Invite";
+      let body = "You've been invited to join a Choreless Group. Your group passcode is: " + this.state.passcode;
+      body += "To join the group visit https://github.com/HomeDivision/Choreless. Log in or create an account, then use the above passcode to join the group.";
+      window.open('mailto:?subject=' + subject + '&body=' + body);
+    };
 
   handleClose = () => {
     this.setState({open: false});
   };
 
-  handleCheck = (elem, isChecked) => {
-    this.setState({recurring: isChecked});
-  }
-
-  handleDate = (date) => {
-    this.setState({choreDate: date})
-  }
-
-  //handle signIn button
   saveSettings = event => {
     event.preventDefault(); //don't submit
-    console.log('Callback for saving settings');
     fbcontroller.updateGroupName(this.props.match.params.groupID, this.state.groupName.trim());
   }
 
@@ -132,14 +156,15 @@ class GroupSettings extends Component {
       <FlatButton
         label="Ok"
         primary={true}
-        onTouchTap={this.handleAddChore}
+        onTouchTap={this.handleDialogConfirm}
       />,
     ];
+
     let chores;
     if(this.state.chores.length > 0) {
       chores = _.map(this.state.chores, (elem, index) => {
         return (
-          <ListItem key={'chore-'+index} rightIcon={<EditIcon/>}>{elem}</ListItem>
+          <ListItem key={'chore-'+index} rightIcon={<EditIcon/>} onTouchTap={() => {this.handleOpen("Edit Chore", elem)}}>{elem}</ListItem>
         )
       })
     } else {
@@ -150,14 +175,25 @@ class GroupSettings extends Component {
     if(this.state.members.length > 0) {
       members = _.map(this.state.members, (elem, index) => {
         return (
-          <ListItem key={'member-'+index} rightIcon={<EditIcon/>}>{elem}</ListItem>
+          <ListItem key={'member-'+index} rightIcon={<EditIcon/>} onTouchTap={() => {this.handleOpen("Remove Member", elem)}}>{elem}</ListItem>
         )
       })
     } else {
       members = <div>There are no chores for this group yet</div>
     }
 
-
+    let getDialogBody = () => {
+    switch (this.state.dialogTitle) {
+      case "Add Chore":
+        return (<TextField style={{color: '#039BE5'}} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChange(e)}} />);
+      case "Edit Chore":
+        return (<TextField style={{color: '#039BE5'}} value={this.state.dialogBody} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChange(e)}} />);
+      case "Remove Member":
+        return (<h6>Are you sure you want to remove {this.state.dialogBody}</h6>);
+      default:
+        return (<h6>what do you want</h6>);
+    }
+  }
 
     return (
       <section className="container">
@@ -193,6 +229,11 @@ class GroupSettings extends Component {
                   </div>
                   <div className="input-field">
                     <MuiThemeProvider muiTheme={getMuiTheme()}>
+                      <RaisedButton type="submit" label="Invite Friends" secondary={true} labelStyle={{color: '#fff'}} onTouchTap={this.handleEmail}/>
+                    </MuiThemeProvider>
+                  </div>
+                  <div className="input-field">
+                    <MuiThemeProvider muiTheme={getMuiTheme()}>
                       <List>
                         <Subheader>Group Members</Subheader>
                         {members}
@@ -203,7 +244,7 @@ class GroupSettings extends Component {
                     <MuiThemeProvider muiTheme={getMuiTheme()}>
                       <List>
                         <Subheader>Chores</Subheader>
-                        <RaisedButton style={{marginTop: 5, marginBottom: 20}} label="Add Chore" secondary={true} labelStyle={{color: '#fff'}} onTouchTap={this.handleOpen}/>
+                        <RaisedButton style={{marginTop: 5, marginBottom: 20}} label="Add Chore" secondary={true} labelStyle={{color: '#fff'}} onTouchTap={() => {this.handleOpen("Add Chore", "")}}/>
                         {chores}
                       </List>
                     </MuiThemeProvider>
@@ -221,14 +262,15 @@ class GroupSettings extends Component {
             </Row>
             <MuiThemeProvider muiTheme={getMuiTheme()}>
               <Dialog
-                title="Add Chore"
+                title={this.state.dialogTitle}
                 actions={actions}
                 modal={false}
                 open={this.state.open}
                 onRequestClose={this.handleClose}
               >
-                <TextField style={{color: '#039BE5'}} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChange(e)}} />
-                {/* <Row>
+              <TextField style={{color: '#039BE5'}} value={this.state.dialogBody} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChange(e)}}/>
+                {/* <TextField style={{color: '#039BE5'}} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChange(e)}} />
+                <Row>
                   <Col s={12}>
                     <TextField type="text" name="chore_name" floatingLabelText="Chore Name" onChange={(e) => {this.handleChange(e)}}/>
                   </Col>

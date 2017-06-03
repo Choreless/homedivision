@@ -66,6 +66,29 @@ let fbcontroller = {
         firebase.database().ref('groups/' + group).update({chores: newChores});
     },
 
+    removeMemberFromGroup: (group, member) => {
+        firebase.database().ref('groups/' + group + '/members').once('value').then((snapshot) => {
+            var currentMembers = snapshot.val();
+            var newMembers = [];
+
+            currentMembers.forEach((currentMember) => {
+                if(currentMember != member){
+                    newMembers.push(currentMember);
+                }
+            });
+
+            firebase.database().ref('groups/' + group).update({
+                members: newMembers
+            }).then(() => {  
+                firebase.database().ref('users/' + member).update({
+                    group: false
+                })
+            }).catch((err) =>{
+                alert('Error occured', err);
+            })            
+        });
+    },
+
 // albert's stuff (user settings)
 
     // updates name, color, email for given user
