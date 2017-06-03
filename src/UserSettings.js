@@ -195,7 +195,7 @@ class UserSettings extends Component {
 
   handleClose = () => {
     this.setState({open: false});
-    this.props.history.push('/settings');
+    window.location.reload()
   };
 
   updateSettings = (event) => {
