@@ -81,13 +81,7 @@ class Weekly extends Component {
                    chores: currentGroup.chores
                });
            }
-       })
-        
-        firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
-           this.setState({
-               userColor: snapshot.val().color
-           })
-        })             
+       })           
 
        this.setState({
            items: this.grabLayout()
@@ -127,20 +121,56 @@ class Weekly extends Component {
 
       onLayoutChange = (newLayout) => {
         for(let i = 0; i < newLayout.length; i++) {
-          newLayout[i].isDraggable = true;
-          newLayout[i]['maxH'] = 10;
-          newLayout[i]['maxW'] = 10;
-          newLayout[i]['minH'] = 1;
-          newLayout[i]['minW'] = 0;
-          newLayout[i]['chore'] = this.state.items[i].chore;
-          newLayout[i]['i'] = i.toString();
+            console.log(newLayout[i]);
+            if (newLayout[i].owner === "") {
+              newLayout[i].isDraggable = true;
+              newLayout[i]['maxH'] = 10;
+              newLayout[i]['maxW'] = 10;
+              newLayout[i]['minH'] = 1;
+              newLayout[i]['minW'] = 0;
+              newLayout[i]['chore'] = this.state.items[i].chore;
+              newLayout[i]['i'] = i.toString();
+              newLayout[i]['color'] = this.props.userColor;
 
-          // A chore card is assigned an owner only if its not in the deck (at x=0)
-          if (newLayout[i]['x'] !== 0) { //chore card is on a day of a week
-              newLayout[i]['owner'] = this.props.userID;
-          } else { //the chore card is now in the deck
-              newLayout[i]['owner'] = "";
-          }
+              // A chore card is assigned an owner only if its not in the deck (at x=0)
+              if (newLayout[i]['x'] !== 0) { //chore card is on a day of a week
+                  newLayout[i]['owner'] = this.props.userID;         
+              } else { //the chore card is now in the deck
+                  newLayout[i]['owner'] = "";
+              }
+            } else if (newLayout[i].owner == this.props.userID) {
+              newLayout[i].isDraggable = true;
+              newLayout[i]['maxH'] = 10;
+              newLayout[i]['maxW'] = 10;
+              newLayout[i]['minH'] = 1;
+              newLayout[i]['minW'] = 0;
+              newLayout[i]['chore'] = this.state.items[i].chore;
+              newLayout[i]['i'] = i.toString();
+              newLayout[i]['color'] = this.props.userColor;
+
+              // A chore card is assigned an owner only if its not in the deck (at x=0)
+              if (newLayout[i]['x'] !== 0) { //chore card is on a day of a week
+                  newLayout[i]['owner'] = this.props.userID;         
+              } else { //the chore card is now in the deck
+                  newLayout[i]['owner'] = "";
+              }                
+            } else {
+              newLayout[i].isDraggable = true;
+              newLayout[i]['maxH'] = 10;
+              newLayout[i]['maxW'] = 10;
+              newLayout[i]['minH'] = 1;
+              newLayout[i]['minW'] = 0;
+              newLayout[i]['chore'] = this.state.items[i].chore;
+              newLayout[i]['i'] = i.toString();
+              newLayout[i]['color'] = this.props.userColor;
+
+              // A chore card is assigned an owner only if its not in the deck (at x=0)
+              if (newLayout[i]['x'] !== 0) { //chore card is on a day of a week
+                  newLayout[i]['owner'] = this.props.userID;         
+              } else { //the chore card is now in the deck
+                  newLayout[i]['owner'] = "";
+              }   
+            }
         }
         firebase.database().ref('groups/'+this.props.match.params.groupID).update({
           layout: newLayout
@@ -217,10 +247,10 @@ class Weekly extends Component {
     }
 
     createElement = (el) => {
-        //var i = el.i;
+        console.log(el);
         var cardColor = "#ffffff";   
         if (el.x !== 0) {
-            cardColor = this.state.userColor;
+            cardColor = this.props.userColor;
         }
         var cardStyle = {background: cardColor};
         return (
@@ -231,7 +261,6 @@ class Weekly extends Component {
     // Get current chore card layout of group from firebase
     grabLayout = () => {
         // array of objects to be returned, represents chore cards in screen
-        var currentLayout = [];
         firebase.database().ref('groups/' + this.props.match.params.groupID + '/layout').once('value').then((snapshot) => {
           this.setState({items: snapshot.val()})
         });

@@ -28,7 +28,8 @@ class App extends Component {
          if(snapshot.val()) {
            this.setState({
              userHandle: snapshot.val().handle,
-             groupID: snapshot.val().group
+             groupID: snapshot.val().group,
+             userColor: snapshot.val().color
             });
          }
        });
@@ -52,7 +53,7 @@ class App extends Component {
           <Switch>
             <Route exact path="/" component={Home} />
             <Route path="/:groupID/monthly" render={(props)=><Monthly {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle}/>}/>
-            <Route path="/:groupID/weekly" render={(props)=><Weekly {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle} groupID={this.state.groupID}/>}/>
+            <Route path="/:groupID/weekly" render={(props)=><Weekly {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle} groupID={this.state.groupID} userColor={this.state.userColor}/>}/>
             <Route path="/:groupID/settings" render={(props)=><GroupSettings {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle} groupID={this.state.groupID}/>}/>
             <Route path="/login" component={Login} userID={this.state.userID}/>
             <Route path="/create" render={(props)=><CreateGroup {...props} isAuth={this.state.isAuth} userID={this.state.userID}/>}/>
