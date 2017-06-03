@@ -24,7 +24,8 @@ class GroupSettings extends Component {
     members:[],
     memberIDs:[],
     dialogTitle:'',
-    dialogBody:''
+    dialogBody:'',
+    dialogItem:'',
   }
 
   componentWillReceiveProps = (newProps) => {
@@ -39,42 +40,46 @@ class GroupSettings extends Component {
     }
   }
 
+  loadFirebase = () => {
+    firebase.database().ref('groups/' + this.props.match.params.groupID).once('value').then((snapshot) => {
+          const currentGroup = snapshot.val();
+          if (currentGroup !== null){
+            firebase.database().ref('users').once('value').then((snapshot) => {
+                const users = snapshot.val();
+                if (users !== null) {
+                    let tempMembers = [];
+                    currentGroup.members.forEach((currentUserID) => {
+                      let currentUser = users[currentUserID];
+                      tempMembers.push(currentUser.handle);
+                    });
+                    // let tempChores = [];
+                    // if(currentGroup.chores !== null){
+                    //   currentGroup.chores.forEach((chore) => {
+                    //     console.log(chore);
+                    //     tempChores.push(chore);
+                    //   });
+                    // }
+                    this.setState({
+                      groupName: currentGroup.name,
+                      passcode: currentGroup.passcode,
+                      members: tempMembers,
+                      groupID: this.props.match.params.groupID,
+                      chores: currentGroup.chores || [],
+                      memberIDs: currentGroup.members
+                    });
+                }
+              });
+          }
+        });
+  }
+
   componentDidMount = () => {
     this.setState({isAuth: this.props.isAuth});
     this.choreRef = firebase.database().ref('groups/'+this.props.match.params.groupID + '/chores');
     this.choreRef.on('value', (snapshot) => {
       this.setState({chores: snapshot.val()});
     })
-    firebase.database().ref('groups/' + this.props.match.params.groupID).once('value').then((snapshot) => {
-      const currentGroup = snapshot.val();
-      if (currentGroup !== null){
-        firebase.database().ref('users').once('value').then((snapshot) => {
-            const users = snapshot.val();
-            if (users !== null) {
-                let tempMembers = [];
-                currentGroup.members.forEach((currentUserID) => {
-                  let currentUser = users[currentUserID];
-                  tempMembers.push(currentUser.handle);
-                });
-                // let tempChores = [];
-                // if(currentGroup.chores !== null){
-                //   currentGroup.chores.forEach((chore) => {
-                //     console.log(chore);
-                //     tempChores.push(chore);
-                //   });
-                // }
-                this.setState({
-                  groupName: currentGroup.name,
-                  passcode: currentGroup.passcode,
-                  members: tempMembers,
-                  groupID: this.props.match.params.groupID,
-                  chores: currentGroup.chores || [],
-                  memberIDs: currentGroup.members
-                });
-            }
-          });
-      }
-    });
+    this.loadFirebase();
    }
 
   componentWillUnmount = () => {
@@ -95,10 +100,25 @@ class GroupSettings extends Component {
   }
 
   handleOpen = (title, item) => {
+    var body;
+    switch (title) {
+      case "Add Chore":
+        body = <TextField style={{color: '#039BE5'}} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChange(e)}} />;
+        break;
+      case "Edit Chore":
+        body = <TextField style={{color: '#039BE5'}} value={item} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChange(e)}} />;
+        break;
+      case "Remove Member":
+        body = <h6>Are you sure you want to remove {item}?</h6>;
+        break;
+      default:
+        body = <h6>what do you want</h6>;
+    }
     this.setState({
       open: true,
       dialogTitle: title,
-      dialogBody: item
+      dialogBody: body,
+      dialogItem: item
     });
   };
 
@@ -110,7 +130,7 @@ class GroupSettings extends Component {
         this.setState({open: false});
         break;
       case "Edit Chore":
-        var index = this.state.chores.indexOf(this.state.dialogBody);
+        var index = this.state.chores.indexOf(this.state.dialogItem);
         if (index !== -1) {
             this.state.chores[index] = this.state.description;
         }
@@ -118,7 +138,7 @@ class GroupSettings extends Component {
         this.setState({open: false});
         break;
       case "Remove Member":
-        var index = this.state.members.indexOf(this.state.dialogBody);
+        var index = this.state.members.indexOf(this.state.dialogItem);
         if (index !== -1) {
             fbcontroller.removeMemberFromGroup(this.state.groupID, this.state.memberIDs[index]);
         };
@@ -126,6 +146,7 @@ class GroupSettings extends Component {
         break;
       default:
         console.log("this shouldnt be happening");
+      this.loadFirebase();
     }
     
   }
@@ -181,19 +202,6 @@ class GroupSettings extends Component {
     } else {
       members = <div>There are no chores for this group yet</div>
     }
-
-    let getDialogBody = () => {
-    switch (this.state.dialogTitle) {
-      case "Add Chore":
-        return (<TextField style={{color: '#039BE5'}} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChange(e)}} />);
-      case "Edit Chore":
-        return (<TextField style={{color: '#039BE5'}} value={this.state.dialogBody} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChange(e)}} />);
-      case "Remove Member":
-        return (<h6>Are you sure you want to remove {this.state.dialogBody}</h6>);
-      default:
-        return (<h6>what do you want</h6>);
-    }
-  }
 
     return (
       <section className="container">
@@ -268,7 +276,7 @@ class GroupSettings extends Component {
                 open={this.state.open}
                 onRequestClose={this.handleClose}
               >
-              {getDialogBody}
+              {this.state.dialogBody}
                 {/* <TextField style={{color: '#039BE5'}} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChange(e)}} />
                 <Row>
                   <Col s={12}>
