@@ -52,14 +52,14 @@ class Navigation extends Component {
     let links;
     if(this.props.isAuth && !this.props.groupID) {
       //Person is logged in, not assigned to group, display create group
-      links = [{link: '/', body: 'Home'}, {link: '/create', body: 'Create Group'}, {link: '/dw23498xz/weekly', body: 'Test Weekly'}, {link: '/settings', body: 'User Settings'}];
+      links = [{link: '/', body: 'Home'}, {link: '/create', body: 'Create Group'}, {link: '/settings', body: 'User Settings'}];
     } else if(!this.props.isAuth && !this.props.groupID) {
       //Person not logged, and not assigned to group
-      links = [{link: '/', body: 'Home'}, {link: '/login', body: 'Login'}, {link: '/dw23498xz/weekly', body: 'Test Weekly'}];
+      links = [{link: '/', body: 'Home'}, {link: '/login', body: 'Login'}];
     } else if(this.props.isAuth && this.props.groupID) {
-      links = [{link: '/', body: 'Home'}, {link: '/dw23498xz/weekly', body: 'Test Weekly'},{link: '/' + this.props.groupID +'/weekly', body: 'Weekly Calendar'}, {link: '/' + this.props.groupID + '/settings', body: 'Group Settings'},  {link: '/settings', body: 'User Settings'}];
+      links = [{link: '/', body: 'Home'},{link: '/' + this.props.groupID +'/weekly', body: 'Weekly Calendar'}, {link: '/' + this.props.groupID + '/settings', body: 'Group Settings'},  {link: '/settings', body: 'User Settings'}];
     } else {
-      links = [{link: '/', body: 'Home'}, {link: '/login', body: 'Login'}, {link: '/dw23498xz/weekly', body: 'Test Weekly'}];
+      links = [{link: '/', body: 'Home'}, {link: '/login', body: 'Login'}];
     }
     let drawerlinks = _.map(links, (elem, index) => {
       let activeStyle = this.handleActiveLink(elem.link);
