@@ -131,7 +131,6 @@ class Weekly extends Component {
          console.log(this.state.items);
          console.log(newLayout);
         for(let i = 0; i < newLayout.length; i++) {
-          newLayout[i].isDraggable = true;
           newLayout[i]['maxH'] = 10;
           newLayout[i]['maxW'] = 10;
           newLayout[i]['minH'] = 1;
@@ -160,7 +159,22 @@ class Weekly extends Component {
           } else {
             newLayout[i]['userHandle'] = "";
           }
+          if (this.state.items[i].owner !== this.props.userID) {
+            newLayout[i].isDraggable = false; 
+          } else {
+            newLayout[i].isDraggable = true;
+          }
+          // if (newLayout[i]['owner'] !== "") {
+          //   if (this.state.items[i].owner == this.props.userID) {
+          //     newLayout[i]['color'] = this.props.userColor
+          //   } else if (newLayout[i]['owner'] !== this.props.userID) {
+          //     newLayout[i]['color'] = this.state.items[i].color
+          //   }
+          // } else {
+          //   newLayout[i]['color'] = "";
+          // }
         }
+
         firebase.database().ref('groups/'+this.props.match.params.groupID).update({
           layout: newLayout
         }).then(() => {
@@ -186,7 +200,8 @@ class Weekly extends Component {
                             isDraggable: true,
                             completed: false,
                             userHandle: "",
-                            owner: "",
+                            owner: ""
+                            // color: ""
                         }
         // if there are no chore cards, set this to be the first item
         if (this.state.items == null) {
