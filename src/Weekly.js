@@ -72,7 +72,10 @@ class Weekly extends Component {
       this.layoutRef = firebase.database().ref('groups/'+this.props.match.params.groupID + '/layout');
       this.layoutRef.on('value', (snapshot) => {
         this.setState({items: snapshot.val()});
+        this.setState({items: snapshot.val(), layouts: {lg: snapshot.val()}}) //update the layout for everyone viewing it
       })
+
+      
         // grabs the group data from firebase, and save the chores list in the state as an array
        firebase.database().ref('groups/' + this.props.match.params.groupID).once('value').then((snapshot) => {
            const currentGroup = snapshot.val();
@@ -131,6 +134,7 @@ class Weekly extends Component {
          console.log(this.state.items);
          console.log(newLayout);
         for(let i = 0; i < newLayout.length; i++) {
+          newLayout[i].isDraggable = true;
           newLayout[i]['maxH'] = 10;
           newLayout[i]['maxW'] = 10;
           newLayout[i]['minH'] = 1;
@@ -145,9 +149,9 @@ class Weekly extends Component {
           // A chore card is assigned an owner only if its not in the deck (at x=0)
           if (newLayout[i]['x'] !== 0 && this.state.items[i].owner == "") { //chore card is on a day of a week
               newLayout[i]['owner'] = this.props.userID;
-          } else if (newLayout[i]['x'] !== 0 && this.state.items[i].owner !== "") { //the chore card is now in the deck
+          } else if (newLayout[i]['x'] !== 0) { 
               newLayout[i]['owner'] = this.state.items[i].owner;
-           } else {
+           } else { //the chore card is now in the deck
               newLayout[i]['owner'] = "";
           }          
           if (newLayout[i]['owner'] !== "") {
@@ -159,11 +163,11 @@ class Weekly extends Component {
           } else {
             newLayout[i]['userHandle'] = "";
           }
-          if (this.state.items[i].owner !== this.props.userID && this.state.items[i].owner !== "") {
-            newLayout[i].isDraggable = false; 
-          } else {
-            newLayout[i].isDraggable = true;
-          }
+          // if (this.state.items[i].owner !== this.props.userID && this.state.items[i].owner !== "") {
+          //   newLayout[i].isDraggable = false; 
+          // } else {
+          //   newLayout[i].isDraggable = true;
+          // }
           if (this.state.items[i].owner !== "") {
             if (this.state.items[i].owner == this.props.userID) {
               newLayout[i]['color'] = this.props.userColor;
