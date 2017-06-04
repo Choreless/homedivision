@@ -147,9 +147,11 @@ class Weekly extends Component {
             newLayout[i]['completed'] = this.state.items[i].completed;
           }
           // A chore card is assigned an owner only if its not in the deck (at x=0)
-          if (newLayout[i]['x'] !== 0 && this.state.items[i].owner == "") { //chore card is on a day of a week
+          if (newLayout[i]['x'] !== 0) { //chore card is on a day of a week
+            if (this.state.items[i].owner == "") {
               newLayout[i]['owner'] = this.props.userID;
-          } else if (newLayout[i]['x'] !== 0) { 
+            }
+          } else if (newLayout[i]['x'] !== 0 && this.state.items[i].owner !== "") { 
               newLayout[i]['owner'] = this.state.items[i].owner;
            } else { //the chore card is now in the deck
               newLayout[i]['owner'] = "";
