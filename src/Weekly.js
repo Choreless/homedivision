@@ -221,13 +221,14 @@ class Weekly extends Component {
     }
 
     onRemoveItem = (i) => {
-        console.log('removing', i);
         var newItems = this.state.items;
-        newItems.splice(i, 1);
-        this.setState({
-            items: newItems,
-            popoverOpen: false,
-        })
+        if (newItems[i].owner == this.props.userID) {
+          newItems.splice(i, 1);
+          this.setState({
+              items: newItems,
+              popoverOpen: false,
+          })
+        }
     }
 
     onMarkComplete = (i) => {
