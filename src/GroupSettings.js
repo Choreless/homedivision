@@ -20,12 +20,13 @@ class GroupSettings extends Component {
     groupID: '',
     passcode: '',
     groupName: '',
-    chores:[],
-    members:[],
-    memberIDs:[],
-    dialogTitle:'',
-    dialogBody:'',
-    dialogItem:'',
+    chores: [],
+    members: [],
+    memberIDs: [],
+    dialogTitle: '',
+    dialogBody: '',
+    dialogItem: '',
+    disableDialogConfirm: false
   }
 
   componentWillReceiveProps = (newProps) => {
@@ -38,6 +39,28 @@ class GroupSettings extends Component {
     if(newProps.isAuth !== this.state.isAuth) {
       this.setState({isAuth: newProps.isAuth});
     }
+  }
+
+  validate = (value, validations) => {
+    var errors = {isValid: false, style:''};
+    
+    if(value !== undefined){ //check validations
+      //handle required
+      if(validations.required && value === ''){
+        errors.required = true;
+        errors.isValid = false;
+      }
+
+      let valid;
+      if(validations.chore) {
+        valid = !/[^a-zA-Z0-9\s]/.test(value)
+        if(!valid) {
+          errors.isValid = true;
+          errors.specialcharacters = true;
+        }
+      }
+    }
+    return errors;
   }
 
   loadFirebase = () => {
@@ -99,14 +122,23 @@ class GroupSettings extends Component {
     return moment(date).format('ddd, MMMM D YYYY');
   }
 
+  handleChoreValidate = (event) => {
+    this.handleChange(event);
+    let errors = this.validate(event.target.value, {required:true, chore:true});
+    this.setState({
+      disableDialogConfirm: errors.isValid, 
+      dialogBody: <TextField style={{color: '#039BE5'}} value={event.target.value} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChoreValidate(e)}} errorText={errors.isValid ? 'Chores can only contain letters, numbers, or spaces':''} />
+    });
+  }
+
   handleOpen = (title, item) => {
     var body;
     switch (title) {
       case "Add Chore":
-        body = <TextField style={{color: '#039BE5'}} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChange(e)}} />;
+        body = <TextField style={{color: '#039BE5'}} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChoreValidate(e)}} errorText={this.state.disableDialogConfirm ? 'Chores can only contain letters, numbers, or spaces':''} />;
         break;
       case "Edit Chore":
-        body = <TextField style={{color: '#039BE5'}} value={item} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChange(e)}} />;
+        body = <TextField style={{color: '#039BE5'}} value={item} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChoreValidate(e)}} errorText={this.state.disableDialogConfirm ? 'Chores can only contain letters, numbers, or spaces':''}/>;
         break;
       case "Remove Member":
         body = <h6>Are you sure you want to remove {item}?</h6>;
@@ -177,6 +209,7 @@ class GroupSettings extends Component {
       <FlatButton
         label="Ok"
         primary={true}
+        disabled={this.state.disableDialogConfirm}
         onTouchTap={this.handleDialogConfirm}
       />,
     ];
