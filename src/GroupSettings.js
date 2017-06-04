@@ -150,21 +150,25 @@ class GroupSettings extends Component {
       open: true,
       dialogTitle: title,
       dialogBody: body,
-      dialogItem: item
+      dialogItem: item,
+      disableDialogConfirm: false
     });
   };
 
   handleDialogConfirm = () => {
     switch (this.state.dialogTitle) {
       case "Add Chore":
-        this.state.chores.push(this.state.description)
+        this.state.description.trim() != "" ? this.state.chores.push(this.state.description) : console.log("no chore to add") ;
         fbcontroller.updateChores(this.state.groupID, this.state.chores)
         this.setState({open: false});
         break;
       case "Edit Chore":
         var index = this.state.chores.indexOf(this.state.dialogItem);
         if (index !== -1) {
-            this.state.chores[index] = this.state.description;
+          this.state.chores[index] = this.state.description;
+          if(this.state.description.trim() == "") {
+            this.state.chores.splice(index, 1);
+          }
         }
         fbcontroller.updateChores(this.state.groupID, this.state.chores)
         this.setState({open: false});

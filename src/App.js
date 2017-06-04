@@ -55,7 +55,7 @@ class App extends Component {
             <Route path="/:groupID/monthly" render={(props)=><Monthly {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle}/>}/>
             <Route path="/:groupID/weekly" render={(props)=><Weekly {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle} groupID={this.state.groupID} userColor={this.state.userColor}/>}/>
             <Route path="/:groupID/settings" render={(props)=><GroupSettings {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle} groupID={this.state.groupID}/>}/>
-            <Route path="/login" component={Login} userID={this.state.userID}/>
+            <Route path="/login" render={(props)=><Login {...props} userID={this.state.userID}/>}/>
             <Route path="/create" render={(props)=><CreateGroup {...props} isAuth={this.state.isAuth} userID={this.state.userID}/>}/>
             <Route path="/settings" render={(props)=><UserSettings {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle}/>}/>
           </Switch>
