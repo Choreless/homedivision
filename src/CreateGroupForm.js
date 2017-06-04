@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import {TextField, RaisedButton, CircularProgress, Dialog, FlatButton} from 'material-ui';
+import {TextField, RaisedButton, CircularProgress, Dialog, FlatButton, Checkbox} from 'material-ui';
 import firebase from 'firebase';
 import randomatic from 'randomatic';
+import fbcontroller from './fbcontroller';
 
 class CreateGroupForm extends Component{
 
@@ -27,11 +28,15 @@ class CreateGroupForm extends Component{
           firebase.database().ref('users/' + this.props.userID).update({
             group: groupcode
           })
+          //Adding default chores if selected
+          if(document.getElementById("defaultChores").checked) {
+          var choreList = ["Take out the trash", "Vacuum", "Clean the bathroom", "Clean the kitchen", "Dusting", "Wipe the windows"];
+          fbcontroller.updateChores(groupcode, choreList);
+          }
           this.setState({open: true});
         }).catch((err) =>{
           alert('Error occured', err);
         })
-        
     }
 
     handleChange = (event) => {
@@ -69,6 +74,16 @@ class CreateGroupForm extends Component{
           onTouchTap={this.handleEmail}
         />
       ];
+
+      const styles = {
+        block: {
+          marginTop: 10,
+          maxWidth: 400
+        },
+        checkbox: {
+          marginBottom: 16,
+        },
+      };
         return (
             <div className="container">
                 <h4>Create a New Group</h4>
@@ -80,6 +95,12 @@ class CreateGroupForm extends Component{
 
                     <RaisedButton type="submit" label={!this.state.icon && 'Create Group'} icon={this.state.icon} primary={true} disabled={this.state.disabled} labelStyle={{color: '#fff'}}/>
                 </form>
+                <div style={styles.block}>
+                  <Checkbox id="defaultChores"
+                  label="Include a set of common chores to my group on creation"
+                  style={styles.checkbox}
+                  />
+                </div>
                 <Dialog
                   title="Group Created"
                   actions={actions}
