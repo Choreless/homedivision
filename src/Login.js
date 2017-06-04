@@ -17,6 +17,11 @@ class Login extends Component {
     showSignUp: false,
   }
 
+  componentWillReceiveProps(newProps) {
+    console.log(newProps);
+    if(newProps.userID) this.props.history.push('/create')
+  }
+
   render() {
     return (
       <section className="container">

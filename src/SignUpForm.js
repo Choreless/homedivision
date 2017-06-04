@@ -39,7 +39,7 @@ class SignUpForm extends Component {
   //handle signUp button
   signUp = (event) => {
     event.preventDefault(); //don't submit
-    var colors = ["#f44336", "#e91e63", "#9c27b0", "#673ab7", "#9c27b0", "#3f51b5", "#2196f3", "#03a9f4", "#00bcd4", "#009688", "#4caf50", "#8bc34a", "#cddc39", "#ffeb3b", "#ffc107", "#ff9800", "#ff5722", "#795548", "#607d8b"];
+    let colors = ["#f44336", "#e91e63", "#9c27b0", "#673ab7", "#9c27b0", "#3f51b5", "#2196f3", "#03a9f4", "#00bcd4", "#009688", "#4caf50", "#8bc34a", "#cddc39", "#ffeb3b", "#ffc107", "#ff9800", "#ff5722", "#795548", "#607d8b"];
     var randomnumber = Math.floor(Math.random() * (19));
     this.signUpCallback(this.state.email, this.state.user, this.state.password, colors[randomnumber]);
   }
@@ -69,7 +69,6 @@ class SignUpForm extends Component {
         var userPromise = userRef.set(userData); //update entry in JOITC, return promise for chaining
         //return Promise.all(profilePromise, userPromise); //do both at once!
         //Move them to create group after successful signup.
-        this.props.history.push('/create');
       })
       .catch(err => {
         this.setState({disabled: false});
