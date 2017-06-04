@@ -158,13 +158,15 @@ class GroupSettings extends Component {
   handleDialogConfirm = () => {
     switch (this.state.dialogTitle) {
       case "Add Chore":
-        this.state.description.trim() != "" ? this.state.chores.push(this.state.description) : console.log("no chore to add") ;
-        fbcontroller.updateChores(this.state.groupID, this.state.chores)
+        if(this.state.description.trim() != "" && !this.state.chores.includes(this.state.description)){
+          this.state.chores.push(this.state.description)
+          fbcontroller.updateChores(this.state.groupID, this.state.chores)
+        }
         this.setState({open: false});
         break;
       case "Edit Chore":
         var index = this.state.chores.indexOf(this.state.dialogItem);
-        if (index !== -1) {
+        if (index !== -1 && !this.state.chores.includes(this.state.description)) {
           this.state.chores[index] = this.state.description;
           if(this.state.description.trim() == "") {
             this.state.chores.splice(index, 1);
@@ -176,7 +178,9 @@ class GroupSettings extends Component {
       case "Remove Member":
         var index = this.state.members.indexOf(this.state.dialogItem);
         if (index !== -1) {
-            fbcontroller.removeMemberFromGroup(this.state.groupID, this.state.memberIDs[index]);
+          fbcontroller.removeMemberFromGroup(this.state.groupID, this.state.memberIDs[index]);
+          this.state.members.splice(index, 1);
+          this.state.memberIDs.splice(index, 1);
         };
         this.setState({open: false});
         break;
