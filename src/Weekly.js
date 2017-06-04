@@ -85,13 +85,6 @@ class Weekly extends Component {
            }
        })
 
-//        firebase.database().ref('users/' + this.state.userID).once('value').then((snapshot) => {
-//            const userColor = snapshot.val();
-//           this.setState({
-//               userColor: userColor
-//           })
-//        })
-
        this.setState({
            items: this.grabLayout()
        });
@@ -162,7 +155,7 @@ class Weekly extends Component {
           } else {
             newLayout[i]['userHandle'] = "";
           }
-          // if (this.state.items[i].owner !== this.props.userID && this.state.items[i].owner !== "") {
+          // if (this.state.items[i].owner !== this.props.userID && this.state.items[i].owner !== "") { //causing weird constant fb write bug
           //   newLayout[i].isDraggable = false; 
           // } else {
           //   newLayout[i].isDraggable = true;
@@ -412,18 +405,9 @@ class Weekly extends Component {
     }
 }
 
-// Generate the layout of the chore cards
-// Returns an array of objects
-// x is the x position on the grid, defaults to 8, the chore deck column
-// y is the y position on the grid
-// w and h are width and height
-// i is the div key of the card
-
-
 // set inital layout to be no cards
 function generateLayout() {
     return _.map(_.range(0, 0), function (item, i) {
-        //var y = Math.ceil(Math.random() * 4) + 1;
         return {
             x: 0,
             y: Infinity, // puts card at the bottom
@@ -436,14 +420,3 @@ function generateLayout() {
 }
 
 export default Weekly;
-
-/*
-col 0: deck
-col 1: sunday
-col 2: monday
-col 3: tueday
-col 4: wed
-col 5: thur
-col 6: friday
-col 7: saturday
-*/
