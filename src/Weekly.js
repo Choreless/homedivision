@@ -14,7 +14,6 @@ import ActionAddNote from 'material-ui/svg-icons/action/note-add';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import RaisedButton from 'material-ui/RaisedButton';
 
-//var choresRef = firebase.database().ref("groups/dw23498xz/chores");
 /*This file handles display of the weekly calendar*/
 
 class Weekly extends Component {
@@ -129,8 +128,9 @@ class Weekly extends Component {
 
        onLayoutChange = (changedLayout) => {
          var newLayout = changedLayout;
+         console.log(this.state.items);
+         console.log(newLayout);
         for(let i = 0; i < newLayout.length; i++) {
-          newLayout[i].isDraggable = true;
           newLayout[i]['maxH'] = 10;
           newLayout[i]['maxW'] = 10;
           newLayout[i]['minH'] = 1;
@@ -142,25 +142,39 @@ class Weekly extends Component {
           } else {
             newLayout[i]['completed'] = this.state.items[i].completed;
           }
-          console.log(newLayout);
           // A chore card is assigned an owner only if its not in the deck (at x=0)
-          if (newLayout[i]['x'] !== 0) { //chore card is on a day of a week
+          if (newLayout[i]['x'] !== 0 && this.state.items[i].owner == "") { //chore card is on a day of a week
               newLayout[i]['owner'] = this.props.userID;
-          } else { //the chore card is now in the deck
+          } else if (newLayout[i]['x'] !== 0 && this.state.items[i].owner !== "") { //the chore card is now in the deck
+              newLayout[i]['owner'] = this.state.items[i].owner;
+           } else {
               newLayout[i]['owner'] = "";
           }          
-          console.log(newLayout);
-          console.log(this.props.userID);
           if (newLayout[i]['owner'] !== "") {
-            if (newLayout[i]['owner'] == this.props.userID) {
+            if (this.state.items[i].owner == this.props.userID) {
               newLayout[i]['userHandle'] = this.props.userHandle;
-            } else if (newLayout[i]['userHandle'] !== null) {
-              newLayout[i]['userHandle'] = newLayout[i]['userHandle'];
+            } else if (newLayout[i]['owner'] !== this.props.userID) {
+              newLayout[i]['userHandle'] = this.state.items[i].userHandle;
             } 
           } else {
             newLayout[i]['userHandle'] = "";
           }
+          if (this.state.items[i].owner !== this.props.userID && this.state.items[i].owner !== "") {
+            newLayout[i].isDraggable = false; 
+          } else {
+            newLayout[i].isDraggable = true;
+          }
+          if (this.state.items[i].owner !== "") {
+            if (this.state.items[i].owner == this.props.userID) {
+              newLayout[i]['color'] = this.props.userColor;
+            } else {
+              newLayout[i]['color'] = this.state.items[i].color;
+            }
+          } else {
+            newLayout[i]['color'] = "";
+          }
         }
+
         firebase.database().ref('groups/'+this.props.match.params.groupID).update({
           layout: newLayout
         }).then(() => {
@@ -185,8 +199,9 @@ class Weekly extends Component {
                             minW: 0,
                             isDraggable: true,
                             completed: false,
-                            userHandle: this.props.userHandle,
-                            owner: this.props.userID
+                            userHandle: "",
+                            owner: "",
+                            color: ""
                         }
         // if there are no chore cards, set this to be the first item
         if (this.state.items == null) {
@@ -206,13 +221,14 @@ class Weekly extends Component {
     }
 
     onRemoveItem = (i) => {
-        console.log('removing', i);
         var newItems = this.state.items;
-        newItems.splice(i, 1);
-        this.setState({
-            items: newItems,
-            popoverOpen: false,
-        })
+        if (newItems[i].owner == this.props.userID) {
+          newItems.splice(i, 1);
+          this.setState({
+              items: newItems,
+              popoverOpen: false,
+          })
+        }
     }
 
     onMarkComplete = (i) => {
@@ -226,11 +242,9 @@ class Weekly extends Component {
     }
 
     createElement = (el) => {
-        console.log(el);
-        console.log(this.props);
-        var cardColor = "#ffffff";   
+        var cardColor = "#ffffff"; 
         if (el.x !== 0) {
-            cardColor = this.state.userColor;
+            cardColor = el.color;
         }
         var cardStyle = {background: cardColor};
         return (
