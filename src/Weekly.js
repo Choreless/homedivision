@@ -53,7 +53,6 @@ class Weekly extends Component {
         if(newProps.isAuth !== this.state.isAuth) {
         this.setState({isAuth: newProps.isAuth, userID: newProps.userID});
         }
-        console.log(newProps);
         // Saves the user color and handle info to state
         if (this.props.userID !== null) {
             firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
@@ -131,8 +130,6 @@ class Weekly extends Component {
 
        onLayoutChange = (changedLayout) => {
          var newLayout = changedLayout;
-         console.log(this.state.items);
-         console.log(newLayout);
         for(let i = 0; i < newLayout.length; i++) {
           newLayout[i].isDraggable = true;
           newLayout[i]['maxH'] = 10;
