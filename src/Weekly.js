@@ -291,7 +291,7 @@ class Weekly extends Component {
       })
         return (
           <div>
-            {this.state.isMobile ?
+            {/*this.state.isMobile ?
               <section>
                 <Row className="reduce-bot-margin">
                   <Col s={12}>
@@ -338,7 +338,7 @@ class Weekly extends Component {
                   </Col>
                 </Row>
               </section>
-            :
+            :*/
               <section>
                 {/* <MuiThemeProvider muiTheme={getMuiTheme()}>
                   <Drawer containerStyle={{top: '65px', boxShadow: 'none'}} open={this.state.open}>
