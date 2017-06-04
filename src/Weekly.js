@@ -31,7 +31,7 @@ class Weekly extends Component {
       newCounter: 0,
       currentCard: 0,
       value: undefined,
-      currentDay: new Date().getDay() + 1
+      currentDay: new Date().getDay() + 1,
     }
 
     static propTypes = {
@@ -50,20 +50,19 @@ class Weekly extends Component {
 
     componentWillReceiveProps = (newProps) => {
         var groupID = this.props.location.pathname.split('/')[1]; //grabs groupID from url parameter
-
         //Check for prop changes, and set state from here if something new comes up, since render does not re render component.
         if(newProps.isAuth !== this.state.isAuth) {
         this.setState({isAuth: newProps.isAuth, userID: newProps.userID});
         }
-
+        console.log(newProps);
         // Saves the user color and handle info to state
         if (this.props.userID !== null) {
             firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
             const userData = snapshot.val();
             if (userData !== null) {
                 this.setState({
-                    userColor: userData.color,
-                    userHandle: userData.handle
+                    userColor: newProps['userColor'],
+                    userHandle: newProps['handle']
                 });
             }
           })
@@ -85,11 +84,12 @@ class Weekly extends Component {
            }
        })
 
-        firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
-           this.setState({
-               userColor: snapshot.val().color
-           })
-        })
+//        firebase.database().ref('users/' + this.state.userID).once('value').then((snapshot) => {
+//            const userColor = snapshot.val();
+//           this.setState({
+//               userColor: userColor
+//           })
+//        })
 
        this.setState({
            items: this.grabLayout()
@@ -127,7 +127,8 @@ class Weekly extends Component {
         });
       };
 
-       onLayoutChange = (newLayout) => {
+       onLayoutChange = (changedLayout) => {
+         var newLayout = changedLayout;
         for(let i = 0; i < newLayout.length; i++) {
           newLayout[i].isDraggable = true;
           newLayout[i]['maxH'] = 10;
@@ -141,12 +142,23 @@ class Weekly extends Component {
           } else {
             newLayout[i]['completed'] = this.state.items[i].completed;
           }
-
+          console.log(newLayout);
           // A chore card is assigned an owner only if its not in the deck (at x=0)
           if (newLayout[i]['x'] !== 0) { //chore card is on a day of a week
               newLayout[i]['owner'] = this.props.userID;
           } else { //the chore card is now in the deck
               newLayout[i]['owner'] = "";
+          }          
+          console.log(newLayout);
+          console.log(this.props.userID);
+          if (newLayout[i]['owner'] !== "") {
+            if (newLayout[i]['owner'] == this.props.userID) {
+              newLayout[i]['userHandle'] = this.props.userHandle;
+            } else if (newLayout[i]['userHandle'] !== null) {
+              newLayout[i]['userHandle'] = newLayout[i]['userHandle'];
+            } 
+          } else {
+            newLayout[i]['userHandle'] = "";
           }
         }
         firebase.database().ref('groups/'+this.props.match.params.groupID).update({
@@ -172,7 +184,9 @@ class Weekly extends Component {
                             minH: 1,
                             minW: 0,
                             isDraggable: true,
-                            completed: false
+                            completed: false,
+                            userHandle: this.props.userHandle,
+                            owner: this.props.userID
                         }
         // if there are no chore cards, set this to be the first item
         if (this.state.items == null) {
@@ -213,13 +227,14 @@ class Weekly extends Component {
 
     createElement = (el) => {
         console.log(el);
+        console.log(this.props);
         var cardColor = "#ffffff";   
         if (el.x !== 0) {
-            cardColor = this.props.userColor;
+            cardColor = this.state.userColor;
         }
         var cardStyle = {background: cardColor};
         return (
-        <div style={cardStyle} onTouchTap={(event) => this.handleTouchTap(event, el.i)} key={el.i} data-grid={el}>{el.chore} Completed: {el.completed.toString()}</div>
+        <div style={cardStyle} onTouchTap={(event) => this.handleTouchTap(event, el.i)} key={el.i} data-grid={el}>{el.chore} Completed: {el.completed.toString()} Assigned: {el.userHandle}</div>
         );
     }
 
