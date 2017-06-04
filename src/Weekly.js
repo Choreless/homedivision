@@ -127,7 +127,8 @@ class Weekly extends Component {
         });
       };
 
-       onLayoutChange = (newLayout) => {
+       onLayoutChange = (changedLayout) => {
+         var newLayout = changedLayout;
         for(let i = 0; i < newLayout.length; i++) {
           newLayout[i].isDraggable = true;
           newLayout[i]['maxH'] = 10;
@@ -141,12 +142,23 @@ class Weekly extends Component {
           } else {
             newLayout[i]['completed'] = this.state.items[i].completed;
           }
-
+          console.log(newLayout);
           // A chore card is assigned an owner only if its not in the deck (at x=0)
           if (newLayout[i]['x'] !== 0) { //chore card is on a day of a week
               newLayout[i]['owner'] = this.props.userID;
           } else { //the chore card is now in the deck
               newLayout[i]['owner'] = "";
+          }          
+          console.log(newLayout);
+          console.log(this.props.userID);
+          if (newLayout[i]['owner'] !== "") {
+            if (newLayout[i]['owner'] == this.props.userID) {
+              newLayout[i]['userHandle'] = this.props.userHandle;
+            } else if (newLayout[i]['userHandle'] !== null) {
+              newLayout[i]['userHandle'] = newLayout[i]['userHandle'];
+            } 
+          } else {
+            newLayout[i]['userHandle'] = "";
           }
         }
         firebase.database().ref('groups/'+this.props.match.params.groupID).update({
@@ -172,7 +184,9 @@ class Weekly extends Component {
                             minH: 1,
                             minW: 0,
                             isDraggable: true,
-                            completed: false
+                            completed: false,
+                            userHandle: this.props.userHandle,
+                            owner: this.props.userID
                         }
         // if there are no chore cards, set this to be the first item
         if (this.state.items == null) {
@@ -219,7 +233,7 @@ class Weekly extends Component {
         }
         var cardStyle = {background: cardColor};
         return (
-        <div style={cardStyle} onTouchTap={(event) => this.handleTouchTap(event, el.i)} key={el.i} data-grid={el}>{el.chore} Completed: {el.completed.toString()}</div>
+        <div style={cardStyle} onTouchTap={(event) => this.handleTouchTap(event, el.i)} key={el.i} data-grid={el}>{el.chore} Completed: {el.completed.toString()} Assigned: {el.userHandle}</div>
         );
     }
 
