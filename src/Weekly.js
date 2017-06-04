@@ -143,7 +143,7 @@ class Weekly extends Component {
             }
           } else if (newLayout[i]['x'] !== 0 && this.state.items[i].owner !== "") { 
               newLayout[i]['owner'] = this.state.items[i].owner;
-           } else { //the chore card is now in the deck
+           } else if (newLayout[i]['x'] == 0) { //the chore card is now in the deck
               newLayout[i]['owner'] = "";
           }          
           if (newLayout[i]['owner'] !== "") {
@@ -218,13 +218,13 @@ class Weekly extends Component {
 
     onRemoveItem = (i) => {
         var newItems = this.state.items;
-        if (newItems[i].owner == this.props.userID) {
+        //if (newItems[i].owner == this.props.userID) {
           newItems.splice(i, 1);
           this.setState({
               items: newItems,
               popoverOpen: false,
           })
-        }
+        //}
     }
 
     onMarkComplete = (i) => {
