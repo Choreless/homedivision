@@ -52,6 +52,7 @@ class CreateGroupForm extends Component{
     handleClose = () => {
       this.setState({open: false});
       this.props.history.push('/' + this.state.groupcode + '/weekly')
+          window.location.reload()
     };
 
     handleEmail = () => {
