@@ -159,20 +159,20 @@ class Weekly extends Component {
           } else {
             newLayout[i]['userHandle'] = "";
           }
-          if (this.state.items[i].owner !== this.props.userID) {
+          if (this.state.items[i].owner !== this.props.userID && this.state.items[i].owner !== "") {
             newLayout[i].isDraggable = false; 
           } else {
             newLayout[i].isDraggable = true;
           }
-          // if (newLayout[i]['owner'] !== "") {
-          //   if (this.state.items[i].owner == this.props.userID) {
-          //     newLayout[i]['color'] = this.props.userColor
-          //   } else if (newLayout[i]['owner'] !== this.props.userID) {
-          //     newLayout[i]['color'] = this.state.items[i].color
-          //   }
-          // } else {
-          //   newLayout[i]['color'] = "";
-          // }
+          if (this.state.items[i].owner !== "") {
+            if (this.state.items[i].owner == this.props.userID) {
+              newLayout[i]['color'] = this.props.userColor;
+            } else {
+              newLayout[i]['color'] = this.state.items[i].color;
+            }
+          } else {
+            newLayout[i]['color'] = "";
+          }
         }
 
         firebase.database().ref('groups/'+this.props.match.params.groupID).update({
@@ -200,8 +200,8 @@ class Weekly extends Component {
                             isDraggable: true,
                             completed: false,
                             userHandle: "",
-                            owner: ""
-                            // color: ""
+                            owner: "",
+                            color: ""
                         }
         // if there are no chore cards, set this to be the first item
         if (this.state.items == null) {
@@ -242,9 +242,9 @@ class Weekly extends Component {
     }
 
     createElement = (el) => {
-        var cardColor = "#ffffff";   
+        var cardColor = "#ffffff"; 
         if (el.x !== 0) {
-            cardColor = this.state.userColor;
+            cardColor = el.color;
         }
         var cardStyle = {background: cardColor};
         return (
