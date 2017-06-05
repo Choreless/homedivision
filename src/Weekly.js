@@ -53,7 +53,6 @@ class Weekly extends Component {
         if(newProps.isAuth !== this.state.isAuth) {
         this.setState({isAuth: newProps.isAuth, userID: newProps.userID});
         }
-        console.log(newProps);
         // Saves the user color and handle info to state
         if (this.props.userID !== null) {
             firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
@@ -85,13 +84,6 @@ class Weekly extends Component {
                });
            }
        })
-
-//        firebase.database().ref('users/' + this.state.userID).once('value').then((snapshot) => {
-//            const userColor = snapshot.val();
-//           this.setState({
-//               userColor: userColor
-//           })
-//        })
 
        this.setState({
            items: this.grabLayout()
@@ -131,8 +123,6 @@ class Weekly extends Component {
 
        onLayoutChange = (changedLayout) => {
          var newLayout = changedLayout;
-         console.log(this.state.items);
-         console.log(newLayout);
         for(let i = 0; i < newLayout.length; i++) {
           newLayout[i].isDraggable = true;
           newLayout[i]['maxH'] = 10;
@@ -153,7 +143,7 @@ class Weekly extends Component {
             }
           } else if (newLayout[i]['x'] !== 0 && this.state.items[i].owner !== "") { 
               newLayout[i]['owner'] = this.state.items[i].owner;
-           } else { //the chore card is now in the deck
+           } else if (newLayout[i]['x'] == 0) { //the chore card is now in the deck
               newLayout[i]['owner'] = "";
           }          
           if (newLayout[i]['owner'] !== "") {
@@ -165,7 +155,7 @@ class Weekly extends Component {
           } else {
             newLayout[i]['userHandle'] = "";
           }
-          // if (this.state.items[i].owner !== this.props.userID && this.state.items[i].owner !== "") {
+          // if (this.state.items[i].owner !== this.props.userID && this.state.items[i].owner !== "") { //causing weird constant fb write bug
           //   newLayout[i].isDraggable = false; 
           // } else {
           //   newLayout[i].isDraggable = true;
@@ -228,13 +218,13 @@ class Weekly extends Component {
 
     onRemoveItem = (i) => {
         var newItems = this.state.items;
-        if (newItems[i].owner == this.props.userID) {
+        //if (newItems[i].owner == this.props.userID) {
           newItems.splice(i, 1);
           this.setState({
               items: newItems,
               popoverOpen: false,
           })
-        }
+        //}
     }
 
     onMarkComplete = (i) => {
@@ -301,7 +291,7 @@ class Weekly extends Component {
       })
         return (
           <div>
-            {this.state.isMobile ?
+            {/*this.state.isMobile ?
               <section>
                 <Row className="reduce-bot-margin">
                   <Col s={12}>
@@ -348,7 +338,7 @@ class Weekly extends Component {
                   </Col>
                 </Row>
               </section>
-            :
+            :*/
               <section>
                 {/* <MuiThemeProvider muiTheme={getMuiTheme()}>
                   <Drawer containerStyle={{top: '65px', boxShadow: 'none'}} open={this.state.open}>
@@ -415,18 +405,9 @@ class Weekly extends Component {
     }
 }
 
-// Generate the layout of the chore cards
-// Returns an array of objects
-// x is the x position on the grid, defaults to 8, the chore deck column
-// y is the y position on the grid
-// w and h are width and height
-// i is the div key of the card
-
-
 // set inital layout to be no cards
 function generateLayout() {
     return _.map(_.range(0, 0), function (item, i) {
-        //var y = Math.ceil(Math.random() * 4) + 1;
         return {
             x: 0,
             y: Infinity, // puts card at the bottom
@@ -439,14 +420,3 @@ function generateLayout() {
 }
 
 export default Weekly;
-
-/*
-col 0: deck
-col 1: sunday
-col 2: monday
-col 3: tueday
-col 4: wed
-col 5: thur
-col 6: friday
-col 7: saturday
-*/
