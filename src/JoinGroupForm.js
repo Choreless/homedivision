@@ -43,6 +43,9 @@ class JoinGroupForm extends Component{
                 
                 if(!userExists) {
                     //add user to currentMembers
+                    if (currentMembers == null) {
+                        currentMembers = [];
+                    }
                     currentMembers.push(this.props.userID);                
                     firebase.database().ref('groups/' + groupID).update({
                         members: currentMembers
