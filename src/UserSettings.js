@@ -29,7 +29,7 @@ class UserSettings extends Component {
     currentUser: undefined
   }
 
-  componentDidMount = () => { 
+  componentDidMount = () => {
     if(this.props.isAuth === false) this.props.history.push('/');
 
     if (this.props.userID !== null) {
@@ -57,7 +57,7 @@ class UserSettings extends Component {
 
   validate = (value, validations) => {
     var errors = {isValid: true, style:''};
-    
+
     if(value !== undefined){ //check validations
       //handle required
       if(validations.required && value === ''){
@@ -183,6 +183,25 @@ class UserSettings extends Component {
 
   updateColor = (color, event) => {
     fbcontroller.updateUserInfo(this.props.userID, this.props.userHandle, color.hex, this.props.userEmail);
+    //Need to update the color for each chore card with that user Handle.
+    if(this.props.groupID) {
+      firebase.database().ref('groups/' + this.props.groupID + '/layout').once('value').then((snapshot) => {
+        let groupLayout = snapshot.val() || [];
+        for(let i = 0; i < groupLayout.length; i++) {
+          if(this.props.userHandle === groupLayout[i].userHandle) {
+            groupLayout[i].color = color.hex;
+          }
+        }
+          firebase.database().ref('groups/'+this.props.groupID).update({
+            layout: groupLayout
+          }).then(() => {
+            console.log('Succesfully updated colors in layout');
+          }).catch((err) => {
+            alert('Error occured', err);
+          })
+      })
+    }
+
   }
 
   handleChange = (event) => {
@@ -218,24 +237,24 @@ class UserSettings extends Component {
       />,
     ];
 
-    if(this.state.uservalidate) { 
+    if(this.state.uservalidate) {
       nicknameDisabled = false;
     } else {
       nicknameDisabled = true;
     }
 
-    if(this.state.passwordvalidate && this.state.matchvalidate) { 
+    if(this.state.passwordvalidate && this.state.matchvalidate) {
       passwordDisabled = false;
     } else {
       passwordDisabled = true;
     }
 
-    if(this.state.emailvalidate) { 
+    if(this.state.emailvalidate) {
       emailDisabled = false;
     } else {
       emailDisabled = true;
     }
-    
+
     return (
       <div className="container">
         <h4>User Settings</h4>
@@ -250,7 +269,7 @@ class UserSettings extends Component {
           {this.state.dialogText}
           </Dialog>
         </MuiThemeProvider>
-        
+
         <form role="form" onSubmit={this.updateSettings}>
           <div>
             <h5>Update Nickname</h5>
@@ -269,7 +288,7 @@ class UserSettings extends Component {
 
           <div>
             <h5>Update Password</h5>
-            
+
               <div className="form-group">
                 <MuiThemeProvider muiTheme={getMuiTheme()}>
                   <TextField id="changePassword" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="New Password" name="new_password" type="password" onChange={(e) => {this.handlePasswordValidate(e);}} errorText={!this.state.passwordvalidate && this.state.new_password ? 'Must contain at least 1 digit and be between 6-20 alphanumeric characters inclusive': ''} />
@@ -300,13 +319,13 @@ class UserSettings extends Component {
                   <RaisedButton type="submit" label={!this.state.icon && 'Update Email Address'} icon={this.state.icon} primary={true} disabled={emailDisabled} labelStyle={{color: '#fff'}} onTouchTap={this.updateEmail}/>
                 </MuiThemeProvider>
               </div>
-            
+
           </div>
         </form>
 
         <div>
           <h5>Update Personal Color</h5>
-            <CirclePicker 
+            <CirclePicker
               color= {this.state.userColor}
               onChange={this.updateColor}
               width="400px"
@@ -314,7 +333,7 @@ class UserSettings extends Component {
         </div>
       </div>
     );
-  } 
+  }
 }
 
 export default UserSettings;
