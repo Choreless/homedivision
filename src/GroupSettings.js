@@ -5,7 +5,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { TextField, RaisedButton, List, ListItem, Subheader, CircularProgress, Checkbox, DatePicker, FlatButton, Dialog } from 'material-ui';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
-import xIcon from 'material-ui/svg-icons/action/delete';
+import RemoveIcon from 'material-ui/svg-icons/action/delete';
 import moment from 'moment';
 import _ from 'lodash';
 import fbcontroller from './fbcontroller';
@@ -186,6 +186,7 @@ class GroupSettings extends Component {
           this.state.memberIDs.splice(index, 1);
         };
         this.setState({open: false});
+        location.reload();
         break;
       default:
         console.log("this shouldnt be happening");
@@ -240,11 +241,11 @@ class GroupSettings extends Component {
     if(this.state.members.length > 0) {
       members = _.map(this.state.members, (elem, index) => {
         return (
-          <ListItem key={'member-'+index} rightIcon={<xIcon/>} onTouchTap={() => {this.handleOpen("Remove Member", elem)}}>{elem}</ListItem>
+          <ListItem key={'member-'+index} rightIcon={<RemoveIcon/>} onTouchTap={() => {this.handleOpen("Remove Member", elem)}}>{elem}</ListItem>
         )
       })
     } else {
-      members = <div>There are no chores for this group yet</div>
+      members = <div>There are no members for this group yet</div>
     }
 
     return (

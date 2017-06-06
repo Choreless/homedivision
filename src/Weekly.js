@@ -258,9 +258,9 @@ class Weekly extends Component {
     createElement = (el) => {
         var cardColor = "#ffffff";
         if (el.x !== 0) {
-            cardColor = el.color;
+            cardColor = this.state.userColor;
         }
-        var cardStyle = {background: cardColor};
+        var cardStyle = {background: this.state.userColor};
         return (
         <div style={cardStyle} onTouchTap={(event) => this.handleTouchTap(event, el.i)} key={el.i} data-grid={el}>
           {el.chore} <br />
@@ -307,13 +307,15 @@ class Weekly extends Component {
 
     createMenu = (currentCard) => {
       var currentItems = this.state.items;
-      if(typeof currentItems != 'undefined' && currentItems[currentCard].x <= this.state.currentDay) {
+      if(currentItems !== undefined && currentItems !== null && currentItems.length > 0) {
+        if(currentItems[currentCard].x <= this.state.currentDay) {
           return (
             <Menu>
               <MenuItem primaryText="Mark as Complete" onTouchTap={() => this.onMarkComplete(currentCard)}/>
               <MenuItem primaryText="Remove" onTouchTap={() => this.onRemoveItem(currentCard)}/>
             </Menu>
           );
+        }
       }
       return (
         <Menu>
