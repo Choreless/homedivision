@@ -303,24 +303,7 @@ class Weekly extends Component {
         this.onAddItem(value);
         this.setState({value: null});
       }
-    };
-
-    createMenu = (currentCard) => {
-      var currentItems = this.state.items;
-      if(typeof currentItems != 'undefined' && currentItems[currentCard].x <= this.state.currentDay) {
-          return (
-            <Menu>
-              <MenuItem primaryText="Mark as Complete" onTouchTap={() => this.onMarkComplete(currentCard)}/>
-              <MenuItem primaryText="Remove" onTouchTap={() => this.onRemoveItem(currentCard)}/>
-            </Menu>
-          );
-      }
-      return (
-        <Menu>
-          <MenuItem primaryText="Remove" onTouchTap={() => this.onRemoveItem(this.state.currentCard)}/>
-        </Menu>
-      );
-    };
+    }
 
     createDayColumnTitles = () => {
       console.log("current day " + this.state.currentDay);
@@ -432,7 +415,10 @@ class Weekly extends Component {
                         targetOrigin={{horizontal: 'left', vertical: 'top'}}
                         onRequestClose={this.handleRequestClose}
                       >
-                      {this.createMenu(this.state.currentCard)}
+                      <Menu>
+                        <MenuItem primaryText="Mark as Complete" onTouchTap={() => this.onMarkComplete(this.state.currentCard)}/>
+                        <MenuItem primaryText="Remove" onTouchTap={() => this.onRemoveItem(this.state.currentCard)}/>
+                      </Menu>
                       </Popover>
                     </MuiThemeProvider>
                 </div>
