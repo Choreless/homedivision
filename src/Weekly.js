@@ -363,13 +363,14 @@ class Weekly extends Component {
                           <div className="col-md-1">
                             <MuiThemeProvider muiTheme={getMuiTheme()}>
                               <SelectField
-                                floatingLabelText="Select Chore to Add"
+                                floatingLabelText={chores.length > 0 ? "Select Chore to Add" : 'No Chores Found'}
                                 value={this.state.value}
                                 onChange={this.handleChange}
                                 autoWidth={false}
+                                disabled={chores.length > 0 ? false : true}
                                 style={{width: 200, marginTop: -10}}
                               >
-                                <MenuItem value={null} primaryText=""/>
+
                                 {chores}
                               </SelectField>
                             </MuiThemeProvider>

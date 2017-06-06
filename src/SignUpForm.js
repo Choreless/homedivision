@@ -187,7 +187,7 @@ class SignUpForm extends Component {
           <Col s={12}>
             <h1>Sign Up</h1>
             <div style={{color: '#E53935'}}>{this.state.errorText}</div>
-            <form role="form">
+            <form role="form" onSubmit={this.signUp}>
               <div className="form-group">
                 <MuiThemeProvider muiTheme={getMuiTheme()}>
                   <TextField id="signin-email" style={{color: '#039BE5'}} fullWidth={true} floatingLabelText="Email" name="email" type="email" onChange={this.handleEmailValidate} errorText={!this.state.emailvalidate && this.state.email ? 'Not a valid email address':''} />
