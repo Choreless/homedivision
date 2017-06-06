@@ -244,7 +244,11 @@ class Weekly extends Component {
         }
         var cardStyle = {background: cardColor};
         return (
-        <div style={cardStyle} onTouchTap={(event) => this.handleTouchTap(event, el.i)} key={el.i} data-grid={el}>{el.chore} Completed: {el.completed.toString()} Assigned: {el.userHandle}</div>
+        <div style={cardStyle} onTouchTap={(event) => this.handleTouchTap(event, el.i)} key={el.i} data-grid={el}>
+          {el.chore} <br />
+          Completed: {el.completed.toString()} <br/>
+          Assigned: {el.userHandle}
+        </div>
         );
     }
 
