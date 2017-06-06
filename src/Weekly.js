@@ -67,7 +67,7 @@ class Weekly extends Component {
         }
     }
 
-    componentDidMount = () => {
+    componentWillMount = () => {
       if (this.props.userID !== null) {
           firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
           const userData = snapshot.val();
@@ -88,10 +88,18 @@ class Weekly extends Component {
         // grabs the group data from firebase, and save the chores list in the state as an array
        firebase.database().ref('groups/' + this.props.match.params.groupID).once('value').then((snapshot) => {
            const currentGroup = snapshot.val();
-           if (currentGroup != null) {
-               this.setState({
-                   chores: currentGroup.chores
-               });
+           if(this.props.userID) {
+             if(_.indexOf(currentGroup.members, this.props.userID) === -1) {
+               alert('You do not have permission to view this group');
+               this.props.history.push('/');
+               console.log('User does not belong');
+             } else {
+               if (currentGroup != null) {
+                   this.setState({
+                       chores: currentGroup.chores
+                   });
+               }
+             }
            }
        })
 
@@ -354,13 +362,6 @@ class Weekly extends Component {
               </section>
             :*/
               <section>
-                {/* <MuiThemeProvider muiTheme={getMuiTheme()}>
-                  <Drawer containerStyle={{top: '65px', boxShadow: 'none'}} open={this.state.open}>
-                    <div style={{height: 50}}></div>
-                    <div style={{marginLeft: 50, height: 90}}>Jimmy</div>
-                    <div style={{marginLeft: 50, height: 90}}>Jeff</div>
-                  </Drawer>
-                </MuiThemeProvider> */}
                 <div>
                   <div className="container-fluid">
                       <div className="row seven-cols">
