@@ -13,6 +13,7 @@ import { IconButton, Dialog, DatePicker, FlatButton, Checkbox, Table, TableBody,
 import ActionAddNote from 'material-ui/svg-icons/action/note-add';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import RaisedButton from 'material-ui/RaisedButton';
+import { Link } from 'react-router-dom';
 
 /*This file handles display of the weekly calendar*/
 
@@ -323,7 +324,6 @@ class Weekly extends Component {
     };
 
     createDayColumnTitles = () => {
-      console.log("current day " + this.state.currentDay);
       var currentDay = this.state.currentDay
       var columns = [];
       var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -335,6 +335,18 @@ class Weekly extends Component {
         }        
       }
       return (<div>{columns}</div>);
+    };
+
+    addChoreButton = () => {
+      if (typeof this.state.chores == 'undefined' || this.state.chores.length == 0) {
+        return (
+          <MuiThemeProvider muiTheme={getMuiTheme()}>
+            <Link to={"/" + this.props.groupID + "/settings"}><RaisedButton label={'Go to add a chore'} primary={true} labelStyle={{color: '#fff'}}/></Link>
+          </MuiThemeProvider>
+        );
+      } else {
+        return;
+      }      
     };
 
     render() {
@@ -411,6 +423,7 @@ class Weekly extends Component {
                                 {chores}
                               </SelectField>
                             </MuiThemeProvider>
+                            {this.addChoreButton()}
                           </div>
                           {this.createDayColumnTitles()}
                       </div>
