@@ -51,7 +51,7 @@ class App extends Component {
         </header>
         <main>
           <Switch>
-            <Route exact path="/" component={Home} />
+            <Route exact path="/" render={(props) => <Home {...props} isAuth={this.state.isAuth} groupID={this.state.groupID}/>}/>
             <Route path="/:groupID/monthly" render={(props)=><Monthly {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle}/>}/>
             <Route path="/:groupID/weekly" render={(props)=><Weekly {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle} groupID={this.state.groupID} userColor={this.state.userColor}/>}/>
             <Route path="/:groupID/settings" render={(props)=><GroupSettings {...props} isAuth={this.state.isAuth} userID={this.state.userID} userEmail={this.state.userEmail} userHandle={this.state.userHandle} groupID={this.state.groupID}/>}/>
