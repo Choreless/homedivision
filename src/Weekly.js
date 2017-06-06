@@ -258,9 +258,9 @@ class Weekly extends Component {
     createElement = (el) => {
         var cardColor = "#ffffff";
         if (el.x !== 0) {
-            cardColor = el.color;
+            cardColor = this.state.userColor;
         }
-        var cardStyle = {background: cardColor};
+        var cardStyle = {background: this.state.userColor};
         return (
         <div style={cardStyle} onTouchTap={(event) => this.handleTouchTap(event, el.i)} key={el.i} data-grid={el}>
           {el.chore} <br />
@@ -305,20 +305,20 @@ class Weekly extends Component {
       }
     }
 
-    createDayColumnTitles = () => {
-      console.log("current day " + this.state.currentDay);
-      var currentDay = this.state.currentDay
-      var columns = [];
-      var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-      for (let i = 1; i <= days.length; i++) {
-        if (i == currentDay) {
-          columns.push((<div className="col-md-1 center currentDay">{days[i - 1]} <hr/></div>));
-        } else {
-          columns.push((<div className="col-md-1 center">{days[i - 1]} <hr/></div>));
-        }        
+    createMenu = (currentCard) => {
+      var currentItems = this.state.items;
+      if(currentItems !== undefined && currentItems !== null && currentItems.length > 0) {
+        if(currentItems[currentCard].x <= this.state.currentDay) {
+          return (
+            <Menu>
+              <MenuItem primaryText="Mark as Complete" onTouchTap={() => this.onMarkComplete(currentCard)}/>
+              <MenuItem primaryText="Remove" onTouchTap={() => this.onRemoveItem(currentCard)}/>
+            </Menu>
+          );
+        }
       }
-      return (<div>{columns}</div>);
-    };
+      return (<div></div>);
+    }
 
     render() {
       let chores = _.map(this.state.chores, (elem,index) => {
@@ -326,6 +326,14 @@ class Weekly extends Component {
           <MenuItem key={'chore-'+index} value={elem} primaryText={elem} />
         )
       })
+
+      let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      let dayTitles = _.map(days, (elem, index) => {
+        return (
+          <div key={'Day-'+index} className={index === this.state.currentDay ? "col-md-1 center currentDay" : "col-md-1 center"}>{days[index]} <hr/></div>
+        )
+      })
+
         return (
           <div>
             {/*this.state.isMobile ?
@@ -395,7 +403,7 @@ class Weekly extends Component {
                               </SelectField>
                             </MuiThemeProvider>
                           </div>
-                          {this.createDayColumnTitles()}
+                          {dayTitles}
                       </div>
                   </div>
                     <ResponsiveReactGridLayout
