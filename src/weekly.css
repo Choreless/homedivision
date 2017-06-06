@@ -15,6 +15,14 @@
   margin-left: -15px;
 }
 
+.currentDay hr {
+  border: 2px rgb(0, 188, 212) solid;
+}
+
+.currentDay {
+  font-weight: bold;
+}
+
 /*
 http://stackoverflow.com/questions/21955088/7-equal-columns-in-bootstrap
 https://www.bootply.com/td5tnsAgoR

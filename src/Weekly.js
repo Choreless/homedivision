@@ -322,6 +322,21 @@ class Weekly extends Component {
       );
     };
 
+    createDayColumnTitles = () => {
+      console.log("current day " + this.state.currentDay);
+      var currentDay = this.state.currentDay
+      var columns = [];
+      var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      for (let i = 1; i <= days.length; i++) {
+        if (i == currentDay) {
+          columns.push((<div className="col-md-1 center currentDay">{days[i - 1]} <hr/></div>));
+        } else {
+          columns.push((<div className="col-md-1 center">{days[i - 1]} <hr/></div>));
+        }        
+      }
+      return (<div>{columns}</div>);
+    };
+
     render() {
       let chores = _.map(this.state.chores, (elem,index) => {
         return (
@@ -397,13 +412,7 @@ class Weekly extends Component {
                               </SelectField>
                             </MuiThemeProvider>
                           </div>
-                          <div className="col-md-1 center">Sunday <hr/></div>
-                          <div className="col-md-1 center">Monday <hr/></div>
-                          <div className="col-md-1 center">Tuesday <hr/></div>
-                          <div className="col-md-1 center">Wednesday <hr/></div>
-                          <div className="col-md-1 center">Thursday <hr/></div>
-                          <div className="col-md-1 center">Friday <hr/></div>
-                          <div className="col-md-1 center">Saturday <hr/></div>
+                          {this.createDayColumnTitles()}
                       </div>
                   </div>
                     <ResponsiveReactGridLayout
