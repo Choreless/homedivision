@@ -5,6 +5,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { TextField, RaisedButton, List, ListItem, Subheader, CircularProgress, Checkbox, DatePicker, FlatButton, Dialog } from 'material-ui';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
+import xIcon from 'material-ui/svg-icons/action/delete';
 import moment from 'moment';
 import _ from 'lodash';
 import fbcontroller from './fbcontroller';
@@ -43,7 +44,7 @@ class GroupSettings extends Component {
 
   validate = (value, validations) => {
     var errors = {isValid: false, style:''};
-    
+
     if(value !== undefined){ //check validations
       //handle required
       if(validations.required && value === ''){
@@ -126,7 +127,7 @@ class GroupSettings extends Component {
     this.handleChange(event);
     let errors = this.validate(event.target.value, {required:true, chore:true});
     this.setState({
-      disableDialogConfirm: errors.isValid, 
+      disableDialogConfirm: errors.isValid,
       dialogBody: <TextField style={{color: '#039BE5'}} value={event.target.value} floatingLabelText="Chore Description" fullWidth={true} type="text" name="description" onChange={(e) => {this.handleChoreValidate(e)}} errorText={errors.isValid ? 'Chores can only contain letters, numbers, or spaces':''} />
     });
   }
@@ -158,7 +159,7 @@ class GroupSettings extends Component {
   handleDialogConfirm = () => {
     switch (this.state.dialogTitle) {
       case "Add Chore":
-        if(this.state.description.trim() != "" && !this.state.chores.includes(this.state.description)){
+        if(this.state.description.trim() !== "" && !this.state.chores.includes(this.state.description)){
           this.state.chores.push(this.state.description)
           fbcontroller.updateChores(this.state.groupID, this.state.chores)
         }
@@ -167,8 +168,10 @@ class GroupSettings extends Component {
       case "Edit Chore":
         var index = this.state.chores.indexOf(this.state.dialogItem);
         if (index !== -1 && !this.state.chores.includes(this.state.description)) {
-          this.state.chores[index] = this.state.description;
-          if(this.state.description.trim() == "") {
+          let temp = this.state.chores;
+          temp[index] = this.state.description;
+          this.setState({chores: temp});
+          if(this.state.description.trim() === "") {
             this.state.chores.splice(index, 1);
           }
         }
@@ -188,7 +191,7 @@ class GroupSettings extends Component {
         console.log("this shouldnt be happening");
       this.loadFirebase();
     }
-    
+
   }
 
   handleEmail = () => {
@@ -237,7 +240,7 @@ class GroupSettings extends Component {
     if(this.state.members.length > 0) {
       members = _.map(this.state.members, (elem, index) => {
         return (
-          <ListItem key={'member-'+index} rightIcon={<EditIcon/>} onTouchTap={() => {this.handleOpen("Remove Member", elem)}}>{elem}</ListItem>
+          <ListItem key={'member-'+index} rightIcon={<xIcon/>} onTouchTap={() => {this.handleOpen("Remove Member", elem)}}>{elem}</ListItem>
         )
       })
     } else {
