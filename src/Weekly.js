@@ -68,13 +68,23 @@ class Weekly extends Component {
     }
 
     componentDidMount = () => {
+      if (this.props.userID !== null) {
+          firebase.database().ref('users/' + this.props.userID).once('value').then((snapshot) => {
+          const userData = snapshot.val();
+          if (userData !== null) {
+              this.setState({
+                  userColor: this.props.userColor,
+                  userHandle: this.props.userHandle
+              });
+          }
+        })
+      }
       this.layoutRef = firebase.database().ref('groups/'+this.props.match.params.groupID + '/layout');
       this.layoutRef.on('value', (snapshot) => {
-        this.setState({items: snapshot.val()});
-        this.setState({items: snapshot.val(), layouts: {lg: snapshot.val()}}) //update the layout for everyone viewing it
+        this.setState({items: snapshot.val() || [], layouts: {lg: snapshot.val() || []}}) //update the layout for everyone viewing it
       })
 
-      
+
         // grabs the group data from firebase, and save the chores list in the state as an array
        firebase.database().ref('groups/' + this.props.match.params.groupID).once('value').then((snapshot) => {
            const currentGroup = snapshot.val();
@@ -141,27 +151,27 @@ class Weekly extends Component {
             if (this.state.items[i].owner == "") {
               newLayout[i]['owner'] = this.props.userID;
             }
-          } else if (newLayout[i]['x'] !== 0 && this.state.items[i].owner !== "") { 
+          } else if (newLayout[i]['x'] !== 0 && this.state.items[i].owner !== "") {
               newLayout[i]['owner'] = this.state.items[i].owner;
            } else if (newLayout[i]['x'] == 0) { //the chore card is now in the deck
               newLayout[i]['owner'] = "";
-          }          
+          }
           if (newLayout[i]['owner'] !== "") {
             if (this.state.items[i].owner == this.props.userID) {
               newLayout[i]['userHandle'] = this.props.userHandle;
             } else if (newLayout[i]['owner'] !== this.props.userID) {
               newLayout[i]['userHandle'] = this.state.items[i].userHandle;
-            } 
+            }
           } else {
             newLayout[i]['userHandle'] = "";
           }
           // if (this.state.items[i].owner !== this.props.userID && this.state.items[i].owner !== "") { //causing weird constant fb write bug
-          //   newLayout[i].isDraggable = false; 
+          //   newLayout[i].isDraggable = false;
           // } else {
           //   newLayout[i].isDraggable = true;
           // }
-          if (this.state.items[i].owner !== "") {
-            if (this.state.items[i].owner == this.props.userID) {
+          if (this.state.items[i].userHandle !== "") {
+            if (this.state.items[i].userHandle === this.props.userHandle) {
               newLayout[i]['color'] = this.props.userColor;
             } else {
               newLayout[i]['color'] = this.state.items[i].color;
@@ -233,12 +243,12 @@ class Weekly extends Component {
             currentItems[i].completed = true;
             firebase.database().ref('groups/'+this.props.match.params.groupID).update({
             layout: currentItems
-            })        
+            })
         }
     }
 
     createElement = (el) => {
-        var cardColor = "#ffffff"; 
+        var cardColor = "#ffffff";
         if (el.x !== 0) {
             cardColor = el.color;
         }

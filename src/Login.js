@@ -22,6 +22,10 @@ class Login extends Component {
     if(newProps.userID) this.props.history.push('/create')
   }
 
+  componentWillMount = () => {
+    if(this.props.userID) this.props.history.push('/create');
+  }
+
   render() {
     return (
       <section className="container">

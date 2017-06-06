@@ -13,7 +13,12 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
 class CreateGroup extends Component {
 
+  componentWillReceiveProps(newProps) {
+    if(newProps.groupID) this.props.history.push('/' + newProps.groupID + '/weekly');
+  }
+
   componentDidMount = () => {
+    if(this.props.groupID) this.props.history.push('/' + this.props.groupID + '/weekly');
     if(this.props.isAuth === false) this.props.history.push('/');
   }
 
