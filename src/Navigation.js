@@ -6,6 +6,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import _ from 'lodash';
 import firebase from 'firebase';
+import logo from './img/favicon.png';
 
 /*This file handles display of navigation*/
 
@@ -87,7 +88,7 @@ class Navigation extends Component {
                     style={{backgroundColor: '#000', boxShadow: 'none'}}
                     onLeftIconButtonTouchTap={this.handleToggle}
                     id="navbar-appbarz" //Remove the "z" to make it so that the menu shows up only on mobile.
-                    title={<span style={{color: '#fff'}}>Logo {this.state.name && '- '+this.state.name}</span>}
+                    title={<span style={{color: '#fff'}}><img src={logo} style={{width: 64, height: 64, float: 'left'}} alt="Choreless Logo"/> {this.state.name && 'Group - ' + this.state.name}</span>}
                   />
                 </ToolbarGroup>
                 <ToolbarGroup className="hide-on-med-and-down">
