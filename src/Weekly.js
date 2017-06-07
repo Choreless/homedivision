@@ -13,7 +13,6 @@ import { IconButton, Dialog, DatePicker, FlatButton, Checkbox, Table, TableBody,
 import ActionAddNote from 'material-ui/svg-icons/action/note-add';
 import EditIcon from 'material-ui/svg-icons/editor/mode-edit';
 import RaisedButton from 'material-ui/RaisedButton';
-import { Link } from 'react-router-dom';
 
 /*This file handles display of the weekly calendar*/
 
@@ -318,43 +317,8 @@ class Weekly extends Component {
           );
         }
       }
-<<<<<<< HEAD
-      return (
-        <Menu>
-          <MenuItem primaryText="Remove" onTouchTap={() => this.onRemoveItem(this.state.currentCard)}/>
-        </Menu>
-      );
-    };
-
-    createDayColumnTitles = () => {
-      var currentDay = this.state.currentDay
-      var columns = [];
-      var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-      for (let i = 1; i <= days.length; i++) {
-        if (i == currentDay) {
-          columns.push((<div className="col-md-1 center currentDay">{days[i - 1]} <hr/></div>));
-        } else {
-          columns.push((<div className="col-md-1 center">{days[i - 1]} <hr/></div>));
-        }        
-      }
-      return (<div>{columns}</div>);
-    };
-=======
       return (<div></div>);
     }
->>>>>>> development
-
-    addChoreButton = () => {
-      if (typeof this.state.chores == 'undefined' || this.state.chores.length == 0) {
-        return (
-          <MuiThemeProvider muiTheme={getMuiTheme()}>
-            <Link to={"/" + this.props.groupID + "/settings"}><RaisedButton label={'Go to add a chore'} primary={true} labelStyle={{color: '#fff'}}/></Link>
-          </MuiThemeProvider>
-        );
-      } else {
-        return;
-      }      
-    };
 
     render() {
       let chores = _.map(this.state.chores, (elem,index) => {
@@ -438,7 +402,6 @@ class Weekly extends Component {
                                 {chores}
                               </SelectField>
                             </MuiThemeProvider>
-                            {this.addChoreButton()}
                           </div>
                           {dayTitles}
                       </div>
