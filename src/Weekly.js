@@ -303,7 +303,7 @@ class Weekly extends Component {
         this.onAddItem(value);
         this.setState({value: null});
       }
-    }
+    };
 
     createMenu = (currentCard) => {
       var currentItems = this.state.items;
@@ -317,8 +317,10 @@ class Weekly extends Component {
           );
         }
       }
-      return (<div></div>);
-    }
+      return (<Menu>
+                <MenuItem primaryText="Remove" onTouchTap={() => this.onRemoveItem(currentCard)}/>
+              </Menu>);
+    };
 
     render() {
       let chores = _.map(this.state.chores, (elem,index) => {
@@ -330,7 +332,7 @@ class Weekly extends Component {
       let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
       let dayTitles = _.map(days, (elem, index) => {
         return (
-          <div key={'Day-'+index} className={index === this.state.currentDay ? "col-md-1 center currentDay" : "col-md-1 center"}>{days[index]} <hr/></div>
+          <div key={'Day-'+ index} className={index === (this.state.currentDay - 1) ? "col-md-1 center currentDay" : "col-md-1 center"}>{days[index]} <hr/></div>
         )
       })
 
@@ -398,7 +400,6 @@ class Weekly extends Component {
                                 disabled={chores.length > 0 ? false : true}
                                 style={{width: 200, marginTop: -10}}
                               >
-
                                 {chores}
                               </SelectField>
                             </MuiThemeProvider>
@@ -424,8 +425,9 @@ class Weekly extends Component {
                         onRequestClose={this.handleRequestClose}
                       >
                       <Menu>
-                        <MenuItem primaryText="Mark as Complete" onTouchTap={() => this.onMarkComplete(this.state.currentCard)}/>
-                        <MenuItem primaryText="Remove" onTouchTap={() => this.onRemoveItem(this.state.currentCard)}/>
+                        {this.createMenu(this.state.currentCard)}
+                        {/*<MenuItem primaryText="Mark as Complete" onTouchTap={() => this.onMarkComplete(this.state.currentCard)}/>
+                        <MenuItem primaryText="Remove" onTouchTap={() => this.onRemoveItem(this.state.currentCard)}/>*/}
                       </Menu>
                       </Popover>
                     </MuiThemeProvider>
